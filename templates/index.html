@@ -2,90 +2,78 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>주소 검색 및 지도 테스트</title>
-    
-    <!-- 1. 주소 검색 API 통신을 위한 jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    
-    <!-- 2. 브이월드 지도 API 불러오기 -->
-    <script src="https://map.vworld.kr/js/vworldMapInit.js.do?version=2.0&apiKey={{ vworld_key }}"></script>
-
-    <style>
-        /* 기본 여백 제거 및 전체 화면 사용 */
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Malgun Gothic', sans-serif; }
-        
-        /* 전체 레이아웃 (좌측 패널 + 우측 지도) */
-        .container { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
-        
-        /* 좌측 사이드바 패널 */
-        .sidebar {
-            width: 350px;
-            min-width: 350px;
-            background-color: #fff;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            z-index: 10; /* 그림자를 지도 위로 덮기 위함 */
-        }
-        
-        /* 검색 입력 영역 */
-        .search-box { padding: 20px; border-bottom: 1px solid #ddd; display: flex; gap: 5px; }
-        .search-box input { 
-            flex: 1; padding: 10px; border: 1px solid #ccc; 
-            border-radius: 4px; outline: none; font-size: 14px; 
-        }
-        .search-box button { 
-            padding: 10px 15px; background-color: #007bff; 
-            color: white; border: none; border-radius: 4px; 
-            cursor: pointer; font-weight: bold; 
-        }
-        .search-box button:hover { background-color: #0056b3; }
-        
-        /* 검색 결과 리스트 영역 (결과가 많으면 스크롤 생성) */
-        .result-area { flex: 1; overflow-y: auto; padding: 20px; }
-        ul#resultList { list-style: none; padding: 0; margin: 0; }
-        ul#resultList li { 
-            padding: 15px; border: 1px solid #eee; border-radius: 8px; 
-            margin-bottom: 10px; cursor: pointer; transition: background 0.2s; 
-        }
-        ul#resultList li:hover { background-color: #f8f9fa; border-color: #007bff; }
-        
-        /* 우측 지도 영역 */
-        #vmap { flex: 1; height: 100%; background-color: #f0f0f0; }
-
-        /* 모바일/작은 화면 대응 (화면이 좁아지면 사이드바를 상단으로) */
-        @media (max-width: 768px) {
-            .container { flex-direction: column; }
-            .sidebar { width: 100%; min-width: 100%; height: 40%; }
-            #vmap { height: 60%; }
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>그린존 · 신월1동</title>
+    <link rel="stylesheet" href="/static/style.css">
+    {% if kakao_key %}
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&autoload=false"></script>
+    {% endif %}
 </head>
 <body>
-    <div class="container">
-        <!-- 좌측 검색 패널 -->
-        <div class="sidebar">
-            <div class="search-box">
-                <input type="text" id="keyword" value="성암로" placeholder="도로명 주소 입력">
-                <button id="searchBtn">검색</button>
+    <aside>
+        <header>
+            <h1>그린존 · 신월1동</h1>
+            <p id="dataStatus">팀 2차 자료를 읽는 중입니다.</p>
+            <small>운영 승인 전 분석 제안입니다.</small>
+        </header>
+        <section>
+            <h2>우리 집 담당 거점 찾기</h2>
+            <form id="searchForm">
+                <label for="keyword">보유 도로명주소·지번·건물명</label>
+                <div class="search-box">
+                    <input id="keyword" placeholder="예: 월정로27길 또는 밀레니엄빌라">
+                    <button id="searchButton">검색</button>
+                </div>
+            </form>
+            <p id="searchStatus" role="status">저장된 주거 필지만 검색합니다. 외부 주소검색 서비스는 사용하지 않습니다.</p>
+            <div id="searchResults"></div>
+            <button id="clearSearch" type="button">검색 지우기</button>
+            <div id="selectedBuilding" aria-live="polite"></div>
+        </section>
+        <section>
+            <h2>생활권과 거점안</h2>
+            <label for="zoneFilter">생활권 선택</label>
+            <select id="zoneFilter"><option value="all">생활권 전체</option></select>
+            <div class="layer-checks">
+                <label><input id="showOriginal" type="checkbox">1차 후보 11곳 함께 보기</label>
+                <label><input id="showHouseholds" type="checkbox">주거 필지 보기</label>
+                <label><input id="showAlternatives" type="checkbox">대안 2·3순위 보기</label>
             </div>
-            <div class="result-area">
-                <ul id="resultList">
-                    <li style="color: #999; text-align: center; border: none;">주소를 검색해 주세요.</li>
-                </ul>
+            <small>초록: 기존 후보에서 선택 · 주황: 새 대안(부지 미확인) · 회색: 1차 후보</small>
+            <div id="hubList"></div>
+            <div id="hubDetail" aria-live="polite"></div>
+        </section>
+        <details>
+            <summary>이번 분석의 기준과 보행거리</summary>
+            <div id="analysisSummary"></div>
+            <small>생활권 선택·표시 체크는 보기 필터입니다. Louvain 분석을 다시 계산하지 않습니다.</small>
+        </details>
+        <details id="wasteDisclosure">
+            <summary>기존 배출량 분석 참고</summary>
+            <div id="wasteFacts"></div>
+        </details>
+        <details>
+            <summary>자료·출처와 확인할 점</summary>
+            <p>팀 2차 결과 작성일: 2026-10-20. 원본별 기준일은 핸드북에 정리했습니다.</p>
+            <div class="source-links">
+                <a href="/api/source/report">분석 설명</a>
+                <a href="/api/source/workbook">결과 엑셀</a>
+                <a href="/api/source/hubs">거점 GeoJSON</a>
+                <a href="/api/source/manifest">출처·원본 해시</a>
+                <a href="https://github.com/Han-think/greenzone_ai/tree/930e1b2d291c888cee84ae284b6d830e3d4b322e/greenzone_data_analysis/greenzone2nd" target="_blank" rel="noopener">팀 분석 코드</a>
             </div>
+            <p>9곳은 설정에 따른 제안입니다. 도로 실폭·정차 공간·보행·부지 사용 동의는 현장 확인이 필요합니다.</p>
+        </details>
+    </aside>
+    <main>
+        <div class="map-toolbar">
+            <span>카카오 지도 · 보유 데이터 검색</span>
+            <button id="showArea" type="button">신월1동 전체</button>
         </div>
-        
-        <!-- 우측 지도 영역 -->
-        <div id="vmap"></div>
-    </div>
-
-    <!-- 파이썬에서 받은 키를 window 객체에 등록 -->
-     <script>
-        window.VWORLD_KEY = "{{ vworld_key }}"; 
-        window.JUSO_KEY = "{{ juso_key }}";
-    </script>
+        <div id="map" aria-label="신월1동 생활권과 거점 지도"></div>
+        <p id="mapStatus" role="status">지도를 준비하고 있습니다.</p>
+    </main>
     <script src="/static/map.js"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html>

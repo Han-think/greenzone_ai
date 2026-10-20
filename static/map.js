@@ -1,205 +1,214 @@
-// ==========================================
-// 1. 브이월드 지도 초기화 (화면이 켜지자마자 실행됨)
-// ==========================================
-// 1. 파일 맨 위에 vmap을 전역 변수(var)로 먼저 선언하여 어디서든 접근 가능하게 합니다.
-let vmap;
-let markerLayer; // 마커를 담을 투명 비닐(레이어) 변수 추가
-var selectMarker;
+// 지도 담당: Kakao SDK에 저장 좌표와 GeoJSON 도형을 전달한다.
+// 지도 제공 함수는 입력과 출력부터 읽으면 된다.
+var map;
+var studyBounds;
+var resultLayers = [];
+var searchMarker;
+var selectedPopup;
+var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
-// HTML이 모두 로드된 후 실행 (window.onload 대신 권장되는 방식)
-document.addEventListener("DOMContentLoaded", function() {
+function mapPoint(coordinates) {
+    // 제공 연결: GeoJSON [경도, 위도]를 Kakao LatLng(위도, 경도)로 바꾼다.
+    return new kakao.maps.LatLng(coordinates[1], coordinates[0]);
+}
 
-    // 브이월드 2.0은 별도 설정이 없으면 center에 기본 위도/경도를 그대로 넣어도 됩니다.
-    vw.ol3.MapOptions.basemapType = vw.ol3.BasemapType.GRAPHIC; // 기본 2D 지도 스타일
-    vw.ol3.MapOptions.controlDensity = vw.ol3.DensityType.EMPTY; // 불필요한 기본 컨트롤 버튼 숨김
-    vw.ol3.MapOptions.interactionDensity = vw.ol3.DensityType.BASIC;
-    vw.ol3.MapOptions.center = [126.9780, 37.5665]; // 초기 서울시청 좌표
-    vw.ol3.MapOptions.zoom = 15; // 초기 확대 축소 레벨
+function matchesZone(zone) {
+    var selected = document.getElementById('zoneFilter').value;
+    return selected === 'all' || Number(selected) === zone;
+}
 
-    // HTML의 id="vmap" 영역에 지도를 그립니다. 
-    // (HTML에 브이월드 키가 정상 입력되어 있다면 여기서 지도가 뜹니다.)
-    // 선언해둔 vmap 변수에 실제 지도를 밀어넣습니다.
-    vmap = new vw.ol3.Map("vmap", vw.ol3.MapOptions);
+function clearResults() {
+    for (var i = 0; i < resultLayers.length; i++) {
+        resultLayers[i].setMap(null);
+    }
+    resultLayers = [];
+    if (selectedPopup) selectedPopup.close();
+}
 
-    // 2. 검색 이벤트 연결
-    const keywordInput = document.getElementById("keyword");
-    const searchBtn = document.getElementById("searchBtn");
-
-    // [버튼 클릭] 시 검색
-    searchBtn.addEventListener("click", searchAddress);
-
-    // [엔터키 입력] 시 검색
-    keywordInput.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            searchAddress();
+function addGeometry(geometry, color, opacity) {
+    // 제공 연결: 팀 경계·생활권의 Polygon/MultiPolygon을 지도에 그린다.
+    if (geometry.type === 'MultiPolygon') {
+        for (var i = 0; i < geometry.coordinates.length; i++) {
+            addGeometry({type: 'Polygon', coordinates: geometry.coordinates[i]}, color, opacity);
         }
-    });
-});
-
-// ==========================================
-// 2. 주소 검색 함수 (버튼 클릭 시 실행됨)
-// ==========================================
-function searchAddress() {
-    let keyword = document.getElementById("keyword").value;
-
-    if (keyword.trim() === "") {
-        alert("검색어를 입력해 주세요.");
         return;
     }
-    
-    $.ajax({
-        url: "https://business.juso.go.kr/addrlink/addrLinkApiJsonp.do",
-        type: "post",
-        data: {
-            confmKey: window.JUSO_KEY, 
-            currentPage: 1,
-            countPerPage: 10, // 한 번에 최대 10개의 유사 주소를 가져옵니다.
-            keyword: keyword,
-            resultType: "json"
-        },
-        dataType: "jsonp",
-        crossDomain: true,
-        success: function(jsonStr) {
-            if(jsonStr.results.common.errorCode !== "0") {
-                alert("에러 발생: " + jsonStr.results.common.errorMessage);
-                return;
-            }
-
-            // HTML의 <ul> 태그 공간을 찾아와서 안의 내용을 깨끗하게 지웁니다.
-            let resultList = document.getElementById("resultList");
-            resultList.innerHTML = ""; // 기존 목록 비우기
-
-            let jusoArray = jsonStr.results.juso;
-            
-            // 검색된 주소 데이터가 1개 이상 있을 때
-            if(jusoArray != null && jusoArray.length > 0) {
-                
-                // for문(반복문)을 사용해 검색된 갯수만큼 목록을 만듭니다.
-                jusoArray.forEach(function(juso) {
-                    // <li> 태그(목록 요소)를 하나 만듭니다.
-                    const listItem = document.createElement("li");
-                    
-                    // 도로명과 지번 주소를 보기 좋게 합쳐서 넣습니다.
-                    listItem.innerHTML = `
-                        <div style="color:#0056b3; font-weight:bold; margin-bottom:5px;">${juso.roadAddr}</div>
-                        <div style="color:#666; font-size:12px;">[지번] ${juso.jibunAddr}</div>
-                    `;
-                    
-                    // 항목에 마우스를 올렸을 때 손가락 모양으로 바뀌게 하고 간격을 줍니다.
-                    listItem.style.cursor = "pointer";
-                    listItem.style.marginBottom = "15px";
-                    
-                    // [핵심] 리스트 중 하나를 클릭했을 때 동작할 '선택 기능'
-                    listItem.onclick = function() {
-                        // alert("선택하신 주소: " + roadAddr + "\n(추후 이 주소를 좌표로 변환해 지도를 움직입니다.)");
-                        displayOnMap(juso.roadAddr);
-                    };
-
-                    // 완성된 <li> 항목을 <ul> 리스트 공간에 쏙 밀어넣습니다.
-                    resultList.appendChild(listItem); 
-                });
-            } else {
-                resultList.innerHTML = "<li style='text-align:center; border:none; color:#999;'>검색 결과가 없습니다.</li>";
-            }
-        },
-        error: function() {
-            alert("주소 검색 중 통신 에러가 발생했습니다.");
+    var rings = [];
+    for (var j = 0; j < geometry.coordinates.length; j++) {
+        var path = [];
+        for (var k = 0; k < geometry.coordinates[j].length; k++) {
+            path.push(mapPoint(geometry.coordinates[j][k]));
         }
+        rings.push(path);
+    }
+    var polygon = new kakao.maps.Polygon({path: rings, strokeColor: color, strokeWeight: 2, fillColor: color, fillOpacity: opacity});
+    polygon.setMap(map);
+    resultLayers.push(polygon);
+}
+
+function showStudyArea() {
+    if (map) map.setBounds(studyBounds, 20, 20, 20, 20);
+}
+
+function geometryBounds(geometry) {
+    // 제공 SDK 연결: 다각형을 모두 담는 지도 범위를 구한다.
+    var bounds = new kakao.maps.LatLngBounds();
+    var polygons = geometry.coordinates;
+    if (geometry.type === 'Polygon') polygons = [geometry.coordinates];
+    for (var i = 0; i < polygons.length; i++) {
+        for (var j = 0; j < polygons[i][0].length; j++) {
+            bounds.extend(mapPoint(polygons[i][0][j]));
+        }
+    }
+    return bounds;
+}
+
+function showSelectedZone() {
+    if (!map) return;
+    var selected = document.getElementById('zoneFilter').value;
+    if (selected === 'all') {
+        showStudyArea();
+        return;
+    }
+    for (var i = 0; i < pageData.zones.features.length; i++) {
+        var zone = pageData.zones.features[i];
+        if (zone.properties['생활권'] === Number(selected)) {
+            map.setBounds(geometryBounds(zone.geometry), 20, 20, 20, 20);
+        }
+    }
+}
+
+function showPointPopup(point, text) {
+    if (selectedPopup) selectedPopup.close();
+    var content = textNode('p', text);
+    content.className = 'map-popup';
+    selectedPopup = new kakao.maps.InfoWindow({position: mapPoint(point), content: content, removable: true});
+    selectedPopup.open(map);
+}
+
+function openHub(id) {
+    var feature = findHub(id);
+    if (!feature) return;
+    document.getElementById('zoneFilter').value = feature.properties['생활권'];
+    renderHubList();
+    drawResults();
+    showHubDetail(feature);
+    if (!map) return;
+    map.setLevel(3);
+    map.panTo(mapPoint(feature.geometry.coordinates));
+    showPointPopup(feature.geometry.coordinates, feature.properties['이름'] + ' / 분석 제안, 운영 승인 전');
+}
+
+function drawBuilding(row) {
+    // 제공 SDK 연결: 필지 한 개를 그린다. 클릭하면 그 필지의 정보를 표시한다.
+    var dot = new kakao.maps.Circle({center: mapPoint(row.coordinates), radius: 3, strokeWeight: 0, fillColor: '#397d66', fillOpacity: 0.7});
+    kakao.maps.event.addListener(dot, 'click', function() { selectBuilding(row); });
+    dot.setMap(map);
+    resultLayers.push(dot);
+}
+
+function drawReference(feature, label, color, description) {
+    // 보조 마커: 1차 후보 또는 대안 2·3순위. 거점안을 바꾸는 기능은 아니다.
+    var button = textNode('button', label);
+    button.type = 'button';
+    button.className = 'map-dot reference-dot';
+    button.style.background = color;
+    button.setAttribute('aria-label', description);
+    button.onclick = function() {
+        kakao.maps.event.preventMap();
+        showPointPopup(feature.geometry.coordinates, description);
+    };
+    var marker = new kakao.maps.CustomOverlay({content: button, position: mapPoint(feature.geometry.coordinates), xAnchor: 0.5, yAnchor: 0.5, zIndex: 20});
+    marker.setMap(map);
+    resultLayers.push(marker);
+}
+
+function drawHub(feature) {
+    var row = feature.properties;
+    var button = textNode('button', row['생활권']);
+    button.type = 'button';
+    button.className = 'map-dot';
+    button.setAttribute('aria-label', '생활권 ' + row['생활권'] + ' · ' + row['거점id'] + ' · ' + row['이름']);
+    if (row['거점id'].indexOf('A') === 0) button.classList.add('alternative-dot');
+    button.onclick = function() {
+        kakao.maps.event.preventMap();
+        openHub(row['거점id']);
+    };
+    var marker = new kakao.maps.CustomOverlay({content: button, position: mapPoint(feature.geometry.coordinates), xAnchor: 0.5, yAnchor: 0.5, zIndex: 30});
+    marker.setMap(map);
+    resultLayers.push(marker);
+}
+
+function drawResults() {
+    if (!map || !pageData) return;
+    clearResults();
+    addGeometry(pageData.boundary.features[0].geometry, '#34785d', 0);
+    for (var i = 0; i < pageData.zones.features.length; i++) {
+        var zone = pageData.zones.features[i];
+        if (matchesZone(zone.properties['생활권'])) {
+            addGeometry(zone.geometry, zoneColors[zone.properties['생활권'] - 1], 0.4);
+        }
+    }
+    if (document.getElementById('showHouseholds').checked) {
+        for (var j = 0; j < pageData.buildings.length; j++) {
+            if (matchesZone(pageData.buildings[j].zone)) drawBuilding(pageData.buildings[j]);
+        }
+    }
+    if (document.getElementById('showOriginal').checked) {
+        for (var k = 0; k < pageData.candidates.features.length; k++) {
+            var candidate = pageData.candidates.features[k];
+            var data = candidate.properties;
+            if (matchesZone(data['생활권'])) {
+                drawReference(candidate, data.id, '#7a837e', data.id + ' · ' + data['이름'] + ' / 2차 역할: ' + data['역할']);
+            }
+        }
+    }
+    if (document.getElementById('showAlternatives').checked) {
+        for (var n = 0; n < pageData.alternatives.features.length; n++) {
+            var alternative = pageData.alternatives.features[n];
+            var item = alternative.properties;
+            if (item['용도'] === '대안' && item['순위'] > 1 && matchesZone(item['생활권'])) {
+                drawReference(alternative, item.id, '#ab6425', item.id + ' · ' + item['가까운_건물주소'] + ' / 현장 확인 필요');
+            }
+        }
+    }
+    for (var m = 0; m < pageData.hubs.features.length; m++) {
+        var hub = pageData.hubs.features[m];
+        if (matchesZone(hub.properties['생활권'])) drawHub(hub);
+    }
+    document.getElementById('mapStatus').textContent = document.getElementById('zoneFilter').selectedOptions[0].text + ' · 숫자는 생활권 번호. 초록: 기존 후보 / 주황: 새 대안';
+}
+
+function clearSearchPoint() {
+    if (searchMarker) searchMarker.setMap(null);
+    if (selectedPopup) selectedPopup.close();
+}
+
+function showSearchPoint(building) {
+    if (!map) return;
+    clearSearchPoint();
+    searchMarker = new kakao.maps.Circle({center: mapPoint(building.coordinates), radius: 6, strokeColor: '#fff', strokeWeight: 3, fillColor: '#2469c6', fillOpacity: 1, zIndex: 40});
+    searchMarker.setMap(map);
+    map.setLevel(3);
+    map.panTo(mapPoint(building.coordinates));
+    showPointPopup(building.coordinates, building.address + ' / 주거 필지 대표점');
+}
+
+function initializeMap() {
+    if (!window.kakao || !kakao.maps) {
+        document.getElementById('mapStatus').textContent = '카카오 JavaScript 키와 허용 도메인 localhost:8003을 확인하세요. 보유 데이터 검색은 사용할 수 있습니다.';
+        return;
+    }
+    // 제공 SDK 연결: 키는 지도 표시에만 사용하며 주소검색 services는 요청하지 않는다.
+    kakao.maps.load(function() {
+        map = new kakao.maps.Map(document.getElementById('map'), {center: new kakao.maps.LatLng(37.533, 126.835), level: 5});
+        map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+        studyBounds = geometryBounds(pageData.boundary.features[0].geometry);
+        drawResults();
+        showStudyArea();
     });
 }
 
-// 맨 위에 var markerLayer; 가 선언되어 있어야 합니다.
-
-// ==========================================
-// 주소를 좌표로 변환하고 지도 부드럽게 이동 및 순정 마커 찍기
-// ==========================================
-function displayOnMap(address) {
-    // console.log("좌표를 찾을 주소: ", address);
-    $.ajax({
-        url: "https://api.vworld.kr/req/address",
-        type: "GET",
-        dataType: "jsonp",
-        data: {
-            service: "address",
-            request: "getCoord",
-            version: "2.0",
-            crs: "epsg:4326",
-            type: "ROAD",
-            address: address,
-            format: "json",
-            key: window.VWORLD_KEY 
-        },
-        success: function(response) {
-            if (response.response.status === "OK") {
-                let point = response.response.result.point;
-                let lon = Number(point.x);
-                let lat = Number(point.y);
-                // console.log("찾아낸 좌표 - 경도:", lon, "위도:", lat);
-                // 1) 기존 마커 레이어 초기화 (기존 핀 지우기)
-                if (markerLayer != null) {
-                    vmap.removeLayer(markerLayer);
-                    markerLayer = null;
-                }
-
-                // 2) 브이월드 전용 마커 레이어 새로 생성 후 지도에 추가
-                markerLayer = new vw.ol3.layer.Marker(vmap);
-                vmap.addLayer(markerLayer);
-
-                // 3) 마커 옵션 셋팅 (샘플 코드 방식 활용)
-                vw.ol3.markerOption = {
-                    x: lon,
-                    y: lat,
-                    epsg: "EPSG:4326",
-                    title: '검색된 위치',
-                    contents: address,
-                    iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png', 
-                    text: {
-                        offsetX: 0.5,
-                        offsetY: 20,
-                        font: '12px Calibri,sans-serif',
-                        fill: {color: '#000'},
-                        stroke: {color: '#fff', width: 2},
-                        text: '검색 위치'
-                    },
-                    attr: {"id": "search_marker", "name": "검색된 주소"}
-                };
-
-                // 4) 마커 레이어에 마커 추가
-                markerLayer.addMarker(vw.ol3.markerOption);
-
-                // 5) 목적지 좌표 변환
-                let targetCoord = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
-
-                // 6) 출발 전의 현재 위치와 현재 줌(해상도) 상태를 기억해 둡니다.
-                let currentCenter = vmap.getView().getCenter(); 
-                let currentResolution = vmap.getView().getResolution(); 
-                
-                // 이동(스르륵) 애니메이션
-                let panAnimation = ol.animation.pan({
-                    duration: 500, // 0.5초 동안 이동
-                    source: currentCenter
-                });
-                
-                // 줌(확대/축소) 애니메이션 추가
-                let zoomAnimation = ol.animation.zoom({
-                    duration: 500, // 0.5초 동안 확대/축소
-                    resolution: currentResolution // 시작할 때의 줌 상태
-                });
-                
-                // 두 개의 애니메이션을 지도 렌더링에 동시에 장착!
-                vmap.beforeRender(panAnimation, zoomAnimation);
-
-                // 7) 최종 목적지 좌표와 줌 레벨을 지시하면 
-                // 위에서 장착한 애니메이션과 맞물려 영화처럼 날아갑니다.
-                vmap.getView().setCenter(targetCoord);
-                vmap.getView().setZoom(17);
-
-            } else {
-                alert("해당 주소의 좌표를 찾을 수 없습니다.");
-            }
-        },
-        error: function() {
-            alert("좌표 변환 중 통신 에러가 발생했습니다.");
-        }
-    });
-}
+window.addEventListener('resize', function() {
+    if (map) map.relayout();
+});
