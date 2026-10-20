@@ -9,6 +9,7 @@ var wasteLoaded = false;
 // 팀의 탭을 전환한다. 검색 결과와 후보 선택 상태는 그대로 남긴다.
 function showPanel(panel) {
     var isSearch = panel === 'search';
+    if (!isSearch) mapAddressRequest += 1;
     document.getElementById('tabContentSearch').hidden = !isSearch;
     document.getElementById('tabContentData').hidden = isSearch;
     document.getElementById('tabSearchBtn').classList.toggle('active', isSearch);

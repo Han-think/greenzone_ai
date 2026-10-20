@@ -5,6 +5,8 @@ var studyBounds;
 var resultLayers = [];
 var searchMarker;
 var selectedPopup;
+var addressGeocoder;
+var mapAddressRequest = 0;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
 function mapPoint(coordinates) {
@@ -43,6 +45,10 @@ function addGeometry(geometry, color, opacity) {
     }
     var polygon = new kakao.maps.Polygon({path: rings, strokeColor: color, strokeWeight: 2, fillColor: color, fillOpacity: opacity});
     polygon.setMap(map);
+    kakao.maps.event.addListener(polygon, 'click', function(event) {
+        kakao.maps.event.preventMap();
+        showClickedAddress(event.latLng);
+    });
     resultLayers.push(polygon);
 }
 
@@ -102,7 +108,10 @@ function openHub(id) {
 function drawBuilding(row) {
     // 제공 SDK 연결: 필지 한 개를 그린다. 클릭하면 그 필지의 정보를 표시한다.
     var dot = new kakao.maps.Circle({center: mapPoint(row.coordinates), radius: 3, strokeWeight: 0, fillColor: '#397d66', fillOpacity: 0.7});
-    kakao.maps.event.addListener(dot, 'click', function() { selectBuilding(row); });
+    kakao.maps.event.addListener(dot, 'click', function() {
+        kakao.maps.event.preventMap();
+        selectBuilding(row);
+    });
     dot.setMap(map);
     resultLayers.push(dot);
 }
@@ -180,8 +189,43 @@ function drawResults() {
 }
 
 function clearSearchPoint() {
+    mapAddressRequest += 1;
     if (searchMarker) searchMarker.setMap(null);
     if (selectedPopup) selectedPopup.close();
+}
+
+// 팀의 지도 클릭 주소 표시를 같은 카카오 JavaScript 키의 좌표→주소 기능으로 연결한다.
+// 클릭한 주소를 보유 필지의 담당 거점으로 임의 배정하지 않는다.
+function showClickedAddress(position) {
+    if (!addressGeocoder) return;
+    mapAddressRequest += 1;
+    var requestNumber = mapAddressRequest;
+    document.getElementById('mapStatus').textContent = '선택한 좌표의 주소를 확인하는 중입니다.';
+    addressGeocoder.coord2Address(position.getLng(), position.getLat(), function(result, status) {
+        if (requestNumber !== mapAddressRequest) return;
+        if (status !== kakao.maps.services.Status.OK || result.length === 0) {
+            document.getElementById('mapStatus').textContent = '선택 위치의 주소를 확인하지 못했습니다. 보유 주소·건물명으로 검색할 수 있습니다.';
+            return;
+        }
+        var row = result[0];
+        var address = '';
+        if (row.road_address) address = row.road_address.address_name;
+        if (!address && row.address) address = row.address.address_name;
+        if (!address) return;
+        clearSearchPoint();
+        var point = [position.getLng(), position.getLat()];
+        searchMarker = new kakao.maps.Circle({center: position, radius: 6, strokeColor: '#fff', strokeWeight: 3, fillColor: '#2469c6', fillOpacity: 1, zIndex: 40});
+        searchMarker.setMap(map);
+        showPointPopup(point, address + ' / 지도에서 선택한 위치');
+        showPanel('search');
+        var box = document.getElementById('selectedBuilding');
+        box.replaceChildren(textNode('h3', '지도에서 선택한 위치'), textNode('p', address));
+        if (row.address && row.road_address) box.append(textNode('p', '지번: ' + row.address.address_name));
+        box.append(textNode('small', '위도 ' + position.getLat().toFixed(6) + ', 경도 ' + position.getLng().toFixed(6)));
+        box.append(textNode('small', '주소 확인 결과입니다. 담당 거점안은 보유 주소·건물명 검색에서 확인하세요.'));
+        box.scrollIntoView({block: 'nearest'});
+        document.getElementById('mapStatus').textContent = '선택 주소: ' + address;
+    });
 }
 
 function showSearchPoint(building) {
@@ -199,10 +243,12 @@ function initializeMap() {
         document.getElementById('mapStatus').textContent = '카카오 JavaScript 키와 허용 도메인 localhost:8003을 확인하세요. 보유 데이터 검색은 사용할 수 있습니다.';
         return;
     }
-    // 제공 SDK 연결: 키는 지도 표시에만 사용하며 주소검색 services는 요청하지 않는다.
+    // 지도와 클릭 좌표→주소 확인은 같은 JavaScript 키를 사용한다. 검색창은 보유 데이터를 쓴다.
     kakao.maps.load(function() {
         map = new kakao.maps.Map(document.getElementById('map'), {center: new kakao.maps.LatLng(37.533, 126.835), level: 5});
         map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+        if (kakao.maps.services) addressGeocoder = new kakao.maps.services.Geocoder();
+        kakao.maps.event.addListener(map, 'click', function(event) { showClickedAddress(event.latLng); });
         studyBounds = geometryBounds(pageData.boundary.features[0].geometry);
         drawResults();
         showStudyArea();
