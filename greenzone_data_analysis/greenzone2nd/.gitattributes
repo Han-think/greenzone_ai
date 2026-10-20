@@ -1,0 +1,11 @@
+# 텍스트 파일은 저장소 안에서 LF로 통일 (윈도우·맥 혼용 대비)
+* text=auto eol=lf
+*.py   text eol=lf
+*.md   text eol=lf
+*.csv  text eol=lf
+*.geojson text eol=lf
+*.html text eol=lf
+# 바이너리
+*.xlsx binary
+*.png  binary
+*.zip  binary
