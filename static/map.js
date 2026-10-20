@@ -7,6 +7,10 @@ let geoJsonMarkerLayer = null; // GeoJSON 공공데이터용 핀 레이어
 let geoJsonRawData = null;     // 나중에 거리 계산을 위해 원본 데이터를 저장할 변수
 let boundaryLayer = null;      // 💡 [신규] 신월1동 경계선 레이어
 
+// 💡 [신규] 페이징 처리를 위해 검색 상태를 기억할 변수
+let currentKeyword = ""; 
+let currentPage = 1;
+
 // ==========================================
 // 1. 초기화 및 이벤트 등록 (화면 켜질 때 1번만 실행)
 // ==========================================
@@ -32,12 +36,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const loadGeoBtn = document.getElementById("loadGeoBtn");
 
     // [검색 버튼] 클릭 시
-    searchBtn.addEventListener("click", searchAddress);
+    searchBtn.addEventListener("click", function() { searchAddress(1); });
 
     // [검색창] 엔터키 입력 시
     keywordInput.addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
-            searchAddress();
+            searchAddress(1);
         }
     });
 
@@ -84,12 +88,18 @@ async function drawBoundary() {
 // ==========================================
 // 2. 주소 검색 함수 (버튼 클릭 시 실행됨)
 // ==========================================
-function searchAddress() {
-    let keyword = document.getElementById("keyword").value;
+function searchAddress(page) {
+    const keywordInput = document.getElementById("keyword").value;
 
-    if (keyword.trim() === "") {
-        alert("검색어를 입력해 주세요.");
-        return;
+    // 💡 1페이지 검색(새로운 검색)일 경우 처리
+    if (page === 1) {
+        if (keywordInput.trim() === "") {
+            alert("검색어를 입력해 주세요.");
+            return;
+        }
+        currentKeyword = keywordInput; // 현재 검색어 기억
+        currentPage = 1;               // 페이지 1로 초기화
+        document.getElementById("resultList").innerHTML = ""; // 기존 리스트 싹 비우기
     }
     
     $.ajax({
@@ -99,9 +109,9 @@ function searchAddress() {
         crossDomain: true,
         data: {
             confmKey: window.JUSO_KEY, 
-            currentPage: 1,
+            currentPage: currentPage, // 💡 기억해둔 페이지 번호 사용
             countPerPage: 10, // 한 번에 최대 10개의 유사 주소를 가져옵니다.
-            keyword: keyword,
+            keyword: currentKeyword, // 💡 기억해둔 검색어 사용
             resultType: "json"
         },
         success: function(jsonStr) {
@@ -112,9 +122,13 @@ function searchAddress() {
 
             // HTML의 <ul> 태그 공간을 찾아와서 안의 내용을 깨끗하게 지웁니다.
             const resultList = document.getElementById("resultList");
-            resultList.innerHTML = ""; // 기존 목록 비우기
-
             const jusoArray = jsonStr.results.juso;
+
+            // 💡 기존에 있던 '더보기' 버튼이 있다면 잠시 삭제 (새로 결과 덧붙인 후 다시 맨 밑에 달기 위함)
+            const oldMoreBtn = document.getElementById("loadMoreBtn");
+            if (oldMoreBtn) {
+                oldMoreBtn.remove();
+            }
             
             // 검색된 주소 데이터가 1개 이상 있을 때
             if(jusoArray && jusoArray.length > 0) {
@@ -129,10 +143,6 @@ function searchAddress() {
                         <div style="color:#666; font-size:12px;">[지번] ${juso.jibunAddr}</div>
                     `;
                     
-                    // 항목에 마우스를 올렸을 때 손가락 모양으로 바뀌게 하고 간격을 줍니다.
-                    listItem.style.cursor = "pointer";
-                    listItem.style.marginBottom = "15px";
-                    
                     // [핵심] 리스트 중 하나를 클릭했을 때 동작할 '선택 기능'
                     listItem.onclick = function() {
                         displayOnMap(juso.roadAddr);
@@ -141,8 +151,30 @@ function searchAddress() {
                     // 완성된 <li> 항목을 <ul> 리스트 공간에 쏙 밀어넣습니다.
                     resultList.appendChild(listItem); 
                 });
+
+                // 💡 다음 페이지가 더 남아있는지 계산해서 '더보기' 버튼 생성
+                const totalCount = parseInt(jsonStr.results.common.totalCount);
+                if (currentPage * 10 < totalCount) {
+                    const moreBtn = document.createElement("li");
+                    moreBtn.id = "loadMoreBtn"; // 나중에 지우기 위해 ID 부여
+                    moreBtn.style.textAlign = "center";
+                    moreBtn.style.backgroundColor = "#e9ecef";
+                    moreBtn.style.fontWeight = "bold";
+                    moreBtn.innerHTML = `⬇️ 결과 더보기 (${currentPage} / ${Math.ceil(totalCount/10)} 페이지)`;
+                    
+                    // 더보기 버튼 누르면 페이지 숫자 1 올리고 다시 검색
+                    moreBtn.onclick = function() {
+                        currentPage++;
+                        searchAddress(currentPage);
+                    };
+                    
+                    resultList.appendChild(moreBtn);
+                }
+
             } else {
-                resultList.innerHTML = "<li style='text-align:center; border:none; color:#999;'>검색 결과가 없습니다.</li>";
+                if (page === 1) {
+                    resultList.innerHTML = "<li style='text-align:center; border:none; color:#999;'>검색 결과가 없습니다.</li>";
+                }
             }
         },
         error: function() {
