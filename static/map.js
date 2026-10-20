@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // 2. 검색 이벤트 연결
     const keywordInput = document.getElementById("keyword");
     const searchBtn = document.getElementById("searchBtn");
+    const loadGeoBtn = document.getElementById("loadGeoBtn");
+    loadGeoBtn.addEventListener("click", loadGeoJsonMarkers);
 
     // [버튼 클릭] 시 검색
     searchBtn.addEventListener("click", searchAddress);
@@ -202,4 +204,75 @@ function displayOnMap(address) {
             alert("좌표 변환 중 통신 에러가 발생했습니다.");
         }
     });
+}
+
+// ==========================================
+// GeoJSON 파일 불러와서 다중 마커 찍기
+// ==========================================
+async function loadGeoJsonMarkers() {
+    try {
+        // 1. data 폴더에 있는 geojson 파일 불러오기
+        const response = await fetch('/data/greenzone1st.geojson');
+        const geojsonData = await response.json();
+
+        // 2. 기존 마커 레이어가 있다면 지우고 새로 생성
+        if (markerLayer != null) {
+            vmap.removeLayer(markerLayer);
+        }
+        markerLayer = new vw.ol3.layer.Marker(vmap);
+        vmap.addLayer(markerLayer);
+
+        // 3. features 배열을 반복문(forEach)으로 돌면서 핀 찍기
+        geojsonData.features.forEach(function(feature) {
+            // 점(Point) 데이터인 경우에만 핀을 찍음
+            if (feature.geometry.type === "Point") {
+                const lon = feature.geometry.coordinates[0]; // 경도
+                const lat = feature.geometry.coordinates[1]; // 위도
+                const placeName = feature.properties.name;   // 장소 이름
+                const placeDesc = feature.properties.desc;   // 장소 설명
+
+                // 마커 옵션 설정
+                vw.ol3.markerOption = {
+                    x: lon,
+                    y: lat,
+                    epsg: "EPSG:4326",
+                    title: placeName,
+                    contents: placeDesc,
+                    iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png',
+                    text: {
+                        offsetX: 0.5,
+                        offsetY: 20,
+                        font: '12px Calibri,sans-serif',
+                        fill: {color: '#000'},
+                        stroke: {color: '#fff', width: 2},
+                        text: placeName // 핀 아래에 장소 이름 표시
+                    },
+                    attr: {"id": placeName, "name": placeName}
+                };
+
+                // 마커 레이어에 방금 만든 마커 추가
+                markerLayer.addMarker(vw.ol3.markerOption);
+            }
+        });
+
+        // 4. 데이터가 존재하면, 첫 번째 데이터의 위치로 카메라 자동 이동
+        if (geojsonData.features.length > 0) {
+            const firstFeature = geojsonData.features[0];
+            
+            // 데이터가 '점(Point)' 형태일 때만 좌표를 읽어옵니다.
+            if (firstFeature.geometry.type === "Point") {
+                const lon = firstFeature.geometry.coordinates[0];
+                const lat = firstFeature.geometry.coordinates[1];
+                
+                const centerCoord = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+                
+                vmap.getView().setCenter(centerCoord);
+                vmap.getView().setZoom(15); // 화면에 넓게 들어오도록 줌 조절
+            }
+        }
+
+    } catch (error) {
+        console.error("GeoJSON 로딩 에러:", error);
+        alert("데이터를 불러오는 중 문제가 발생했습니다.");
+    }
 }

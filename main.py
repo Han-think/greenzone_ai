@@ -12,6 +12,7 @@ app = FastAPI()
 
 # <-- static 폴더를 웹 서버에 마운트(연결)하는 코드 추가
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/data", StaticFiles(directory="data"), name="data")
 
 templates = Jinja2Templates(directory="templates")
 
