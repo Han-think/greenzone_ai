@@ -34,7 +34,7 @@ if (!(Test-Path .env)) { Copy-Item .env.example .env }
 .venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8003 --no-access-log
 ```
 
-Docker·Ollama는 현재 D 작업본 실행에 필요하지 않습니다. 지도는 카카오 SDK, 검색창은 보유 데이터에서 처리합니다. 팀의 지도 클릭 주소 표시는 같은 키의 카카오 좌표→주소 기능으로 연결했습니다.
+Docker·Ollama는 현재 구현 실행에 필요하지 않습니다. 지도는 카카오 SDK, 검색창은 보유 데이터에서 처리합니다. 팀의 지도 클릭 주소 표시는 같은 키의 카카오 좌표→주소 기능으로 연결했습니다.
 필수 패키지는 기존 `fastapi`, `uvicorn`, `python-dotenv`, `jinja2`이며 분석 결과를 읽는 데 추가 분석 패키지는 사용하지 않습니다.
 `.env`는 각자 작성하고 공유·커밋하지 않습니다. 데이터 파일을 교체했다면 서버를 다시 시작합니다.
 `.gitattributes`는 data 파일의 줄바꿈 변환을 막아 팀원 PC에서도 원본 SHA256이 유지되게 합니다.
@@ -49,17 +49,24 @@ templates/index.html → static/script.js → main.py → data/ → static/map.j
 - [데이터 안내](data/README.md): 현재/과거 자료 구분과 정식 보존 경로
 - `data/data_inventory.csv`: 파일별 출처·기준시점·SHA256·사용 상태
 
-## 팀 코드 반영 상태 — 2026-10-20 검토
+## 팀 공통 구현 기준 — 2026-10-20
 
-저장소는 [Han-think/greenzone_ai](https://github.com/Han-think/greenzone_ai)입니다.
-원격 master 확인본은 [da1cc70](https://github.com/Han-think/greenzone_ai/commit/da1cc70b772dffd6e42dfb256db25b6ab6ce8a34), 분석 결과 출처는 [930e1b2](https://github.com/Han-think/greenzone_ai/tree/930e1b2d291c888cee84ae284b6d830e3d4b322e/greenzone_data_analysis/greenzone2nd)입니다.
+현재 기본 작업 기준은 [master](https://github.com/Han-think/greenzone_ai/tree/master)입니다.
+기존 팀 웹·분석 자료와 통합 작업의 이력을 보존해 반영했습니다. 아래 출처 커밋은 입력과 변경 이력을 설명하는 고정 기준이며 현재 HEAD를 뜻하지 않습니다.
 
-- **이 브랜치는 `integration/greenzone-review` 통합 검토본입니다.** 작업 시작 기준 `eeefe32`에서 데이터를 연결한 뒤, 확인한 팀 master `da1cc70`의 변경을 이 브랜치에 통합했습니다. [검토 브랜치](https://github.com/Han-think/greenzone_ai/tree/integration/greenzone-review)에서 데이터·웹·문서 및 후속 통합 커밋을 확인합니다. 팀 master 자체에는 반영하지 않았습니다.
-- 팀의 **검색/후보지 탭 분리와 결과 더보기**를 보유 데이터 검색에 맞춰 통합했습니다. 같은 화면에서 탭을 전환하고, 결과를 10개씩 추가로 불러옵니다. 탭을 바꿔도 검색 결과와 표시 체크는 유지됩니다.
-- 팀 원본은 VWorld·외부 주소 API, 이 통합본은 카카오·보유 데이터 검색을 사용합니다. 팀 탭의 HTML ID와 페이지 추가 방식을 유지하고 검색 데이터 공급 부분을 FastAPI로 연결했습니다. 새로 올라온 지도 클릭 주소 확인도 카카오 방식으로 반영했습니다. 검색창의 외부 전체 주소검색은 추가하지 않았습니다.
-- 공통 GeoJSON 4개는 최신 master와 내용이 같습니다. 원본 분석 결과·코드 ZIP·과거 배출량은 `data/`의 정해 둔 경로에 보존했습니다.
+| 출처 | 반영 |
+|---|---|
+| 팀 웹 master da1cc70 | 검색/후보지 탭, 결과 더보기, 지도 클릭 주소 확인 |
+| 분석 브랜치 930e1b2 | 2차 주거 필지·생활권·거점·대안·보고서·엑셀 |
+| 통합 커밋 17b8de8 | 팀 웹 이력 병합, 카카오 지도와 보유 주소 검색 연결 |
+| data/의 기존 분석·원본 | 주소·건물명 보완, 배출량 근거·추정, 1차 결과·도로·이전 비교 자료 |
 
-데이터와 팀 탭/더보기를 연결한 검토본입니다. 기능별 연결과 master 반영 절차는 핸드북 8절에 있습니다.
+- 팀의 탭·더보기 방식을 유지하고 결과를 10개씩 추가합니다. 탭을 바꿔도 검색 결과와 표시 체크는 남습니다.
+- 검색창은 보유 주소·건물명 검색입니다. 지도 클릭은 같은 카카오 키로 좌표의 주소를 확인하며, 그 주소를 담당 거점에 임의 배정하지 않습니다.
+- 1·2차 원본 결과와 과거 자료는 data에 구분해 보존합니다. 데이터 107개와 목록 106행의 해시·출처를 대조했습니다.
+- 작업 이력은 [integration/greenzone-review](https://github.com/Han-think/greenzone_ai/tree/integration/greenzone-review)에 보존합니다. 앞으로의 공통 개발은 master를 받은 뒤 별도 작업 브랜치에서 진행합니다.
+
+기능 연결·원천 출처·분석 한계는 [핸드북](docs/HANDBOOK.md)에 있습니다. 이미 작업 중인 팀원은 수정 내용을 먼저 커밋해 보관하고, 최신 master와 비교해 합칩니다.
 
 ## 현재 범위의 한계
 
