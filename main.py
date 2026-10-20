@@ -111,9 +111,13 @@ def map_data():
 
 
 @app.get('/api/buildings')
-def search_buildings(q: str = ''):
+def search_buildings(q: str = '', page: int = 1):
+    # 팀의 더보기 방식을 보유 데이터 검색에 연결한다. 한 번에 10개씩 보낸다.
+    page_size = 10
+    if page < 1:
+        page = 1
     if len(q.strip()) < 2 or len(q) > 100:
-        return {'items': [], 'total': 0}
+        return {'items': [], 'total': 0, 'page': page, 'page_size': page_size, 'has_more': False}
     result = []
     for building in buildings:
         text = building['address'] + building['jibun_address'] + building['name']
@@ -124,7 +128,10 @@ def search_buildings(q: str = ''):
                 matched = False
         if matched:
             result.append(building)
-    return {'items': result[:12], 'total': len(result)}
+    start = (page - 1) * page_size
+    end = start + page_size
+    return {'items': result[start:end], 'total': len(result), 'page': page,
+            'page_size': page_size, 'has_more': end < len(result)}
 
 
 @app.get('/api/waste')

@@ -1,7 +1,22 @@
 // 입력 → fetch → 받은 결과 표시. 생활권 분석은 팀 결과 파일을 사용한다.
 var pageData = null;
 var searchResults = [];
+var searchQuery = '';
+var searchPage = 0;
+var searchBusy = false;
 var wasteLoaded = false;
+
+// 팀의 탭을 전환한다. 검색 결과와 후보 선택 상태는 그대로 남긴다.
+function showPanel(panel) {
+    var isSearch = panel === 'search';
+    document.getElementById('tabContentSearch').hidden = !isSearch;
+    document.getElementById('tabContentData').hidden = isSearch;
+    document.getElementById('tabSearchBtn').classList.toggle('active', isSearch);
+    document.getElementById('tabDataBtn').classList.toggle('active', !isSearch);
+    document.getElementById('tabSearchBtn').setAttribute('aria-pressed', String(isSearch));
+    document.getElementById('tabDataBtn').setAttribute('aria-pressed', String(!isSearch));
+    document.querySelector('.sidebar-content').scrollTop = 0;
+}
 
 function textNode(tag, text) {
     var node = document.createElement(tag);
@@ -39,6 +54,7 @@ function renderHubList() {
     }
 }
 function showHubDetail(feature) {
+    showPanel('data');
     var row = feature.properties;
     var box = document.getElementById('hubDetail');
     box.replaceChildren(textNode('h3', '생활권 ' + row['생활권'] + ' · ' + row['거점id']), textNode('p', row['이름']));
@@ -50,8 +66,10 @@ function showHubDetail(feature) {
     box.append(textNode('small', '위도 ' + feature.geometry.coordinates[1].toFixed(6) + ', 경도 ' + feature.geometry.coordinates[0].toFixed(6)));
     if (row['거점id'] === 'G01') box.append(textNode('p', '등록폭 8m / 도로 도형 단면 추정 5.3m입니다. 팀 코드는 등록폭 우선 기준으로 통과시켰습니다. 현장 유효폭은 별도 확인이 필요합니다.'));
     box.append(textNode('small', '팀이 보고한 도로 중심선 추정값입니다. 모든 지점의 실제 정차·보행·부지 사용 승인은 미확인입니다.'));
+    box.scrollIntoView({block: 'nearest'});
 }
 function selectBuilding(row) {
+    showPanel('search');
     var box = document.getElementById('selectedBuilding');
     box.replaceChildren(textNode('h3', row.name || row.address), textNode('p', row.address + ' / ' + row.jibun_address));
     box.append(textNode('p', '팀 대장 기준 ' + fmt(row.units) + ' 주거단위 · ' + row.housing_type));
@@ -65,38 +83,59 @@ function selectBuilding(row) {
     renderHubList();
     drawResults();
     showSearchPoint(row);
+    box.scrollIntoView({block: 'nearest'});
 }
-async function searchBuildings(event) {
+async function loadSearchPage(page) {
+    if (searchBusy) return;
+    searchBusy = true;
+    document.getElementById('searchButton').disabled = true;
+    document.getElementById('clearSearch').disabled = true;
+    document.getElementById('loadMoreBtn').disabled = true;
+    document.getElementById('keyword').disabled = true;
+    document.getElementById('searchStatus').textContent = '검색 결과를 불러오는 중입니다.';
+    try {
+        var result = await getJSON('/api/buildings?q=' + encodeURIComponent(searchQuery) + '&page=' + page);
+        for (var i = 0; i < result.items.length; i++) {
+            var row = result.items[i];
+            var index = searchResults.length;
+            searchResults.push(row);
+            var button = textNode('button', row.name || row.address);
+            button.type = 'button';
+            button.className = 'search-result';
+            button.dataset.index = index;
+            button.append(textNode('small', row.address + ' / ' + row.jibun_address));
+            button.onclick = function() { selectBuilding(searchResults[Number(this.dataset.index)]); };
+            document.getElementById('searchResults').append(button);
+        }
+        searchPage = result.page;
+        document.getElementById('searchStatus').textContent = result.total + '건 중 ' + searchResults.length + '건 표시. 보유 도로명·지번·건물명 검색입니다.';
+        document.getElementById('loadMoreBtn').hidden = !result.has_more;
+        document.getElementById('loadMoreBtn').textContent = '결과 더보기 (' + searchResults.length + ' / ' + result.total + '건)';
+    } catch (error) { document.getElementById('searchStatus').textContent = error.message; }
+    finally {
+        searchBusy = false;
+        document.getElementById('searchButton').disabled = false;
+        document.getElementById('clearSearch').disabled = false;
+        document.getElementById('loadMoreBtn').disabled = false;
+        document.getElementById('keyword').disabled = false;
+    }
+}
+function searchBuildings(event) {
     event.preventDefault();
-    if (document.getElementById('searchButton').disabled) return;
+    if (searchBusy) return;
     var query = document.getElementById('keyword').value.trim();
     if (query.length < 2) {
         document.getElementById('searchStatus').textContent = '두 글자 이상 입력하세요.';
         return;
     }
-    document.getElementById('searchButton').disabled = true;
-    document.getElementById('clearSearch').disabled = true;
+    searchQuery = query;
+    searchPage = 0;
+    searchResults = [];
     document.getElementById('searchResults').replaceChildren();
     document.getElementById('selectedBuilding').replaceChildren();
+    document.getElementById('loadMoreBtn').hidden = true;
     clearSearchPoint();
-    try {
-        var result = await getJSON('/api/buildings?q=' + encodeURIComponent(query));
-        searchResults = result.items;
-        document.getElementById('searchStatus').textContent = result.total + '건 / 최대 12건 표시. 없으면 도로명 또는 지번으로 검색하세요.';
-        for (var i = 0; i < searchResults.length; i++) {
-            var row = searchResults[i];
-            var button = textNode('button', row.name || row.address);
-            button.className = 'search-result';
-            button.dataset.index = i;
-            button.append(textNode('small', row.address + ' / ' + row.jibun_address));
-            button.onclick = function() { selectBuilding(searchResults[Number(this.dataset.index)]); };
-            document.getElementById('searchResults').append(button);
-        }
-    } catch (error) { document.getElementById('searchStatus').textContent = error.message; }
-    finally {
-        document.getElementById('searchButton').disabled = false;
-        document.getElementById('clearSearch').disabled = false;
-    }
+    loadSearchPage(1);
 }
 function showSummary() {
     var summary = pageData.summary;
@@ -131,12 +170,18 @@ async function loadWaste() {
     } catch (error) { box.textContent = error.message; }
 }
 document.addEventListener('DOMContentLoaded', async function() {
+    document.getElementById('tabSearchBtn').onclick = function() { showPanel('search'); };
+    document.getElementById('tabDataBtn').onclick = function() { showPanel('data'); };
     document.getElementById('searchForm').onsubmit = searchBuildings;
+    document.getElementById('loadMoreBtn').onclick = function() { loadSearchPage(searchPage + 1); };
     document.getElementById('clearSearch').onclick = function() {
         searchResults = [];
+        searchQuery = '';
+        searchPage = 0;
         document.getElementById('keyword').value = '';
         document.getElementById('searchResults').replaceChildren();
         document.getElementById('selectedBuilding').replaceChildren();
+        document.getElementById('loadMoreBtn').hidden = true;
         document.getElementById('searchStatus').textContent = '검색을 지웠습니다. 검색 기록은 저장하지 않습니다.';
         clearSearchPoint();
     };

@@ -7,8 +7,8 @@
 | 구분 | 내용 |
 |---|---|
 | 현재 데이터 | 주거 1,585필지 · 등록 주거단위 7,193 · 생활권 9개 · 거점안 9곳 |
-| 건물 검색 | 보유 도로명주소·지번·건물명 검색 → 선택 → 담당 생활권·거점 표시 |
-| 지도 | 카카오 일반 지도, 생활권 선택, 1차 후보·주거 필지·대안 표시 체크 |
+| 건물 검색 | 보유 도로명주소·지번·건물명 검색 → 10개씩 더보기 → 선택 → 담당 생활권·거점 표시 |
+| 지도 | 검색/후보지 탭 분리, 카카오 일반 지도, 생활권 선택, 후보·필지·대안 표시 체크 |
 | 분석 설명 | 받은 엑셀의 보행거리 비교, 후보 도로폭·보호시설 이격, 출처 다운로드 |
 | 배출량 | 2024 결합권역 공식값과 과거 조건부 추정을 구분해 참고 표시 |
 
@@ -54,12 +54,12 @@ templates/index.html → static/script.js → main.py → data/ → static/map.j
 저장소는 [Han-think/greenzone_ai](https://github.com/Han-think/greenzone_ai)입니다.
 원격 master 확인본은 [c1fa036](https://github.com/Han-think/greenzone_ai/commit/c1fa03649a2671b6752deb71a27f17da8db241e1), 분석 결과 출처는 [930e1b2](https://github.com/Han-think/greenzone_ai/tree/930e1b2d291c888cee84ae284b6d830e3d4b322e/greenzone_data_analysis/greenzone2nd)입니다.
 
-- **이 브랜치는 `integration/greenzone-review` 통합 검토본입니다.** 작업 시작 기준은 `eeefe32`이며 최신 master와 코드 병합을 마친 상태는 아닙니다. [검토 브랜치](https://github.com/Han-think/greenzone_ai/tree/integration/greenzone-review)에서 데이터·웹 연결·문서의 세 커밋으로 확인합니다.
-- 최신 master의 **검색 결과 페이지 나누기·검색/후보지 탭 분리**는 보존할 팀 기능입니다. 현재 로컬 화면에는 해당 방식이 아직 합쳐지지 않았습니다.
-- 최신 master는 VWorld·주소 API, 로컬 검토안은 카카오·보유 데이터 검색을 사용합니다. `main.py`, `static/map.js`, `templates/index.html`은 파일 전체 복사 대신 변경 부분을 비교해 통합합니다.
+- **이 브랜치는 `integration/greenzone-review` 통합 검토본입니다.** 작업 시작 기준 `eeefe32`에서 데이터를 연결한 뒤, 확인한 팀 master `c1fa036`의 변경을 이 브랜치에 통합했습니다. [검토 브랜치](https://github.com/Han-think/greenzone_ai/tree/integration/greenzone-review)에서 데이터·웹·문서 및 후속 통합 커밋을 확인합니다. 팀 master 자체에는 반영하지 않았습니다.
+- 팀의 **검색/후보지 탭 분리와 결과 더보기**를 보유 데이터 검색에 맞춰 통합했습니다. 같은 화면에서 탭을 전환하고, 결과를 10개씩 추가로 불러옵니다. 탭을 바꿔도 검색 결과와 표시 체크는 유지됩니다.
+- 팀 원본은 VWorld·외부 주소 API, 이 통합본은 카카오·보유 데이터 검색을 사용합니다. 팀 탭의 HTML ID와 페이지 추가 방식을 유지하고 검색 데이터 공급 부분을 FastAPI로 연결했습니다. 외부 주소 API를 추가한 것은 아닙니다.
 - 공통 GeoJSON 4개는 최신 master와 내용이 같습니다. 원본 분석 결과·코드 ZIP·과거 배출량은 `data/`의 정해 둔 경로에 보존했습니다.
 
-반영 제안은 **데이터 정리 → 웹 연결과 팀 UI 통합 → 문서 확정**으로 나눕니다. 세부 대상과 완료 조건은 핸드북 8절에 있습니다.
+데이터와 팀 탭/더보기를 연결한 검토본입니다. 기능별 연결과 master 반영 절차는 핸드북 8절에 있습니다.
 
 ## 현재 범위의 한계
 
