@@ -1,6 +1,0 @@
-# server
-uvicorn
-fastapi
-
-python-dotenv
-jinja2
