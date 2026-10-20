@@ -2,33 +2,50 @@
 // 1. 브이월드 지도 초기화 (화면이 켜지자마자 실행됨)
 // ==========================================
 // 1. 파일 맨 위에 vmap을 전역 변수(var)로 먼저 선언하여 어디서든 접근 가능하게 합니다.
-var vmap;
-var markerLayer; // 마커를 담을 투명 비닐(레이어) 변수 추가
+let vmap;
+let markerLayer; // 마커를 담을 투명 비닐(레이어) 변수 추가
 var selectMarker;
 
-// 2. 브이월드의 모든 내부 스크립트와 화면이 '완벽히' 로딩된 후 실행 (window.onload)
-window.onload = function() {
+// HTML이 모두 로드된 후 실행 (window.onload 대신 권장되는 방식)
+document.addEventListener("DOMContentLoaded", function() {
 
     // 브이월드 2.0은 별도 설정이 없으면 center에 기본 위도/경도를 그대로 넣어도 됩니다.
-
     vw.ol3.MapOptions.basemapType = vw.ol3.BasemapType.GRAPHIC; // 기본 2D 지도 스타일
     vw.ol3.MapOptions.controlDensity = vw.ol3.DensityType.EMPTY; // 불필요한 기본 컨트롤 버튼 숨김
     vw.ol3.MapOptions.interactionDensity = vw.ol3.DensityType.BASIC;
     vw.ol3.MapOptions.center = [126.9780, 37.5665]; // 초기 서울시청 좌표
     vw.ol3.MapOptions.zoom = 15; // 초기 확대 축소 레벨
 
-    
     // HTML의 id="vmap" 영역에 지도를 그립니다. 
     // (HTML에 브이월드 키가 정상 입력되어 있다면 여기서 지도가 뜹니다.)
     // 선언해둔 vmap 변수에 실제 지도를 밀어넣습니다.
     vmap = new vw.ol3.Map("vmap", vw.ol3.MapOptions);
-};
+
+    // 2. 검색 이벤트 연결
+    const keywordInput = document.getElementById("keyword");
+    const searchBtn = document.getElementById("searchBtn");
+
+    // [버튼 클릭] 시 검색
+    searchBtn.addEventListener("click", searchAddress);
+
+    // [엔터키 입력] 시 검색
+    keywordInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            searchAddress();
+        }
+    });
+});
 
 // ==========================================
 // 2. 주소 검색 함수 (버튼 클릭 시 실행됨)
 // ==========================================
 function searchAddress() {
     let keyword = document.getElementById("keyword").value;
+
+    if (keyword.trim() === "") {
+        alert("검색어를 입력해 주세요.");
+        return;
+    }
     
     $.ajax({
         url: "https://business.juso.go.kr/addrlink/addrLinkApiJsonp.do",
@@ -50,7 +67,7 @@ function searchAddress() {
 
             // HTML의 <ul> 태그 공간을 찾아와서 안의 내용을 깨끗하게 지웁니다.
             let resultList = document.getElementById("resultList");
-            resultList.innerHTML = ""; 
+            resultList.innerHTML = ""; // 기존 목록 비우기
 
             let jusoArray = jsonStr.results.juso;
             
@@ -58,17 +75,14 @@ function searchAddress() {
             if(jusoArray != null && jusoArray.length > 0) {
                 
                 // for문(반복문)을 사용해 검색된 갯수만큼 목록을 만듭니다.
-                for(let i = 0; i < jusoArray.length; i++) {
-                    let roadAddr = jusoArray[i].roadAddr; // 도로명 주소
-                    let jibunAddr = jusoArray[i].jibunAddr; // 지번 주소
-                    
+                jusoArray.forEach(function(juso) {
                     // <li> 태그(목록 요소)를 하나 만듭니다.
-                    let listItem = document.createElement("li");
+                    const listItem = document.createElement("li");
                     
                     // 도로명과 지번 주소를 보기 좋게 합쳐서 넣습니다.
                     listItem.innerHTML = `
-                        <span style="color:#0056b3; font-weight:bold;">${roadAddr}</span><br>
-                        <span style="color:#666; font-size:13px;">[지번] ${jibunAddr}</span>
+                        <div style="color:#0056b3; font-weight:bold; margin-bottom:5px;">${juso.roadAddr}</div>
+                        <div style="color:#666; font-size:12px;">[지번] ${juso.jibunAddr}</div>
                     `;
                     
                     // 항목에 마우스를 올렸을 때 손가락 모양으로 바뀌게 하고 간격을 줍니다.
@@ -78,18 +92,18 @@ function searchAddress() {
                     // [핵심] 리스트 중 하나를 클릭했을 때 동작할 '선택 기능'
                     listItem.onclick = function() {
                         // alert("선택하신 주소: " + roadAddr + "\n(추후 이 주소를 좌표로 변환해 지도를 움직입니다.)");
-                        displayOnMap(roadAddr);
+                        displayOnMap(juso.roadAddr);
                     };
 
                     // 완성된 <li> 항목을 <ul> 리스트 공간에 쏙 밀어넣습니다.
                     resultList.appendChild(listItem); 
-                }
+                });
             } else {
-                resultList.innerHTML = "<li>검색 결과가 없습니다.</li>";
+                resultList.innerHTML = "<li style='text-align:center; border:none; color:#999;'>검색 결과가 없습니다.</li>";
             }
         },
         error: function() {
-            alert("통신 에러가 발생했습니다.");
+            alert("주소 검색 중 통신 에러가 발생했습니다.");
         }
     });
 }
@@ -100,8 +114,7 @@ function searchAddress() {
 // 주소를 좌표로 변환하고 지도 부드럽게 이동 및 순정 마커 찍기
 // ==========================================
 function displayOnMap(address) {
-    console.log("좌표를 찾을 주소: ", address);
-
+    // console.log("좌표를 찾을 주소: ", address);
     $.ajax({
         url: "https://api.vworld.kr/req/address",
         type: "GET",
@@ -121,9 +134,7 @@ function displayOnMap(address) {
                 let point = response.response.result.point;
                 let lon = Number(point.x);
                 let lat = Number(point.y);
-                
-                console.log("찾아낸 좌표 - 경도:", lon, "위도:", lat);
-
+                // console.log("찾아낸 좌표 - 경도:", lon, "위도:", lat);
                 // 1) 기존 마커 레이어 초기화 (기존 핀 지우기)
                 if (markerLayer != null) {
                     vmap.removeLayer(markerLayer);
@@ -165,13 +176,13 @@ function displayOnMap(address) {
                 
                 // 이동(스르륵) 애니메이션
                 let panAnimation = ol.animation.pan({
-                    duration: 1000, // 1초 동안 이동
+                    duration: 500, // 0.5초 동안 이동
                     source: currentCenter
                 });
                 
                 // 줌(확대/축소) 애니메이션 추가
                 let zoomAnimation = ol.animation.zoom({
-                    duration: 1000, // 1초 동안 확대/축소
+                    duration: 500, // 0.5초 동안 확대/축소
                     resolution: currentResolution // 시작할 때의 줌 상태
                 });
                 
