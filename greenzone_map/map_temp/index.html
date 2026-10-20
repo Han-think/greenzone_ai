@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>신월1동 그린존 서비스</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Malgun Gothic', sans-serif; display: flex; height: 100vh; }
+        #sidebar { width: 360px; background: #f7faf8; border-right: 1px solid #d9e4dd; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        #map { flex-grow: 1; height: 100%; }
+        h2 { color: #1b6b4a; font-size: 18px; margin-top: 0; }
+        .search-box { margin-bottom: 20px; }
+        .search-box input { width: 70%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .search-box button { width: 25%; padding: 8px; background: #1b6b4a; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .search-box button:hover { background: #144f36; }
+        .candidate-item { background: white; border: 1px solid #e1e8e4; padding: 10px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .candidate-item:hover { border-color: #1b6b4a; background: #f0f7f4; }
+        .pin { border-radius: 50%; color: #fff; font-weight: bold; text-align: center; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <h2>🌿 신월1동 그린존 후보지</h2>
+        <p style="font-size: 12px; color: #555;">11곳의 후보지가 지도 위에 상시 고정되어 있습니다. 주소를 검색해 내 위치(🏠)를 확인해보세요.</p>
+
+        <div class="search-box">
+            <input type="text" id="addressInput" placeholder="예: 신월로, 월정로 등 입력">
+            <button onclick="searchAddress()">검색</button>
+        </div>
+
+        <div id="candidateList">
+            <b>11개 후보지 목록</b>
+            <div id="listContainer" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // 1. 지도 초기화 (신월1동 중심 좌표로 바로 확대 설정)
+        var map = L.map('map').setView([37.5312, 126.8251], 15);
+
+        // 2. OpenStreetMap 무료 배경 지도 추가
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        var userMarker = null;
+
+        // 3. 신월1동 경계 폴리곤 불러오기
+        fetch('/api/boundary')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: {
+                        color: "#1b8a4a",
+                        weight: 3,
+                        fillColor: "#2ecc71",
+                        fillOpacity: 0.1
+                    }
+                }).addTo(map);
+            })
+            .catch(err => console.log('경계 파일 로드 실패:', err));
+
+        // 4. 11곳 후보지 데이터 불러와서 마커 고정 및 사이드바 목록 생성
+        fetch('/api/candidates')
+            .then(response => response.json())
+            .then(data => {
+                var listContainer = document.getElementById('listContainer');
+
+                L.geoJSON(data, {
+                    pointToLayer: function(feature, latlng) {
+                        var p = feature.properties;
+
+                        // 초록색 번호 마커 생성
+                        var customIcon = L.divIcon({
+                            className: '',
+                            html: `<div class="pin" style="background:#1b8a4a;width:26px;height:26px;line-height:26px;font-size:12px;">${p['번호']}</div>`,
+                            iconSize: [26, 26],
+                            iconAnchor: [13, 13]
+                        });
+
+                        var marker = L.marker(latlng, { icon: customIcon });
+                        marker.bindPopup(`<b>[${p['번호']}번] ${p['이름']}</b><br>유형: ${p['부지유형']}<br>면적: ${p['부지면적_㎡']}㎡<br>유효폭: ${p['유효폭_m']}m`);
+
+                        // 사이드바 아이템 생성
+                        var item = document.createElement('div');
+                        item.className = 'candidate-item';
+                        item.innerHTML = `<b>${p['번호']}. ${p['이름']}</b><br><span style="color:#666;">${p['부지유형']} · ${p['부지면적_㎡']}㎡</span>`;
+                        item.onclick = function() {
+                            map.setView(latlng, 17);
+                            marker.openPopup();
+                        };
+                        listContainer.appendChild(item);
+
+                        return marker;
+                    }
+                }).addTo(map);
+            })
+            .catch(err => console.log('후보지 데이터 로드 실패:', err));
+
+        // 5. 주소 검색 후 파란색 집(🏠) 마커 표시 함수
+        function searchAddress() {
+            var addr = document.getElementById('addressInput').value;
+            if (!addr) {
+                alert('주소를 입력해주세요!');
+                return;
+            }
+
+            fetch('/api/search-address', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: addr })
+            })
+            .then(response => response.json())
+            .then(result => {
+                var lat = result.lat;
+                var lng = result.lng;
+
+                if (userMarker) {
+                    map.removeLayer(userMarker);
+                }
+
+                var houseIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="font-size:26px; text-align:center;" title="내 위치">🏠</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                userMarker = L.marker([lat, lng], { icon: houseIcon }).addTo(map);
+                userMarker.bindPopup(`<b>[검색 위치]</b><br>${result.address}`).openPopup();
+
+                map.setView([lat, lng], 16);
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('주소 검색 중 오류가 발생했습니다.');
+            });
+        }
+    </script>
+</body>
+</html>
