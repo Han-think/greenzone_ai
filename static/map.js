@@ -228,16 +228,30 @@ async function loadGeoJsonMarkers() {
             if (feature.geometry.type === "Point") {
                 const lon = feature.geometry.coordinates[0]; // 경도
                 const lat = feature.geometry.coordinates[1]; // 위도
-                const placeName = feature.properties.name;   // 장소 이름
-                const placeDesc = feature.properties.desc;   // 장소 설명
+                
+                //geojson 안의 모든 속성(properties)을 긁어와서 HTML 텍스트로 조립
+                let popupHtml = "<div style='font-size:12px; line-height:1.5;'>";
+                let mainTitle = "상세 정보"; // 팝업 제목 기본값
+
+                if (feature.properties) {
+                    for (let key in feature.properties) {
+                        // 만약 속성 중에 '시설명', 'name', '명칭' 같은 게 있다면 그걸 메인 제목으로 씁니다
+                        if (key.includes("명") || key.includes("name")) {
+                            mainTitle = feature.properties[key];
+                        }
+                        // 말풍선 내용에 '항목이름: 값' 형태로 전부 추가
+                        popupHtml += `<strong>${key}:</strong> ${feature.properties[key]}<br>`;
+                    }
+                }
+                popupHtml += "</div>";
 
                 // 마커 옵션 설정
                 vw.ol3.markerOption = {
                     x: lon,
                     y: lat,
                     epsg: "EPSG:4326",
-                    title: placeName,
-                    contents: placeDesc,
+                    title: mainTitle,      // 팝업의 굵은 제목
+                    contents: popupHtml,   // 팝업의 실제 내용 (방금 조립한 텍스트)
                     iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png',
                     text: {
                         offsetX: 0.5,
@@ -245,9 +259,9 @@ async function loadGeoJsonMarkers() {
                         font: '12px Calibri,sans-serif',
                         fill: {color: '#000'},
                         stroke: {color: '#fff', width: 2},
-                        text: placeName // 핀 아래에 장소 이름 표시
+                        text: mainTitle // 핀 아래쪽에도 이름 표시
                     },
-                    attr: {"id": placeName, "name": placeName}
+                    attr: {"id": mainTitle, "name": mainTitle}
                 };
 
                 // 마커 레이어에 방금 만든 마커 추가
