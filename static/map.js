@@ -229,39 +229,34 @@ async function loadGeoJsonMarkers() {
                 const lon = feature.geometry.coordinates[0]; // 경도
                 const lat = feature.geometry.coordinates[1]; // 위도
                 
-                //geojson 안의 모든 속성(properties)을 긁어와서 HTML 텍스트로 조립
-                let popupHtml = "<div style='font-size:12px; line-height:1.5;'>";
-                let mainTitle = "상세 정보"; // 팝업 제목 기본값
+                // 💡 1. 필요한 데이터만 정확한 이름으로 콕 집어서 꺼내옵니다.
+                const placeName = feature.properties["이름"] || "이름 없음";
+                const roadAddr = feature.properties["도로명주소"] || feature.properties["지번주소"] || "주소 미상";
 
-                if (feature.properties) {
-                    for (let key in feature.properties) {
-                        // 만약 속성 중에 '시설명', 'name', '명칭' 같은 게 있다면 그걸 메인 제목으로 씁니다
-                        if (key.includes("명") || key.includes("name")) {
-                            mainTitle = feature.properties[key];
-                        }
-                        // 말풍선 내용에 '항목이름: 값' 형태로 전부 추가
-                        popupHtml += `<strong>${key}:</strong> ${feature.properties[key]}<br>`;
-                    }
-                }
-                popupHtml += "</div>";
+                // 💡 2. 말풍선(팝업) 내용에는 주소만 심플하게 넣습니다.
+                const popupHtml = `<div style="font-size:13px; margin-top:5px;">${roadAddr}</div>`;
 
-                // 마커 옵션 설정
+                // 3. 마커 옵션 설정
                 vw.ol3.markerOption = {
                     x: lon,
                     y: lat,
                     epsg: "EPSG:4326",
-                    title: mainTitle,      // 팝업의 굵은 제목
-                    contents: popupHtml,   // 팝업의 실제 내용 (방금 조립한 텍스트)
+                    title: placeName,      // 팝업의 굵은 제목으로 '이름' 사용
+                    contents: popupHtml,   // 팝업 내용으로 조립한 '주소' 사용
                     iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png',
+                    
+                    // 💡 4. 핀 아래에 텍스트 표시하는 부분은 완전히 주석 처리(비활성화)
+                    /*
                     text: {
                         offsetX: 0.5,
                         offsetY: 20,
                         font: '12px Calibri,sans-serif',
                         fill: {color: '#000'},
                         stroke: {color: '#fff', width: 2},
-                        text: mainTitle // 핀 아래쪽에도 이름 표시
+                        text: placeName
                     },
-                    attr: {"id": mainTitle, "name": mainTitle}
+                    */
+                    attr: {"id": placeName, "name": placeName}
                 };
 
                 // 마커 레이어에 방금 만든 마커 추가
