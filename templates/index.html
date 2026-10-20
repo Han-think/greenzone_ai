@@ -20,41 +20,45 @@
         
         /* 좌측 사이드바 패널 */
         .sidebar {
-            width: 360px; /* 💡 팀원 사이즈(360px)로 살짝 넓힘 */
-            min-width: 360px;
-            background-color: #f7faf8; /* 💡 팀원의 부드러운 배경색 흡수 */
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            z-index: 10; /* 그림자를 지도 위로 덮기 위함 */
+            width: 360px; min-width: 360px;
+            background-color: #f7faf8; display: flex; flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 10;
         }
 
         /* 💡 [신규] 병합 된 사이드바 아이템 디자인 */
         h2 { color: #1b6b4a; font-size: 18px; margin-top: 0; margin-bottom: 5px; }
-        .candidate-item { background: white; border: 1px solid #e1e8e4; padding: 10px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-        .candidate-item:hover { border-color: #1b6b4a; background: #f0f7f4; }
-        
+        /* 💡 [신규] 탭 버튼 디자인 */
+        .tab-container { display: flex; border-bottom: 1px solid #d9e4dd; margin-top: 15px; }
+        .tab-btn { 
+            flex: 1; padding: 12px 0; border: none; background: transparent; 
+            font-size: 14px; font-weight: bold; color: #888; cursor: pointer;
+            border-bottom: 3px solid transparent; outline: none; transition: 0.2s;
+        }
+        /* 선택된 탭 디자인 */
+        .tab-btn.active { color: #1b6b4a; border-bottom: 3px solid #1b6b4a; }
+        .tab-btn:hover { background: #f0f7f4; }
+
+        /* 💡 [신규] 탭 내용물(컨텐츠) 디자인 */
+        .tab-content { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        .tab-content.active { display: flex; } /* 활성화된 탭만 보이게 함 */
+
         /* 검색 입력 영역 */
-        .search-box { padding: 20px; padding-bottom: 10px; border-bottom: 1px solid #ddd; display: flex; gap: 5px; }
-        .search-box input { 
-            flex: 1; padding: 10px; border: 1px solid #ccc; 
-            border-radius: 4px; outline: none; font-size: 14px; 
-        }
-        .search-box button { 
-            padding: 10px 15px; background-color: #1b6b4a; /* 💡 팀원 테마색(진녹색)으로 통일 */
-            color: white; border: none; border-radius: 4px; 
-            cursor: pointer; font-weight: bold; 
-        }
+        .search-box { padding: 20px; border-bottom: 1px solid #ddd; display: flex; gap: 5px; }
+        .search-box input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; font-size: 14px; }
+        .search-box button { padding: 10px 15px; background-color: #1b6b4a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .search-box button:hover { background-color: #144f36; }
         
-        /* 검색 결과 리스트 영역 (결과가 많으면 스크롤 생성) */
+        /* 스크롤 영역 공통 설정 */
         .result-area { flex: 1; overflow-y: auto; padding: 20px; }
+        
+        /* 검색 결과 리스트 */
         ul#resultList { list-style: none; padding: 0; margin: 0; }
-        ul#resultList li { 
-            padding: 15px; border: 1px solid #eee; border-radius: 8px; background: white;
-            margin-bottom: 10px; cursor: pointer; transition: background 0.2s; 
-        }
+        ul#resultList li { padding: 15px; border: 1px solid #eee; border-radius: 8px; background: white; margin-bottom: 10px; cursor: pointer; transition: background 0.2s; }
         ul#resultList li:hover { background-color: #f8f9fa; border-color: #1b6b4a; }
+        
+        /* 후보지 리스트 */
+        .candidate-item { background: white; border: 1px solid #e1e8e4; padding: 10px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .candidate-item:hover { border-color: #1b6b4a; background: #f0f7f4; }
         
         /* 우측 지도 영역 */
         #vmap { flex: 1; height: 100%; background-color: #f0f0f0; }
@@ -71,32 +75,45 @@
     <div class="container">
         <!-- 좌측 검색 패널 -->
         <div class="sidebar">
-            <!-- 💡 [신규] 병합 됨: 상단 타이틀 텍스트 추가 -->
+            <!-- 상단 타이틀 -->
             <div style="padding: 20px 20px 0 20px;">
                 <h2>🌿 신월1동 그린존 후보지</h2>
-                <p style="font-size: 12px; color: #555; margin-bottom: 0;">주소를 검색해 내 위치(파란 핀)를 확인하거나 후보지를 불러와 보세요.</p>
+
+                <!-- 💡 [신규] 탭 버튼 영역 -->
+                <div class="tab-container">
+                    <button id="tabSearchBtn" class="tab-btn active">🔍 주소 검색</button>
+                    <button id="tabDataBtn" class="tab-btn">🌿 후보지 목록</button>
+                </div>
             </div>
 
-            <div class="search-box">
-                <input type="text" id="keyword" placeholder="도로명 주소 입력 (예: 신월로)">
-                <button id="searchBtn">검색</button>
+            <!-- =====================================
+                 💡 1번 탭 내용 (주소 검색창 + 검색 리스트) 
+                 ===================================== -->
+            <div id="tabContentSearch" class="tab-content active">
+                <div class="search-box">
+                    <input type="text" id="keyword" placeholder="도로명 주소 입력 (예: 신월로)">
+                    <button id="searchBtn">검색</button>
+                </div>
+                <div class="result-area" style="padding-top: 20px;">
+                    <!-- 1. 주소 검색 결과 리스트 -->
+                    <ul id="resultList"></ul>
+                </div>
             </div>
-            
-            <div class="search-box" style="border-top: none; padding-top: 0; padding-bottom: 20px;">
-                <button id="loadGeoBtn" style="width: 100%; background-color: #28a745;">🗺️ 11개 후보지(GeoJSON) 불러오기</button>
-            </div>
-            
-            <div class="result-area" style="padding-top: 0;">
-                <!-- 1. 주소 검색 결과 리스트 -->
-                <ul id="resultList">
-                    <!-- 검색 전에는 공간만 차지함 -->
-                </ul>
-                
-                <!-- 2. 💡 [신규] GeoJSON 후보지 목록 컨테이너 -->
-                <div id="listContainer"></div>
+
+            <!-- =====================================
+                 💡 2번 탭 내용 (GeoJSON 불러오기 + 후보지 리스트) 
+                 ===================================== -->
+            <div id="tabContentData" class="tab-content">
+                <div class="search-box" style="padding-bottom: 20px;">
+                    <button id="loadGeoBtn" style="width: 100%; background-color: #28a745;">🗺️ 11개 후보지 불러오기 (토글)</button>
+                </div>
+                <div class="result-area" style="padding-top: 0;">
+                    <!-- 2. 💡 [신규] GeoJSON 후보지 목록 컨테이너 -->
+                    <div id="listContainer"></div>
+                </div>
             </div>
         </div>
-        
+            
         <!-- 우측 지도 영역 -->
         <div id="vmap"></div>
     </div>

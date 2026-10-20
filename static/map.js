@@ -30,6 +30,30 @@ document.addEventListener("DOMContentLoaded", function() {
     // 선언해둔 vmap 변수에 실제 지도를 밀어넣습니다.
     vmap = new vw.ol3.Map("vmap", vw.ol3.MapOptions);
 
+    // --- 💡 [신규] 탭 전환 기능 시작 ---
+    const tabSearchBtn = document.getElementById("tabSearchBtn");
+    const tabDataBtn = document.getElementById("tabDataBtn");
+    const tabContentSearch = document.getElementById("tabContentSearch");
+    const tabContentData = document.getElementById("tabContentData");
+
+    // [주소 검색 탭] 클릭 시
+    tabSearchBtn.addEventListener("click", function() {
+        tabSearchBtn.classList.add("active");      // 내 버튼 활성화
+        tabDataBtn.classList.remove("active");     // 상대방 버튼 비활성화
+        
+        tabContentSearch.classList.add("active");  // 내 화면 켜기
+        tabContentData.classList.remove("active"); // 상대방 화면 끄기
+    });
+
+    // [후보지 목록 탭] 클릭 시
+    tabDataBtn.addEventListener("click", function() {
+        tabDataBtn.classList.add("active");
+        tabSearchBtn.classList.remove("active");
+        
+        tabContentData.classList.add("active");
+        tabContentSearch.classList.remove("active");
+    });
+
     // 이벤트 리스너(버튼 클릭, 엔터키 감지) 등록
     const keywordInput = document.getElementById("keyword");
     const searchBtn = document.getElementById("searchBtn");
