@@ -1,0 +1,31 @@
+{
+  "result": [
+    {
+      "ppltn_dnsty": "32410.9",
+      "oldage_suprt_per": "28.7",
+      "imga_cnt": "N/A",
+      "avg_age": "46.6",
+      "aged_child_idx": "282.1",
+      "naesuoga_cnt": "N/A",
+      "avg_fmember_cnt": "2.1",
+      "haesuoga_cnt": "N/A",
+      "adm_cd": "11150570",
+      "adm_nm": "서울특별시양천구신월1동",
+      "tot_family": "9208",
+      "naesuoga_ppltn": "N/A",
+      "juv_suprt_per": "10.2",
+      "tot_ppltn": "20158",
+      "corp_cnt": "1944",
+      "imga_ppltn": "N/A",
+      "employee_cnt": "5581",
+      "nongga_cnt": "N/A",
+      "tot_house": "6160",
+      "nongga_ppltn": "N/A",
+      "haesuoga_ppltn": "N/A"
+    }
+  ],
+  "errCd": 0,
+  "errMsg": "Success",
+  "id": "API_0301",
+  "trId": "H*LK_API_0301_1792407285503"
+}

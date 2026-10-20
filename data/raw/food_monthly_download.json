@@ -1,0 +1,15 @@
+{
+  "page": "https://data.seoul.go.kr/dataList/OA-22039/F/1/datasetView.do",
+  "download_url": "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false",
+  "post_parameters": {
+    "infId": "OA-22039",
+    "infSeq": "1",
+    "seq": "1"
+  },
+  "retrieved_at": "2026-10-19",
+  "bytes": 1152,
+  "sha256": "71f65be5b49ccbb8ab843672aa8534b344a96e30d8e0b8467b98efc625ee0369",
+  "encoding": "cp949",
+  "http_status": 200,
+  "content_type": "application/x-msdownload"
+}

@@ -1,0 +1,4 @@
+﻿use_group,parcels,share_of_target_percent,registered_families_fmlyCnt,registered_units_hhldCnt,parcels_without_positive_family_or_unit_count,total_registered_floor_area_m2,quantity_status
+residential_only,1155,69.37,2468,3697,0,358448.97,descriptive_registry_counts_not_waste_amount
+commercial_only,108,6.49,25,12,86,79743.35,descriptive_registry_counts_not_waste_amount
+mixed_use,402,24.14,577,403,4,172692.49,descriptive_registry_counts_not_waste_amount

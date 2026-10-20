@@ -1,0 +1,26 @@
+[
+  {
+    "file": "yangcheon-zone-waste-20260831.csv",
+    "url": "https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000007671274&fileDetailSn=1&insertDataPrcus=N",
+    "post": null,
+    "encoding": "cp949",
+    "bytes": 36985,
+    "sha256": "324f8409e9ea119529b741e8947609da44048d79bc30cbcb28db2a0c94129a1d",
+    "retrieved_at": "2026-10-19",
+    "rows": 540
+  },
+  {
+    "file": "yangcheon-zone-waste-20221029.csv",
+    "url": "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false",
+    "post": {
+      "infId": "OA-22025",
+      "infSeq": "1",
+      "seq": "1"
+    },
+    "encoding": "cp949",
+    "bytes": 493,
+    "sha256": "e0f20767210a5a4e5dabd53ff42255107ffed29e56f84126fc53d7a63680336d",
+    "retrieved_at": "2026-10-19",
+    "rows": 6
+  }
+]

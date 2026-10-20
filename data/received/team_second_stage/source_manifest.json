@@ -1,0 +1,143 @@
+{
+  "branch": "analysis/greenzone2nd",
+  "commit": "930e1b2d291c888cee84ae284b6d830e3d4b322e",
+  "author": "hihiimj",
+  "commit_time": "2026-10-20T16:04:09+09:00",
+  "retrieved_date": "2026-10-20",
+  "source_url": "https://github.com/Han-think/greenzone_ai/tree/930e1b2d291c888cee84ae284b6d830e3d4b322e/greenzone_data_analysis/greenzone2nd/",
+  "files": [
+    {
+      "file_name": "greenzone2nd.csv",
+      "bytes": 2102,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd.csv",
+      "sha256": "3f417cf8026c7269a85b2a85c947450c40ef7fdcdea20acf66da5060abcbbe81"
+    },
+    {
+      "file_name": "greenzone2nd.geojson",
+      "bytes": 6472,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd.geojson",
+      "sha256": "d303d0a2571a7f6030b2a944e4e5a912db09dae7d09ff490b5bc82df74d97f11"
+    },
+    {
+      "file_name": "greenzone2nd.md",
+      "bytes": 19344,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd.md",
+      "sha256": "b0018482739db175e5edff2aac9ea0acc98f01d9f6e73b64856285d76fdbb35c"
+    },
+    {
+      "file_name": "greenzone2nd.xlsx",
+      "bytes": 28999,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd.xlsx",
+      "sha256": "0931949a90019441313f9c1dd66a64e426e1bf38b6728d0ed04b0de4810d4df5"
+    },
+    {
+      "file_name": "greenzone2nd_layer_alternatives.geojson",
+      "bytes": 9317,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd_layer_alternatives.geojson",
+      "sha256": "55b9208b620f8778f80461ef91c8b254a01b2c3f4b231c66716f3c39acf73f76"
+    },
+    {
+      "file_name": "greenzone2nd_layer_candidates.geojson",
+      "bytes": 5396,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd_layer_candidates.geojson",
+      "sha256": "b35bc85e9c12f22e742854107657ac8da48f90b81085b38f6b94d7d8e4467ae7"
+    },
+    {
+      "file_name": "greenzone2nd_layer_households.geojson",
+      "bytes": 351184,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd_layer_households.geojson",
+      "sha256": "0b04ee7fe2f976d5f295a838b15f83aa273e253582be2f1236591c8fc602308c"
+    },
+    {
+      "file_name": "greenzone2nd_layer_zones.geojson",
+      "bytes": 38722,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd_layer_zones.geojson",
+      "sha256": "cd28ad394ddd28da916ead41d9331080e14cc240660de90d56c2101396d9bdc1"
+    },
+    {
+      "file_name": "greenzone2nd_map.html",
+      "bytes": 396782,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd_map.html",
+      "sha256": "f11c12cc317b7663bcf96279d1a1ebf30390fe60095fd2c0d8cf24d30bcaab33"
+    },
+    {
+      "file_name": "greenzone2nd_map.png",
+      "bytes": 505781,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd_map.png",
+      "sha256": "0d8e13a1b9e553b3f5a9033145398d47c70e4f3f9bb906f12f08eeea32ce8fdc"
+    },
+    {
+      "file_name": "greenzone2nd_sensitivity.png",
+      "bytes": 132439,
+      "git_path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd_sensitivity.png",
+      "sha256": "09688e421f69b9860cb3dd7e6f8913def919a4ea74c572443a0b51f5ae846c2e"
+    }
+  ],
+  "review": {
+    "received_outputs": 11,
+    "joined_parcels": 1585,
+    "source_legacy_roles": {
+      "analysis_target": 1578,
+      "context_only": 7
+    },
+    "apartment_matches": 0,
+    "zone_units": {
+      "1": 1038,
+      "4": 876,
+      "3": 877,
+      "9": 582,
+      "8": 585,
+      "5": 859,
+      "6": 708,
+      "2": 977,
+      "7": 691
+    },
+    "zone_parcels": {
+      "1": 194,
+      "4": 167,
+      "3": 263,
+      "9": 154,
+      "8": 162,
+      "5": 183,
+      "6": 121,
+      "2": 221,
+      "7": 120
+    },
+    "original_report_unchanged": true,
+    "source_code_executed": false,
+    "full_analysis_reproduced": false,
+    "missing_inputs": [
+      "pyojebu.xlsx",
+      "TL_SPRD_MANAGE SHP and sidecars",
+      "TL_SPBD_BULD SHP and sidecars"
+    ],
+    "missing_intermediates": [
+      "cand_dist.csv",
+      "lot_lot.npy",
+      "plan.pkl"
+    ],
+    "known_review_items": [
+      "G01 registered width 8m and geometry-estimated cross-section 5.3m are different measures. REGISTERED_OK=True explicitly prioritizes registered width >=7m; field effective width remains unverified.",
+      "7193 formula visible in code; previous 6853 row difference unavailable",
+      "nearest hub metrics differ from own-community assignment metrics",
+      "first-stage selected sites not freshly screened by alternative road criteria"
+    ]
+  },
+  "source_dates_note": "Source raw files are absent. Input dates in HANDBOOK are team-declared dates, not rechecked raw metadata.",
+  "road_evidence": {
+    "first_stage_layer": "data/received/team_results/roads.geojson",
+    "first_stage_layer_sha256": "324e2cab8ca306f9434a40b14f78e0eedc09cc82a5e004d0e2fd017c3f84da22",
+    "first_stage_segments": 162,
+    "first_stage_export_extent": "roads intersecting Sinwol 1-dong boundary buffered by 150m",
+    "first_stage_source_archive": "data/received/archive/first_stage_source.zip",
+    "G01_registered_width_m": 8,
+    "G01_geometry_cross_section_estimate_m": 5.3,
+    "G01_policy": "REGISTERED_OK=True; registered width >=7m accepted; not a field measurement or safety approval",
+    "second_stage_road_analysis": "received code uses road graph / Dijkstra distances and registered-width >=7m filtering for new alternatives",
+    "second_stage_input_extent": "Sinwol 1-dong boundary buffered by 500m; not identical to first-stage exported roads",
+    "full_reproduction_ready": false,
+    "limitation": "Raw SHP inputs and intermediate distance matrices have not been received. Road analysis exists; missing reproduction inputs do not mean road data are absent."
+  },
+  "current_dataset": "team_louvain_7193_9_communities",
+  "historical_comparison_path": "data/received/archive/tradeoff_6853.png"
+}

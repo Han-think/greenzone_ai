@@ -1,0 +1,4 @@
+﻿year,administrative_dong,adm_cd,population_persons,households,housing_units,population_density_per_km2,businesses,employees,average_household_size,includes_apartments,source_id,retrieved_at,use
+2021,신월1동,11150570,20158,9208,6160,32410.9,1944,5581,2.1,True,SGIS_CENSUS,2026-10-19,dong_context_not_non_apartment_parcel_population
+2022,신월1동,11150570,19878,9304,6248,31960.7,1899,5159,2.1,True,SGIS_CENSUS,2026-10-19,dong_context_not_non_apartment_parcel_population
+2024,신월1동,11150570,18712,8981,6081,30085.9,1836,4981,2,True,SGIS_CENSUS,2026-10-19,dong_context_not_non_apartment_parcel_population

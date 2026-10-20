@@ -1,0 +1,14 @@
+{
+  "result": [
+    {
+      "all_house_cnt": 1327,
+      "house_cnt": "1327",
+      "adm_cd": "11150570",
+      "adm_nm": "신월1동"
+    }
+  ],
+  "errCd": 0,
+  "errMsg": "Success",
+  "id": "API_0306",
+  "trId": "HmET_API_0306_1792407285726"
+}

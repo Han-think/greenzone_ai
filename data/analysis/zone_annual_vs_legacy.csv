@@ -1,0 +1,4 @@
+﻿year,waste_type,legacy_annual_tonnes,current_monthly_sum_tonnes,difference_tonnes,status
+2021,general,6392,6392,0,matches
+2021,food,4345,4345,0,matches
+2021,recycling,2797,2801,4,source_vintage_or_aggregation_difference_reason_unconfirmed

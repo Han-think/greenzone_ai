@@ -1,0 +1,30 @@
+{
+  "target_rows": 1665,
+  "all_parcels": 1738,
+  "unique_target_ids": 1665,
+  "apartments_in_targets": 0,
+  "other_dongs_in_parcel_output": 0,
+  "filled_parcel_waste_estimates": 0,
+  "target_classification_counts": {
+    "commercial_only": 108,
+    "mixed_use": 402,
+    "residential_only": 1155
+  },
+  "review_rows": 143,
+  "household_or_unit_nonpositive_parcels": 90,
+  "zone_raw_rows": 90,
+  "duplicate_zone_months": 0,
+  "zone_raw_period": [
+    [
+      2019,
+      1
+    ],
+    [
+      2026,
+      6
+    ]
+  ],
+  "formula_differences": [],
+  "sgis_requests_successful": 17,
+  "qualification": "파일 수치·수식·범위 대조 완료. 가구당 배출량 균일·상가 미보정 등 추정 가정의 현장 검증은 미완료"
+}

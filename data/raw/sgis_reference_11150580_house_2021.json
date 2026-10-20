@@ -1,0 +1,14 @@
+{
+  "result": [
+    {
+      "all_house_cnt": 3845,
+      "house_cnt": "3845",
+      "adm_cd": "11150580",
+      "adm_nm": "신월2동"
+    }
+  ],
+  "errCd": 0,
+  "errMsg": "Success",
+  "id": "API_0306",
+  "trId": "=K78_API_0306_1792407286127"
+}

@@ -1,0 +1,108 @@
+{
+  "source_file": "yangcheon-food-truck-routes-20200929.csv",
+  "encoding": "cp949",
+  "bytes": 3203,
+  "sha256": "bb335a0b04708b5fb57ad4fb3b8e8d34927576be087bb218e5483d6f397efe38",
+  "time_rows": 17,
+  "columns": 12,
+  "operator_day_columns": 11,
+  "possible_time_area_cells": 187,
+  "populated_time_area_cells": 144,
+  "blank_time_area_cells": 43,
+  "coordinate_columns": [],
+  "operator_aliases": [
+    "업체A",
+    "업체B",
+    "업체C",
+    "업체D",
+    "업체E",
+    "업체F",
+    "업체G"
+  ],
+  "coverage_by_column": [
+    {
+      "header": "업체A(월,수,금)",
+      "populated_time_cells": 16,
+      "total_time_cells": 17,
+      "unique_area_texts": 15,
+      "repeated_area_cells": 1
+    },
+    {
+      "header": "업체A(화,목,일)",
+      "populated_time_cells": 16,
+      "total_time_cells": 17,
+      "unique_area_texts": 14,
+      "repeated_area_cells": 2
+    },
+    {
+      "header": "업체B(월,수,금)",
+      "populated_time_cells": 17,
+      "total_time_cells": 17,
+      "unique_area_texts": 9,
+      "repeated_area_cells": 8
+    },
+    {
+      "header": "업체B(화,목,일)",
+      "populated_time_cells": 17,
+      "total_time_cells": 17,
+      "unique_area_texts": 6,
+      "repeated_area_cells": 11
+    },
+    {
+      "header": "업체C(월,수,금)",
+      "populated_time_cells": 10,
+      "total_time_cells": 17,
+      "unique_area_texts": 10,
+      "repeated_area_cells": 0
+    },
+    {
+      "header": "업체C(화,목,토)",
+      "populated_time_cells": 7,
+      "total_time_cells": 17,
+      "unique_area_texts": 7,
+      "repeated_area_cells": 0
+    },
+    {
+      "header": "업체D(월,수,금)",
+      "populated_time_cells": 15,
+      "total_time_cells": 17,
+      "unique_area_texts": 7,
+      "repeated_area_cells": 8
+    },
+    {
+      "header": "업체D(화,목,토)",
+      "populated_time_cells": 14,
+      "total_time_cells": 17,
+      "unique_area_texts": 8,
+      "repeated_area_cells": 6
+    },
+    {
+      "header": "업체E",
+      "populated_time_cells": 10,
+      "total_time_cells": 17,
+      "unique_area_texts": 9,
+      "repeated_area_cells": 1
+    },
+    {
+      "header": "업체F",
+      "populated_time_cells": 16,
+      "total_time_cells": 17,
+      "unique_area_texts": 7,
+      "repeated_area_cells": 9
+    },
+    {
+      "header": "업체G",
+      "populated_time_cells": 6,
+      "total_time_cells": 17,
+      "unique_area_texts": 6,
+      "repeated_area_cells": 0
+    }
+  ],
+  "precision_heuristics": {
+    "address_text_needs_resolution": 77,
+    "address_range": 34,
+    "broad_or_mixed_area": 16,
+    "named_site_or_mixed": 17
+  },
+  "precision_classification_status": "heuristic_not_geocoded_not_field_verified"
+}

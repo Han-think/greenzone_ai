@@ -1,0 +1,44 @@
+{
+  "checked_at": "2026-10-20",
+  "current_dataset": "team_louvain_7193_9_communities",
+  "source": "user-provided five-file delivery; originals preserved byte for byte",
+  "files": [
+    {
+      "original_name": "1. 1차 결과물 greenzone1st.xlsx",
+      "path": "data/received/team_results/first_stage.xlsx",
+      "dataset_version": "first_stage_11_candidates",
+      "bytes": 16357,
+      "sha256": "967406dccdf946c5d4eaf061364ad95447949147749b42f73be03f73a69a5d5c"
+    },
+    {
+      "original_name": "2. 1차 결과물 설명 greenzone1st.md",
+      "path": "data/received/team_results/analysis_report.md",
+      "dataset_version": "first_stage_11_candidates",
+      "bytes": 8156,
+      "sha256": "211dca7a66fb29be2959fb04ab601c2b3c39cfd8e98d521b96ef8ff1d7b57014"
+    },
+    {
+      "original_name": "3. 1차 결과물 코드 greenzone-analysis.zip",
+      "path": "data/received/archive/first_stage_source.zip",
+      "dataset_version": "first_stage_source_archive",
+      "bytes": 716457,
+      "sha256": "7a26a7adeaaebd661a449f8a75220d2dca2da00e223903b0ceeb9451e202797b"
+    },
+    {
+      "original_name": "4._1_greenzone1st_map.png",
+      "path": "data/received/team_results/first_stage_map.png",
+      "dataset_version": "first_stage_11_candidates",
+      "bytes": 569380,
+      "sha256": "da94dc2a374c235b07e6997dc4f46638d09b4a61c45cccb096283959f688753b"
+    },
+    {
+      "original_name": "greenzone2nd_tradeoff.png",
+      "path": "data/received/archive/tradeoff_6853.png",
+      "dataset_version": "historical_6853_comparison",
+      "bytes": 190960,
+      "sha256": "da310b7e0cbbf30a091b4f02686776d3b1d6b5c72bd04aab51b4b52e55c467ee"
+    }
+  ],
+  "temporary_folder_required": false,
+  "historical_note": "6853-unit graph is an earlier comparison. Its exact analysis date and row-level reconciliation are unavailable; do not merge with current 7193 units."
+}

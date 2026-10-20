@@ -1,0 +1,11 @@
+{
+  "source_file": "그린존_요구사항정의서.xlsx",
+  "source_sha256": "1adfb3fb102c14f1f15ab913861877302629a9cedb6d3d0cef03ccbdf77c1cf8",
+  "sheet": "요구사항정의서",
+  "row": 5,
+  "requirement_id": "REQ-DA-001",
+  "user_confirmed_requirement": "REQ-DA-001",
+  "study_area": "신월1동",
+  "current_delivery": "기초 분류·과거 물량·조건부 수요 추정·리뷰",
+  "deferred": "도로 검토 이후 분산배정, 웹·AI 구현"
+}

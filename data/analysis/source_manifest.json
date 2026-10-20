@@ -1,0 +1,351 @@
+{
+  "created_at": "2026-10-19",
+  "inputs": [
+    {
+      "file": "pilot_analysis.json",
+      "bytes": 11537467,
+      "sha256": "6b91e1083891fec285fcbc99796108f4b8e5c76691ff89f8b770d322ccb586c7"
+    },
+    {
+      "file": "sinwol-titles-all.json",
+      "bytes": 12361572,
+      "sha256": "4c12a2b0c45519150022046a6e8e550cacf21a935ba013679f7101a845685f8b"
+    },
+    {
+      "file": "sinwol-footprints-all.json",
+      "bytes": 3118673,
+      "sha256": "080d1cdf1a0d1e99904a72dff2213df4465cf9e8dcdd314416da1a869c6922ed"
+    },
+    {
+      "file": "sinwol-boundary-wgs84.json",
+      "bytes": 983,
+      "sha256": "5f098a567159dc19925832998bbdb06fd9970b181b1a67b7622bb024d195c4aa"
+    },
+    {
+      "file": "yangcheon-food-monthly-20260831.csv",
+      "bytes": 3099,
+      "sha256": "5ecbc065058af3c090e79156064700731fb5adb7808d19ffd367aa4680cc29f5"
+    },
+    {
+      "file": "yangcheon-food-monthly-20221201.csv",
+      "bytes": 1152,
+      "sha256": "71f65be5b49ccbb8ab843672aa8534b344a96e30d8e0b8467b98efc625ee0369"
+    },
+    {
+      "file": "yangcheon-carbon-plan-202504.pdf",
+      "bytes": 4547179,
+      "sha256": "f71486fa151786955496c8f2212ec640e102352a0ab77d99ae64c2657bb8181e"
+    },
+    {
+      "file": "data-go-15069391.html",
+      "bytes": 210936,
+      "sha256": "8353ec0911d6f26abd2882e8f18ebb4b527ed92222f7fbc99826273ef37edf7f"
+    },
+    {
+      "file": "carbon-plan-page-14.png",
+      "bytes": 218496,
+      "sha256": "16d66e2bcba1902b13dd253b0f13c19adb263d95701f199ca5b98595e959fc27"
+    },
+    {
+      "file": "sgis-sinwol1-population-2022.json",
+      "bytes": 765,
+      "sha256": "934a4d83e86676c204d75d8eeb4bb94996eed4cffd5cd800f3a340faa956172d"
+    },
+    {
+      "file": "sgis-sinwol1-population-2024.json",
+      "bytes": 761,
+      "sha256": "01917cf00fa6bce1eaadc4f0b8cb18dfe6ca659f89eccc005799d5fa31b61a1b"
+    },
+    {
+      "file": "sgis_statistics_acquisition.json",
+      "bytes": 7669,
+      "sha256": "e9cb3ce913c3d80f29945d363b06491eb04e63a37397d00be9a1b21f55912a10"
+    },
+    {
+      "file": "prepare_sinwol1_demand_handoff.py",
+      "bytes": 30800,
+      "sha256": "07a1d296c432992587b66f562ae273f3e11f5dc20d868fd036cb2dd1a953c40f"
+    },
+    {
+      "file": "yangcheon-zone-waste-20260831.csv",
+      "bytes": 36985,
+      "sha256": "324f8409e9ea119529b741e8947609da44048d79bc30cbcb28db2a0c94129a1d"
+    },
+    {
+      "file": "yangcheon-zone-waste-20221029.csv",
+      "bytes": 493,
+      "sha256": "e0f20767210a5a4e5dabd53ff42255107ffed29e56f84126fc53d7a63680336d"
+    },
+    {
+      "file": "zone_waste_downloads.json",
+      "bytes": 814,
+      "sha256": "36b8411fc65c20577f69f903fa2388b8f60048e125a09babd5b7cf5ddcbd7f17"
+    },
+    {
+      "file": "sgis-house-type-codes.html",
+      "bytes": 1942,
+      "sha256": "b0b36cfbd480ec9aadad5e7bf9ae2f9966a40e37244cf980fee87167c5383880"
+    },
+    {
+      "file": "sgis-reference-11150570-house-2021.json",
+      "bytes": 244,
+      "sha256": "6b999e29baa39c40cb01c29e5e05f26b14b3ee6d4f7ee09bf6d0d27f7bda5dfe"
+    },
+    {
+      "file": "sgis-reference-11150570-house-2024.json",
+      "bytes": 244,
+      "sha256": "f989574585d388162c51202edf12909e0b7c83a4f1665717e6a05746b99dd2f6"
+    },
+    {
+      "file": "sgis-reference-11150580-house-2021.json",
+      "bytes": 244,
+      "sha256": "04a00aba10b307c1ae4442ccf3e3264d873314d6ccfb406ef15c291a4ff31180"
+    },
+    {
+      "file": "sgis-reference-11150580-house-2024.json",
+      "bytes": 244,
+      "sha256": "6eac43edf2a5ba209eab4cf7efe783b2390bdaf2a0d8341a47e24640eaae8022"
+    },
+    {
+      "file": "sgis-reference-11150580-population-2021.json",
+      "bytes": 766,
+      "sha256": "0e0b7c3e0e829976e473a1903c809b16894741e9f0868b6ba29e328b2fe82d69"
+    },
+    {
+      "file": "sgis-reference-11150580-population-2024.json",
+      "bytes": 766,
+      "sha256": "9e22c98e121630e1828744ae8761c467a35590a12d97300091a6106313587821"
+    },
+    {
+      "file": "sgis-reference-11150590-house-2021.json",
+      "bytes": 244,
+      "sha256": "4ccd1615fb37f6941254f040e29eb433cd5dfa61a970a75cad77ee822f9a23e5"
+    },
+    {
+      "file": "sgis-reference-11150590-house-2024.json",
+      "bytes": 244,
+      "sha256": "e472e9f366f1fd21dcd8d9a260c29da4db76b9b947618a9f976376bbee9da3ce"
+    },
+    {
+      "file": "sgis-reference-11150590-population-2021.json",
+      "bytes": 764,
+      "sha256": "cee73c801903fd77b77d813c67e7e9bb186cf638f2045ef30c95025e39fc30c5"
+    },
+    {
+      "file": "sgis-reference-11150590-population-2024.json",
+      "bytes": 764,
+      "sha256": "5b46625871cce773220b5af666e2908e314d39fe34b9ee974fb879c73cfd10b0"
+    },
+    {
+      "file": "sgis-reference-11150610-house-2021.json",
+      "bytes": 244,
+      "sha256": "18f50ebf791298a1330e51917f3ca391431953c9abd978fe5b8c567a08a4f243"
+    },
+    {
+      "file": "sgis-reference-11150610-house-2024.json",
+      "bytes": 244,
+      "sha256": "335137a664fcdcbadde40a2311b747c7d49b6ba5218e8844cddf36153496ac63"
+    },
+    {
+      "file": "sgis-reference-11150610-population-2021.json",
+      "bytes": 766,
+      "sha256": "06c3966473e47a4817995ab6cf37552d9349b9614b3567ac2a2957781f4c97eb"
+    },
+    {
+      "file": "sgis-reference-11150610-population-2024.json",
+      "bytes": 766,
+      "sha256": "3622b0a182d73a47ab2b5b2fda20c8328d72a518713836148e346af719297325"
+    },
+    {
+      "file": "sgis-sinwol1-population-2021.json",
+      "bytes": 766,
+      "sha256": "89359a9c77e71560ef08fe12a80fe1b41e6c64119b88ce97e244d04e74b1c0be"
+    },
+    {
+      "file": "analyze_sinwol1_zone_waste.py",
+      "bytes": 20595,
+      "sha256": "7572b87ca664e0bc20e82e2ba38468723e135d6c7abf4ccee6e6958b13516b64"
+    },
+    {
+      "file": "collect_sinwol1_statistics.py",
+      "bytes": 4395,
+      "sha256": "f5480ab6aab0ffcc08759da521af7e00c47ad77af21077e82e2d608795ddfdd2"
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "BUILDING_HUB",
+      "title": "국토교통부 건축HUB 건축물대장 표제부",
+      "url": "https://www.data.go.kr/data/15134735/openapi.do",
+      "reference_date": null,
+      "note": "법정동 신월동 7,247건 중 주건축물 대장을 PNU로 결합하고 행정동 신월1동 경계로 추출",
+      "unit": "가구 / 세대 / m²",
+      "retrieved_at": "2026-10-18",
+      "temporal_type": "retrieval_snapshot_source_asof_not_published",
+      "display_time_reference": "2026-10-18 API 조회본\n원천 일괄 기준일 미제공",
+      "record_date_field": "crtnDay",
+      "record_date_min": "2022-08-13",
+      "record_date_max": "2026-09-28",
+      "provider_update_frequency": "월간 (공식 API 카탈로그)",
+      "catalog_modified_at": "2026-07-10",
+      "date_evidence": "보존 원본 7,247건 crtnDay: 2022-08-13~2026-09-28. 이 필드는 전체 데이터 갱신일이 아님. 공식 카탈로그는 월간 갱신, 시간범위는 별도 미기재. 2026-10-18 수집·분석 기록으로 조회본 날짜 확인.",
+      "temporal_limit": "조회 당시 응답을 이용한 예비 건물 분류. 생성일 최댓값·카탈로그 수정일을 전체 기준일로 사용하지 않음. 최신 현황 확정에는 원천 기준일이 명시된 배포본 또는 제공기관 확인 필요."
+    },
+    {
+      "source_id": "SGIS_BOUNDARY",
+      "title": "SGIS 2025 행정동 경계",
+      "url": "https://sgis.mods.go.kr/developer/html/newOpenApi/api/dataApi/addressBoundary.html",
+      "reference_date": "2025",
+      "note": "2025 신월1동 행정동 경계. EPSG:5179에서 4326으로 변환",
+      "unit": "좌표 EPSG:4326",
+      "retrieved_at": "2026-10-18",
+      "temporal_type": "requested_boundary_year",
+      "display_time_reference": "2025년 행정동 경계판",
+      "date_evidence": "SGIS 경계 요청 year=2025 및 저장한 양천구 경계 응답. EPSG:5179 원본에서 EPSG:4326으로 변환.",
+      "temporal_limit": "2025 경계판을 사용. 조회일 2026-10-18을 경계 기준연도로 바꾸지 않음."
+    },
+    {
+      "source_id": "VWORLD_BUILDINGS",
+      "title": "VWorld 도로명주소건물 LT_C_SPBD",
+      "url": "https://www.vworld.kr/",
+      "reference_date": null,
+      "note": "공식 도로명주소건물의 도형·PNU와 대표 건물 점 사용. 출입구나 배출장소 아님",
+      "unit": "좌표 EPSG:4326",
+      "retrieved_at": "2026-10-18",
+      "temporal_type": "retrieval_snapshot_source_asof_not_in_response",
+      "display_time_reference": "2026-10-18 WFS 조회본\n원천 갱신일 응답 없음",
+      "date_evidence": "LT_C_SPBD 보존 응답의 속성 전체를 확인했으나 생성·갱신일 필드가 없음. 수집·분석 기록으로 조회본 날짜를 확인. 공식 레이어 기준일은 확보하지 못함.",
+      "temporal_limit": "위치 탐색용 조회 스냅샷. 2026년 현황 확정 자료로 표현하지 않음. 기준일이 명시된 건물 공간자료로 대체하거나 공급기관 메타데이터 확인 필요."
+    },
+    {
+      "source_id": "VWORLD_ROADS",
+      "title": "VWorld 도로중심선 LT_L_N3A0020000",
+      "url": "https://www.vworld.kr/",
+      "unit": "좌표 EPSG:4326",
+      "note": "지도 배경과 도로 선형 참고. 현장 유효폭·통행 규제 미검증",
+      "reference_date": null,
+      "retrieved_at": "2026-10-18",
+      "temporal_type": "retrieval_snapshot_source_asof_not_in_response",
+      "display_time_reference": "2026-10-18 WFS 조회본\n원천 갱신일 응답 없음",
+      "date_evidence": "LT_L_N3A0020000 보존 응답의 속성 전체를 확인했으나 생성·갱신일 필드가 없음. 2026-10-18 수집·분석 기록과 원본 해시 보존.",
+      "temporal_limit": "배경 선형 참고. 현재 도로 유효폭·일방통행·차량 진입 가능 여부의 확정 근거로 사용하지 않음. 기준일 명시 도로 자료 보강 필요."
+    }
+  ],
+  "statistics_sources": [
+    {
+      "source_id": "SGIS_CENSUS",
+      "url": "https://sgis.mods.go.kr/developer/html/newOpenApi/api/dataApi/census.html",
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "reference_years": [
+        2021,
+        2022,
+        2024
+      ],
+      "retrieved_at": "2026-10-19",
+      "adm_cd": "11150570",
+      "verification": "프리뷰 설정 키로 실제 인증·조회 성공. 토큰·키 비저장",
+      "limitation": "동 전체이며 아파트 포함. 비아파트 인구/가구 수로 확정하지 않음",
+      "unit": "가구 / 호",
+      "title": "SGIS 가구·주택 통계",
+      "reference_date": null,
+      "temporal_type": "requested_statistical_years",
+      "display_time_reference": "2021·2024년 통계 (본 분석)\n2022년 신월1동 (참고)",
+      "date_evidence": "SGIS 공식 문서의 year=기준연도. sgis_statistics_acquisition.json의 인증 성공 요청 year와 보존 응답을 대조.",
+      "temporal_limit": "연도별 통계이며 2026년 현재 가구 수가 아님. 2021/2024 배출량에 같은 연도 분모만 사용."
+    },
+    {
+      "source_id": "SGIS_HOUSE_TYPE_02",
+      "url": "https://sgis.mods.go.kr/developer/html/openApi/api/dataCode/HouseCode.html",
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "house_type": "02",
+      "meaning": "아파트 주택 수(호)",
+      "years": [
+        2021,
+        2024
+      ],
+      "limit": "주택 수 비율을 가구 비율로 사용하는 것은 추정 가정",
+      "unit": "호",
+      "title": "SGIS 아파트 주택 수",
+      "verification": "공식 코드 02 확인 및 실제 API 응답 대조",
+      "reference_date": null,
+      "retrieved_at": "2026-10-19",
+      "temporal_type": "requested_statistical_years",
+      "display_time_reference": "2021·2024년 주택 통계",
+      "date_evidence": "SGIS house.json 요청 year=2021·2024, house_type=02와 보존 응답 대조. 코드표의 확인일과 통계 기준연도를 구분.",
+      "temporal_limit": "주택 수(호) 통계. 아파트 가구 수나 2026년 현황으로 해석하지 않음."
+    }
+  ],
+  "waste_sources": [
+    {
+      "source_id": "ZONE_WASTE_15093944",
+      "title": "양천구 구역별쓰레기배출량",
+      "url": "https://www.data.go.kr/data/15093944/fileData.do",
+      "seoul_legacy_url": "https://data.seoul.go.kr/dataList/OA-22025/F/1/datasetView.do",
+      "file_reference_date": "2026-08-31",
+      "retrieved_at": "2026-10-19",
+      "scope": "1구역 = 신월1·2·3·5동",
+      "reference_period": "2019-01~2026-06",
+      "unit": "톤",
+      "verification": "공식 CSV 원본 직접 취득, 컬럼명과 과거 연간 파일 대조",
+      "limitations": [
+        "공동주택 자체계약 재활용과 사업장 자체계약 물량 등 제외",
+        "1구역 값을 신월1동 실측값으로 볼 수 없음",
+        "구역별 재활용 일부 월 미보유",
+        "2021년 재활용 구파일2797톤/최신월합2801톤 차이4톤 사유 미확인"
+      ],
+      "license": "이용허락범위 제한 없음 (공공데이터포털)",
+      "temporal_type": "observation_period_and_file_reference_date",
+      "display_time_reference": "관측 2019-01~2026-06\n파일 기준일 2026-08-31",
+      "catalog_modified_at": "2026-09-14",
+      "provider_update_frequency": "연간 (파일 배포 주기)",
+      "date_evidence": "CSV의 기준년도·기준월과 데이터기준일=2026-08-31 직접 확인. 공식 카탈로그 등록·수정일은 2026-09-14. 과거 연간 파일은 2021년 실적 / 파일명 기준 2022-10-29.",
+      "temporal_limit": "2026년은 1~6월만 수록. 파일 기준일 8월이나 포털 수정일 9월까지 관측된 것으로 해석하지 않음."
+    },
+    {
+      "source_id": "FOOD_MONTHLY_15069391",
+      "title": "양천구 음식물폐기물 월별발생현황",
+      "url": "https://www.data.go.kr/data/15069391/fileData.do",
+      "file_reference_date": "2026-08-31",
+      "observed_period": [
+        "2021-01",
+        "2026-07"
+      ],
+      "license": "이용허락범위 제한 없음 (공공데이터포털 표시)",
+      "unit": null,
+      "limitations": [
+        "양천구 전체",
+        "2022년 11·12월 행 없음",
+        "2022년부터 사업장 4항목 미집계",
+        "공동주택 열에 아파트와 비아파트 분리 없음",
+        "파일의 발생량 단위 미표기"
+      ]
+    },
+    {
+      "source_id": "YANGCHEON_CARBON_PLAN_202504",
+      "title": "양천구 제1차 탄소중립 녹색성장 기본계획",
+      "url": "https://www.pcccr.go.kr/storage/board/base/2025/07/03/BOARD_ATTACH_1751510256077.pdf",
+      "published": "2025-04",
+      "reference_years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022
+      ],
+      "printed_page": 12,
+      "pdf_page": 14,
+      "unit": "톤/일",
+      "retrieved_at": "2026-10-19",
+      "verification": "표 원문 이미지와 텍스트를 대조해 수기 전사",
+      "license": "원문 저작권 및 이용조건 확인 필요",
+      "limitations": [
+        "구 전체·아파트 포함",
+        "신월1동 실측량 아님",
+        "음식물 통계와 합산하지 않음"
+      ]
+    }
+  ],
+  "date_audit_20261019": "기준연도·관측기간·파일 기준일·원문 기록일·취득일을 분리. 일괄 기준일 없는 API는 날짜 확인된 조회 스냅샷으로 제한."
+}

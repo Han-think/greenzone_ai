@@ -1,0 +1,239 @@
+{
+  "retrieved_at": "2026-10-19",
+  "scope": "신월1동",
+  "documentation": "https://sgis.mods.go.kr/developer/html/newOpenApi/api/dataApi/census.html",
+  "auth_success": true,
+  "requests": [
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150570",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-sinwol1-population-2021.json",
+      "sha256": "89359a9c77e71560ef08fe12a80fe1b41e6c64119b88ce97e244d04e74b1c0be"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150570",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150570-house-2021.json",
+      "sha256": "6b999e29baa39c40cb01c29e5e05f26b14b3ee6d4f7ee09bf6d0d27f7bda5dfe"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150580",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150580-population-2021.json",
+      "sha256": "0e0b7c3e0e829976e473a1903c809b16894741e9f0868b6ba29e328b2fe82d69"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150580",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150580-house-2021.json",
+      "sha256": "04a00aba10b307c1ae4442ccf3e3264d873314d6ccfb406ef15c291a4ff31180"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150590",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150590-population-2021.json",
+      "sha256": "cee73c801903fd77b77d813c67e7e9bb186cf638f2045ef30c95025e39fc30c5"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150590",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150590-house-2021.json",
+      "sha256": "4ccd1615fb37f6941254f040e29eb433cd5dfa61a970a75cad77ee822f9a23e5"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150610",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150610-population-2021.json",
+      "sha256": "06c3966473e47a4817995ab6cf37552d9349b9614b3567ac2a2957781f4c97eb"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2021",
+        "adm_cd": "11150610",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150610-house-2021.json",
+      "sha256": "18f50ebf791298a1330e51917f3ca391431953c9abd978fe5b8c567a08a4f243"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150570",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-sinwol1-population-2024.json",
+      "sha256": "01917cf00fa6bce1eaadc4f0b8cb18dfe6ca659f89eccc005799d5fa31b61a1b"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150570",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150570-house-2024.json",
+      "sha256": "f989574585d388162c51202edf12909e0b7c83a4f1665717e6a05746b99dd2f6"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150580",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150580-population-2024.json",
+      "sha256": "9e22c98e121630e1828744ae8761c467a35590a12d97300091a6106313587821"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150580",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150580-house-2024.json",
+      "sha256": "6eac43edf2a5ba209eab4cf7efe783b2390bdaf2a0d8341a47e24640eaae8022"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150590",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150590-population-2024.json",
+      "sha256": "5b46625871cce773220b5af666e2908e314d39fe34b9ee974fb879c73cfd10b0"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150590",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150590-house-2024.json",
+      "sha256": "e472e9f366f1fd21dcd8d9a260c29da4db76b9b947618a9f976376bbee9da3ce"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150610",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150610-population-2024.json",
+      "sha256": "3622b0a182d73a47ab2b5b2fda20c8328d72a518713836148e346af719297325"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/house.json",
+      "params": {
+        "year": "2024",
+        "adm_cd": "11150610",
+        "low_search": "0",
+        "house_type": "02"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-reference-11150610-house-2024.json",
+      "sha256": "335137a664fcdcbadde40a2311b747c7d49b6ba5218e8844cddf36153496ac63"
+    },
+    {
+      "endpoint": "https://sgisapi.mods.go.kr/OpenAPI3/stats/population.json",
+      "params": {
+        "year": "2022",
+        "adm_cd": "11150570",
+        "low_search": "0"
+      },
+      "error_code": 0,
+      "rows": 1,
+      "status": "acquired",
+      "file": "sgis-sinwol1-population-2022.json",
+      "sha256": "934a4d83e86676c204d75d8eeb4bb94996eed4cffd5cd800f3a340faa956172d"
+    }
+  ],
+  "auth_error_code": 0,
+  "reference_scope": "신월2·3·5동 총계는 공식 1구역 비율 분모에만 사용"
+}

@@ -1,0 +1,3 @@
+# Keep source-data bytes unchanged across Windows/Linux checkouts.
+# SHA256 provenance and startup checks depend on exact bytes.
+data/** -text

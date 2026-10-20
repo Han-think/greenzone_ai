@@ -1,0 +1,14 @@
+{
+  "result": [
+    {
+      "all_house_cnt": 4111,
+      "house_cnt": "4111",
+      "adm_cd": "11150580",
+      "adm_nm": "신월2동"
+    }
+  ],
+  "errCd": 0,
+  "errMsg": "Success",
+  "id": "API_0306",
+  "trId": "BtFi_API_0306_1792407288049"
+}

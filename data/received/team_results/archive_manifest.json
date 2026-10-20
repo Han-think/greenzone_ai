@@ -1,0 +1,89 @@
+{
+  "source_zip_sha256": "7a26a7adeaaebd661a449f8a75220d2dca2da00e223903b0ceeb9451e202797b",
+  "source_zip_url": "https://drive.google.com/file/d/1oUWGiz7uWY5-sxeAajXOkH3n63K3V7zb/view",
+  "archive_kept_outside_team_project": false,
+  "extracted_files": [
+    {
+      "path": "data/received/team_results/candidates.geojson",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.geojson",
+      "sha256": "6d10cb875d06818196f6caad2f7118b9b946266279a505de2ebbc207ddca4c1f"
+    },
+    {
+      "path": "data/received/team_results/candidates.csv",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.csv",
+      "sha256": "81a745714073cb497d9cde4d00edbb7ccd470bd7857a108cd5bffe43f28dcca3"
+    },
+    {
+      "path": "data/received/team_results/analysis_report.md",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.md",
+      "sha256": "211dca7a66fb29be2959fb04ab601c2b3c39cfd8e98d521b96ef8ff1d7b57014"
+    },
+    {
+      "path": "data/received/team_results/boundary.geojson",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_boundary.geojson",
+      "sha256": "06e4b00ac2dd2b8901a096f341c73a4a4a94eb8ed2e2050bdd46321a1a95a182"
+    },
+    {
+      "path": "data/received/team_results/roads.geojson",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_roads.geojson",
+      "sha256": "324e2cab8ca306f9434a40b14f78e0eedc09cc82a5e004d0e2fd017c3f84da22"
+    },
+    {
+      "path": "data/received/team_results/protection_facilities.geojson",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_protection_facilities.geojson",
+      "sha256": "80b614b99ab6ff10103e6b5252a83b3cefa5477e42c4ae072b01b70f62401392"
+    },
+    {
+      "path": "data/received/team_results/protection_zones.geojson",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_protection_zones.geojson",
+      "sha256": "e48fa328b4741e9fdc2b79e6ab25162215ad54edfc0715ded22c03e1edb5bacc"
+    },
+    {
+      "path": "data/received/team_results/open_space.geojson",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_open_space.geojson",
+      "sha256": "b68f493c791fba03654d59785befb6561bcecf58e56c5f7038525621460001bf"
+    },
+    {
+      "path": "data/received/team_results/manual_edits.csv",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/data/team/manual_edits.csv",
+      "sha256": "65d7c63d5a0b0c6e93f7a346d5c61a8abc1e2d9fa386e75b506e92541be5d585"
+    },
+    {
+      "path": "data/received/team_results/raw_data_notes.md",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/data/README.md",
+      "sha256": "79c73fec7e6cd24601e1fa471c4406eff069ac212f249f3bf82965e0f893b861"
+    },
+    {
+      "path": "data/received/team_results/first_stage.xlsx",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.xlsx",
+      "sha256": "967406dccdf946c5d4eaf061364ad95447949147749b42f73be03f73a69a5d5c"
+    },
+    {
+      "path": "data/received/team_results/first_stage_map.png",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_map.png",
+      "sha256": "da94dc2a374c235b07e6997dc4f46638d09b4a61c45cccb096283959f688753b"
+    },
+    {
+      "path": "data/received/team_results/first_stage_map.html",
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_map.html",
+      "sha256": "382e1c15b36fdd145d7b515e053dfa87bcfd53f6a4e89dc6559449befc6f320a"
+    }
+  ],
+  "missing_original_team_inputs": [
+    "data/raw/HangJeongDong_ver20260701.geojson",
+    "data/raw/child.csv",
+    "data/raw/elder.csv",
+    "data/raw/park.csv",
+    "data/raw/parking.csv",
+    "data/raw/emap/11470/TL_SPRD_MANAGE.shp",
+    "data/raw/emap/11470/TL_SPRD_RW.shp",
+    "data/raw/emap/11470/TL_SPBD_BULD.shp"
+  ],
+  "web_inputs_available": true,
+  "team_first_stage_reproduction_ready": false,
+  "distributed_assignment_delivered": false,
+  "note": "1차 원본 ZIP과 코드·입력표를 archive에 보존하고 결과를 team_results에 둠. raw의 별도 API 수집본은 팀이 사용한 원천과 동일하다고 간주하지 않음. 현재 2차 배정은 team_second_stage 참조.",
+  "stage": "first_stage_11_candidates_supporting_current_second_stage",
+  "source_zip_path": "data/received/archive/first_stage_source.zip",
+  "distributed_assignment_scope": "first-stage archive only; current second-stage community assignments are supplied separately"
+}

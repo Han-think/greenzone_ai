@@ -1,0 +1,43 @@
+﻿district,year,category,reported_months,absent_month_rows,missing_value_months,reported_month_subtotal_original_unit,full_year_total_original_unit,coverage,unit,source_id
+양천구 전체,2021,가정 단독주택(일반주택),12,,,7723.2,7723.2,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2021,가정 공동주택,12,,,13148.0,13148.0,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2021,가정 음식점(200제곱미터 미만),12,,,7075.4,7075.4,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2021,다량배출사업장 집단급식소,12,,,2365.3,2365.3,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2021,다량배출사업장 음식점(200제곱미터 이상),12,,,2471.5,2471.5,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2021,사업장폐기물배출자 집단급식소,12,,,61.0,61.0,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2021,사업장폐기물배출자 대규모점포,12,,,1041.0,1041.0,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2022,가정 단독주택(일반주택),10,11|12,,6810.3,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2022,가정 공동주택,10,11|12,,11334.7,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2022,가정 음식점(200제곱미터 미만),10,11|12,,5416.8,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2022,다량배출사업장 집단급식소,0,11|12,01|02|03|04|05|06|07|08|09|10,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2022,다량배출사업장 음식점(200제곱미터 이상),0,11|12,01|02|03|04|05|06|07|08|09|10,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2022,사업장폐기물배출자 집단급식소,0,11|12,01|02|03|04|05|06|07|08|09|10,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2022,사업장폐기물배출자 대규모점포,0,11|12,01|02|03|04|05|06|07|08|09|10,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2023,가정 단독주택(일반주택),12,,,7714,7714,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2023,가정 공동주택,12,,,12269,12269,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2023,가정 음식점(200제곱미터 미만),12,,,5771,5771,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2023,다량배출사업장 집단급식소,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2023,다량배출사업장 음식점(200제곱미터 이상),0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2023,사업장폐기물배출자 집단급식소,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2023,사업장폐기물배출자 대규모점포,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2024,가정 단독주택(일반주택),12,,,7663,7663,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2024,가정 공동주택,12,,,12357,12357,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2024,가정 음식점(200제곱미터 미만),12,,,5520,5520,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2024,다량배출사업장 집단급식소,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2024,다량배출사업장 음식점(200제곱미터 이상),0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2024,사업장폐기물배출자 집단급식소,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2024,사업장폐기물배출자 대규모점포,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2025,가정 단독주택(일반주택),12,,,7474,7474,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2025,가정 공동주택,12,,,11763,11763,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2025,가정 음식점(200제곱미터 미만),12,,,5110,5110,complete_year,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2025,다량배출사업장 집단급식소,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2025,다량배출사업장 음식점(200제곱미터 이상),0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2025,사업장폐기물배출자 집단급식소,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2025,사업장폐기물배출자 대규모점포,0,,01|02|03|04|05|06|07|08|09|10|11|12,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2026,가정 단독주택(일반주택),7,08|09|10|11|12,,4174,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2026,가정 공동주택,7,08|09|10|11|12,,6566,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2026,가정 음식점(200제곱미터 미만),7,08|09|10|11|12,,3096,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2026,다량배출사업장 집단급식소,0,08|09|10|11|12,01|02|03|04|05|06|07,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2026,다량배출사업장 음식점(200제곱미터 이상),0,08|09|10|11|12,01|02|03|04|05|06|07,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2026,사업장폐기물배출자 집단급식소,0,08|09|10|11|12,01|02|03|04|05|06|07,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391
+양천구 전체,2026,사업장폐기물배출자 대규모점포,0,08|09|10|11|12,01|02|03|04|05|06|07,,,partial_or_uncollected,not_stated_in_source,FOOD_MONTHLY_15069391

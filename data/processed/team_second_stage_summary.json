@@ -1,0 +1,62 @@
+{
+  "analysis_date": "2026-10-20",
+  "source_commit": "930e1b2d291c888cee84ae284b6d830e3d4b322e",
+  "source_url": "https://github.com/Han-think/greenzone_ai/tree/930e1b2d291c888cee84ae284b6d830e3d4b322e/greenzone_data_analysis/greenzone2nd/",
+  "source_workbook_sha256": "0931949a90019441313f9c1dd66a64e426e1bf38b6728d0ed04b0de4810d4df5",
+  "parcel_count": 1585,
+  "registered_units": 7193,
+  "community_count": 9,
+  "hub_count": 9,
+  "comparisons": [
+    {
+      "name": "생활권 거점 9곳 (자기 생활권 거점 이용)",
+      "hub_count": 9,
+      "mean_m": 195.235582613964,
+      "p90_m": 334.77834038645,
+      "max_m": 474.830234317724,
+      "coverage_200": 0.564715695815376,
+      "coverage_300": 0.840539413318504,
+      "coverage_400": 0.979702488530516,
+      "source_sheet": "안 비교",
+      "source_range": "A5:H5"
+    },
+    {
+      "name": "생활권 거점 9곳 (가장 가까운 거점 이용)",
+      "hub_count": 9,
+      "mean_m": 172.613144785708,
+      "p90_m": 273.906551107877,
+      "max_m": 394.556071238615,
+      "coverage_200": 0.648130126511887,
+      "coverage_300": 0.953426942861115,
+      "coverage_400": 1,
+      "source_sheet": "안 비교",
+      "source_range": "A6:H6"
+    },
+    {
+      "name": "1차 후보 중 거점 6곳만",
+      "hub_count": 6,
+      "mean_m": 226.096258477325,
+      "p90_m": 348.886982948888,
+      "max_m": 576.865442435618,
+      "coverage_200": 0.414708744612818,
+      "coverage_300": 0.79076880300292,
+      "coverage_400": 0.935214792159044,
+      "source_sheet": "안 비교",
+      "source_range": "A7:H7"
+    },
+    {
+      "name": "1차 후보 11곳 전부",
+      "hub_count": 11,
+      "mean_m": 212.093326128619,
+      "p90_m": 336.186427328729,
+      "max_m": 470.352642997015,
+      "coverage_200": 0.471847629639928,
+      "coverage_300": 0.827471152509384,
+      "coverage_400": 0.951897678298346,
+      "source_sheet": "안 비교",
+      "source_range": "A8:H8"
+    }
+  ],
+  "result_status": "received_team_proposal_not_operating_approval",
+  "distance_basis": "received_road_centerline_graph_estimate_not_field_walking_validation"
+}

@@ -1,0 +1,48 @@
+{
+  "checked_at": "2026-10-20",
+  "scope": "신월1동",
+  "schema_version": "shared-drive-v1",
+  "inputs": [
+    {
+      "file": "sinwol1_demand.json",
+      "drive_id": "11V_Cy4KykrnAoFrIKEYT97f9QbrdUd5F",
+      "url": "https://drive.google.com/file/d/11V_Cy4KykrnAoFrIKEYT97f9QbrdUd5F/view?usp=drivesdk",
+      "bytes": 1800652,
+      "sha256": "b70f835815ae1a4135d9e5cbd27ceab85d796ce5aaae2c315e1d2b74f843b890"
+    },
+    {
+      "file": "greenzone-analysis.zip",
+      "drive_id": "1oUWGiz7uWY5-sxeAajXOkH3n63K3V7zb",
+      "url": "https://drive.google.com/file/d/1oUWGiz7uWY5-sxeAajXOkH3n63K3V7zb/view?usp=drivesdk",
+      "bytes": 716457,
+      "sha256": "7a26a7adeaaebd661a449f8a75220d2dca2da00e223903b0ceeb9451e202797b"
+    }
+  ],
+  "derived_layers": {
+    "candidates": {
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.geojson",
+      "original_sha256": "6d10cb875d06818196f6caad2f7118b9b946266279a505de2ebbc207ddca4c1f"
+    },
+    "team_boundary": {
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_boundary.geojson",
+      "original_sha256": "06e4b00ac2dd2b8901a096f341c73a4a4a94eb8ed2e2050bdd46321a1a95a182"
+    },
+    "roads": {
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_roads.geojson",
+      "original_sha256": "324e2cab8ca306f9434a40b14f78e0eedc09cc82a5e004d0e2fd017c3f84da22"
+    },
+    "protection_zones": {
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_protection_zones.geojson",
+      "original_sha256": "e48fa328b4741e9fdc2b79e6ab25162215ad54edfc0715ded22c03e1edb5bacc"
+    },
+    "protection_facilities": {
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_protection_facilities.geojson",
+      "original_sha256": "80b614b99ab6ff10103e6b5252a83b3cefa5477e42c4ae072b01b70f62401392"
+    },
+    "open_space": {
+      "zip_member": "3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st_layer_open_space.geojson",
+      "original_sha256": "b68f493c791fba03654d59785befb6561bcecf58e56c5f7038525621460001bf"
+    }
+  },
+  "note": "공유 원본을 그대로 보존. 후보 재선정·안전 승인·도로망 배정·차량 노선 계산은 하지 않음."
+}

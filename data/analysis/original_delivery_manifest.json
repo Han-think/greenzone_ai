@@ -1,0 +1,274 @@
+{
+  "files": [
+    {
+      "path": "analysis_summary.json",
+      "bytes": 7545,
+      "sha256": "6f9d08683b9bcaf1c5cbde61cd9af3fb824fddc14d44976466baae3fddc907f1"
+    },
+    {
+      "path": "collection_zone_household_denominators.csv",
+      "bytes": 1686,
+      "sha256": "28f9c752d6c1ff225c76bf8c42a59fbdbfcbfc50fc26304ee748b98e387e800c"
+    },
+    {
+      "path": "data_dictionary.json",
+      "bytes": 2786,
+      "sha256": "36a082d3d10a6bcb5cf9a9cc4d4bc5f256e62481c9815932954d154c02a99458"
+    },
+    {
+      "path": "handoff_review.json",
+      "bytes": 769,
+      "sha256": "ed023b4d83bb1117f67e9a978f08a5ac2e603ebdc90de6e32bc3e3ee1121cfda"
+    },
+    {
+      "path": "official_file_revisions.csv",
+      "bytes": 251,
+      "sha256": "507677730f73835a86703fadfa75f8f4f602a0cb4238ef787b330e835cde900b"
+    },
+    {
+      "path": "raw_evidence/carbon-plan-page-14.png",
+      "bytes": 218496,
+      "sha256": "16d66e2bcba1902b13dd253b0f13c19adb263d95701f199ca5b98595e959fc27"
+    },
+    {
+      "path": "raw_evidence/carbon-plan-page-14.txt",
+      "bytes": 1598,
+      "sha256": "ebf49d61cbcfe5f7668cc3f42e5ea5acabf9be6b090f049b888c63adde6dfdb5"
+    },
+    {
+      "path": "raw_evidence/food_monthly_current_download.json",
+      "bytes": 392,
+      "sha256": "58b38384a21b3e2f87c247084599ffa52aea29eb17f6dc36cdd8476c0d7c57fe"
+    },
+    {
+      "path": "raw_evidence/food_monthly_download.json",
+      "bytes": 496,
+      "sha256": "ab10c603164a4fb1d87d7b1d95cf2311592c7c90e347b485692e93d0f091c4b8"
+    },
+    {
+      "path": "raw_evidence/sgis-house-type-codes.html",
+      "bytes": 1942,
+      "sha256": "b0b36cfbd480ec9aadad5e7bf9ae2f9966a40e37244cf980fee87167c5383880"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150570-house-2021.json",
+      "bytes": 244,
+      "sha256": "6b999e29baa39c40cb01c29e5e05f26b14b3ee6d4f7ee09bf6d0d27f7bda5dfe"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150570-house-2024.json",
+      "bytes": 244,
+      "sha256": "f989574585d388162c51202edf12909e0b7c83a4f1665717e6a05746b99dd2f6"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150580-house-2021.json",
+      "bytes": 244,
+      "sha256": "04a00aba10b307c1ae4442ccf3e3264d873314d6ccfb406ef15c291a4ff31180"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150580-house-2024.json",
+      "bytes": 244,
+      "sha256": "6eac43edf2a5ba209eab4cf7efe783b2390bdaf2a0d8341a47e24640eaae8022"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150580-population-2021.json",
+      "bytes": 766,
+      "sha256": "0e0b7c3e0e829976e473a1903c809b16894741e9f0868b6ba29e328b2fe82d69"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150580-population-2024.json",
+      "bytes": 766,
+      "sha256": "9e22c98e121630e1828744ae8761c467a35590a12d97300091a6106313587821"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150590-house-2021.json",
+      "bytes": 244,
+      "sha256": "4ccd1615fb37f6941254f040e29eb433cd5dfa61a970a75cad77ee822f9a23e5"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150590-house-2024.json",
+      "bytes": 244,
+      "sha256": "e472e9f366f1fd21dcd8d9a260c29da4db76b9b947618a9f976376bbee9da3ce"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150590-population-2021.json",
+      "bytes": 764,
+      "sha256": "cee73c801903fd77b77d813c67e7e9bb186cf638f2045ef30c95025e39fc30c5"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150590-population-2024.json",
+      "bytes": 764,
+      "sha256": "5b46625871cce773220b5af666e2908e314d39fe34b9ee974fb879c73cfd10b0"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150610-house-2021.json",
+      "bytes": 244,
+      "sha256": "18f50ebf791298a1330e51917f3ca391431953c9abd978fe5b8c567a08a4f243"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150610-house-2024.json",
+      "bytes": 244,
+      "sha256": "335137a664fcdcbadde40a2311b747c7d49b6ba5218e8844cddf36153496ac63"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150610-population-2021.json",
+      "bytes": 766,
+      "sha256": "06c3966473e47a4817995ab6cf37552d9349b9614b3567ac2a2957781f4c97eb"
+    },
+    {
+      "path": "raw_evidence/sgis-reference-11150610-population-2024.json",
+      "bytes": 766,
+      "sha256": "3622b0a182d73a47ab2b5b2fda20c8328d72a518713836148e346af719297325"
+    },
+    {
+      "path": "raw_evidence/sgis-sinwol1-population-2021.json",
+      "bytes": 766,
+      "sha256": "89359a9c77e71560ef08fe12a80fe1b41e6c64119b88ce97e244d04e74b1c0be"
+    },
+    {
+      "path": "raw_evidence/sgis-sinwol1-population-2022.json",
+      "bytes": 765,
+      "sha256": "934a4d83e86676c204d75d8eeb4bb94996eed4cffd5cd800f3a340faa956172d"
+    },
+    {
+      "path": "raw_evidence/sgis-sinwol1-population-2024.json",
+      "bytes": 761,
+      "sha256": "01917cf00fa6bce1eaadc4f0b8cb18dfe6ca659f89eccc005799d5fa31b61a1b"
+    },
+    {
+      "path": "raw_evidence/sgis_statistics_acquisition.json",
+      "bytes": 7669,
+      "sha256": "e9cb3ce913c3d80f29945d363b06491eb04e63a37397d00be9a1b21f55912a10"
+    },
+    {
+      "path": "raw_evidence/yangcheon-food-monthly-20221201.csv",
+      "bytes": 1152,
+      "sha256": "71f65be5b49ccbb8ab843672aa8534b344a96e30d8e0b8467b98efc625ee0369"
+    },
+    {
+      "path": "raw_evidence/yangcheon-food-monthly-20260831.csv",
+      "bytes": 3099,
+      "sha256": "5ecbc065058af3c090e79156064700731fb5adb7808d19ffd367aa4680cc29f5"
+    },
+    {
+      "path": "raw_evidence/yangcheon-zone-waste-20221029.csv",
+      "bytes": 493,
+      "sha256": "e0f20767210a5a4e5dabd53ff42255107ffed29e56f84126fc53d7a63680336d"
+    },
+    {
+      "path": "raw_evidence/yangcheon-zone-waste-20260831.csv",
+      "bytes": 36985,
+      "sha256": "324f8409e9ea119529b741e8947609da44048d79bc30cbcb28db2a0c94129a1d"
+    },
+    {
+      "path": "raw_evidence/zone_waste_downloads.json",
+      "bytes": 814,
+      "sha256": "36b8411fc65c20577f69f903fa2388b8f60048e125a09babd5b7cf5ddcbd7f17"
+    },
+    {
+      "path": "README.md",
+      "bytes": 9333,
+      "sha256": "f1d80ad72a9a6048681106a96f111762be0e3e69453d0d765e8b105723426f22"
+    },
+    {
+      "path": "requirements_scope.json",
+      "bytes": 468,
+      "sha256": "584f9d7dbb2956e1f88ddc403ae0864b45d5a92e2105978ea4eff254e86e1a09"
+    },
+    {
+      "path": "review_log.csv",
+      "bytes": 2112,
+      "sha256": "ad21334938b9aa6901923d6814bda49758e9ddb09c2a023113261f75db8dc82f"
+    },
+    {
+      "path": "sinwol1_all_parcels.csv",
+      "bytes": 760437,
+      "sha256": "6ad2966775b709d450346623e668d5e63851c19e44cbb6c3ae91c83a07e8c941"
+    },
+    {
+      "path": "sinwol1_analysis_targets.csv",
+      "bytes": 727514,
+      "sha256": "73e8039caf66b71408788e6e475a709d206312fe157cbc851b49414b122df759"
+    },
+    {
+      "path": "sinwol1_analysis_targets.geojson",
+      "bytes": 2569075,
+      "sha256": "e914a2f8ef37d607f5896a8b6be567c988785710b03dc35b8a9ec924ed82043b"
+    },
+    {
+      "path": "sinwol1_boundary.geojson",
+      "bytes": 1821,
+      "sha256": "e457fbf10fd6c00bbcafddf63e4794bfc0559126329e5a2a06d644d9eea417a8"
+    },
+    {
+      "path": "sinwol1_collection_zone_annual.csv",
+      "bytes": 2507,
+      "sha256": "c861c3a037598bae6f5d588ff71ebad41d803c4433c921347cbaf939d7586bd7"
+    },
+    {
+      "path": "sinwol1_collection_zone_monthly.csv",
+      "bytes": 31930,
+      "sha256": "ebf75ec4c01492da8306ba4758fa1681c10c8c54e1eabe561b662070bc0759a5"
+    },
+    {
+      "path": "sinwol1_excluded_apartments.csv",
+      "bytes": 9704,
+      "sha256": "cb8cf6c1012f7227c763bd3030a62a59ec9d856c4c69cd0c2239d987209c1f0b"
+    },
+    {
+      "path": "sinwol1_review_rows.csv",
+      "bytes": 67025,
+      "sha256": "6a341c57179340dcc2f82d068cbe3df878f4c1f7c3f2b59a8f2d94edfd683038"
+    },
+    {
+      "path": "sinwol1_sgis_census.csv",
+      "bytes": 619,
+      "sha256": "74a79684a31693e9376f494b5d6b0aa71b5d7e93e7bbc31a3438f26056189e00"
+    },
+    {
+      "path": "sinwol1_use_summary.csv",
+      "bytes": 463,
+      "sha256": "f218e0a8ba3a378ca92f8ad786f3fc480fffd53bb0963b19ee62b72e988b0cbc"
+    },
+    {
+      "path": "sinwol1_waste_estimation_scenarios.csv",
+      "bytes": 1528,
+      "sha256": "2c4356494665e18f5207c714462fdacb85aac43be4fba770510bb6a60b5e332e"
+    },
+    {
+      "path": "source_manifest.json",
+      "bytes": 10590,
+      "sha256": "d0b75ea73569fc307b01d3b5f7bfe2c15618d0bba92bd4f7c1a880a504ed17c0"
+    },
+    {
+      "path": "yangcheon_food_annual_coverage.csv",
+      "bytes": 6641,
+      "sha256": "e48302480159e5ce56adb49ec934681ed51ed28ac8c1d9d91f3bf17dd862fd79"
+    },
+    {
+      "path": "yangcheon_food_monthly.csv",
+      "bytes": 69775,
+      "sha256": "55508752c2525bf84fc93bf367a7513e578aa0c4f6d1cf632e3da9d50b97df63"
+    },
+    {
+      "path": "yangcheon_general_waste_history.csv",
+      "bytes": 698,
+      "sha256": "36dbb65ee9c16025fe2d36fa486ba7420b76d66bfc557e54b61bc6f197979883"
+    },
+    {
+      "path": "zone_annual_vs_legacy.csv",
+      "bytes": 246,
+      "sha256": "12a28b1ae15cf302b2d58a70a0ed6157a518cc5720dfe49e9cd20c20daabeb51"
+    },
+    {
+      "path": "공식배출량_세대수기반_추정분석.md",
+      "bytes": 5754,
+      "sha256": "b4175ff33375a38b6b8cc547ce8f23c5ec037990eedca8efc7140e42425ac3c5"
+    },
+    {
+      "path": "분산배정_후속검토안.md",
+      "bytes": 3391,
+      "sha256": "0e9333705fa57914fd5c3dcc377e4ad2fdcee83ea0a4441c7b4d797da21ec282"
+    }
+  ]
+}

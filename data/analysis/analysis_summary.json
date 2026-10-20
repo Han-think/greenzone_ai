@@ -1,0 +1,193 @@
+{
+  "requirement": "REQ-DA-001",
+  "scope": "신월1동",
+  "adm_cd": "11150570",
+  "created_at": "2026-10-19",
+  "work_status": "data_review_complete_with_explicit_household_based_planning_estimates",
+  "row_unit": "필지 PNU별 건축물대장·대표 건물 좌표 집계. 세대나 독립 건물 수가 아님",
+  "parcel_counts": {
+    "analysis_target": 1665,
+    "context_only": 44,
+    "excluded_apartment": 20,
+    "classification_review": 9
+  },
+  "target_use_groups": {
+    "commercial_only": 108,
+    "mixed_use": 402,
+    "residential_only": 1155
+  },
+  "target_registry_counts": {
+    "fmlyCnt": 3070,
+    "hhldCnt": 4112,
+    "treatment": "서로 다른 항목이므로 합산하거나 현재 거주 가구 수로 확정하지 않음"
+  },
+  "food_month_rows": 65,
+  "food_monthly_long_rows": 455,
+  "official_file_revised_cells": 2,
+  "sgis_census": [
+    {
+      "year": 2021,
+      "administrative_dong": "신월1동",
+      "adm_cd": "11150570",
+      "population_persons": "20158",
+      "households": "9208",
+      "housing_units": "6160",
+      "population_density_per_km2": "32410.9",
+      "businesses": "1944",
+      "employees": "5581",
+      "average_household_size": "2.1",
+      "includes_apartments": true,
+      "source_id": "SGIS_CENSUS",
+      "retrieved_at": "2026-10-19",
+      "use": "dong_context_not_non_apartment_parcel_population"
+    },
+    {
+      "year": 2022,
+      "administrative_dong": "신월1동",
+      "adm_cd": "11150570",
+      "population_persons": "19878",
+      "households": "9304",
+      "housing_units": "6248",
+      "population_density_per_km2": "31960.7",
+      "businesses": "1899",
+      "employees": "5159",
+      "average_household_size": "2.1",
+      "includes_apartments": true,
+      "source_id": "SGIS_CENSUS",
+      "retrieved_at": "2026-10-19",
+      "use": "dong_context_not_non_apartment_parcel_population"
+    },
+    {
+      "year": 2024,
+      "administrative_dong": "신월1동",
+      "adm_cd": "11150570",
+      "population_persons": "18712",
+      "households": "8981",
+      "housing_units": "6081",
+      "population_density_per_km2": "30085.9",
+      "businesses": "1836",
+      "employees": "4981",
+      "average_household_size": "2",
+      "includes_apartments": true,
+      "source_id": "SGIS_CENSUS",
+      "retrieved_at": "2026-10-19",
+      "use": "dong_context_not_non_apartment_parcel_population"
+    }
+  ],
+  "checks": {
+    "reclassification_mismatch": 0,
+    "apartment_flag_mismatch": 0,
+    "outside_boundary_points": 0,
+    "family_sum_mismatch": 0,
+    "unit_sum_mismatch": 0,
+    "duplicate_registry_ids_within_parcels": 0
+  },
+  "remaining": [
+    "집계권역의 아파트·상가 수거 포함 범위를 품목별로 확인",
+    "비아파트 주택 비율과 실제 비아파트 가구 비율의 차이 확인",
+    "상가·복합용도 주거/영업 수요를 분리할 자료 확보",
+    "분산배정·후보선정은 별도 도로 검토 후 진행"
+  ],
+  "models_executed": false,
+  "web_changed": false,
+  "git_push": false,
+  "collection_zone_waste": {
+    "months": 90,
+    "period": "2019-01~2026-06",
+    "source": "https://www.data.go.kr/data/15093944/fileData.do",
+    "scope": "1구역 신월1·2·3·5동",
+    "observed_sinwol1_only": false
+  },
+  "planning_estimates": [
+    {
+      "year": 2021,
+      "waste_type": "general",
+      "observed_zone_annual_tonnes": 6392.0,
+      "sinwol1_households": 9208,
+      "zone_households": 29918,
+      "sinwol1_household_share": 0.30777458,
+      "non_apartment_housing_share_proxy": 0.78457792,
+      "all_housing_benchmark_tonnes_per_year": 1967.3,
+      "non_apartment_planning_estimate_tonnes_per_year": 1543.5,
+      "non_apartment_planning_estimate_kg_per_calendar_day": 4228.76,
+      "status": "assumption_based_planning_scenario_not_observed",
+      "assumptions": "uniform_waste_per_household|housing_share_equals_household_share|no_separate_commercial_adjustment",
+      "operational_capacity_approved": false
+    },
+    {
+      "year": 2021,
+      "waste_type": "food",
+      "observed_zone_annual_tonnes": 4345.0,
+      "sinwol1_households": 9208,
+      "zone_households": 29918,
+      "sinwol1_household_share": 0.30777458,
+      "non_apartment_housing_share_proxy": 0.78457792,
+      "all_housing_benchmark_tonnes_per_year": 1337.28,
+      "non_apartment_planning_estimate_tonnes_per_year": 1049.2,
+      "non_apartment_planning_estimate_kg_per_calendar_day": 2874.52,
+      "status": "assumption_based_planning_scenario_not_observed",
+      "assumptions": "uniform_waste_per_household|housing_share_equals_household_share|no_separate_commercial_adjustment",
+      "operational_capacity_approved": false
+    },
+    {
+      "year": 2021,
+      "waste_type": "recycling",
+      "observed_zone_annual_tonnes": 2801.0,
+      "sinwol1_households": 9208,
+      "zone_households": 29918,
+      "sinwol1_household_share": 0.30777458,
+      "non_apartment_housing_share_proxy": 0.78457792,
+      "all_housing_benchmark_tonnes_per_year": null,
+      "non_apartment_planning_estimate_tonnes_per_year": null,
+      "non_apartment_planning_estimate_kg_per_calendar_day": null,
+      "status": "service_population_mismatch_hold",
+      "assumptions": "private_apartment_recycling_already_excluded",
+      "operational_capacity_approved": false
+    },
+    {
+      "year": 2024,
+      "waste_type": "general",
+      "observed_zone_annual_tonnes": 5462.0,
+      "sinwol1_households": 8981,
+      "zone_households": 29722,
+      "sinwol1_household_share": 0.30216675,
+      "non_apartment_housing_share_proxy": 0.78506825,
+      "all_housing_benchmark_tonnes_per_year": 1650.43,
+      "non_apartment_planning_estimate_tonnes_per_year": 1295.7,
+      "non_apartment_planning_estimate_kg_per_calendar_day": 3540.17,
+      "status": "assumption_based_planning_scenario_not_observed",
+      "assumptions": "uniform_waste_per_household|housing_share_equals_household_share|no_separate_commercial_adjustment",
+      "operational_capacity_approved": false
+    },
+    {
+      "year": 2024,
+      "waste_type": "food",
+      "observed_zone_annual_tonnes": 4375.0,
+      "sinwol1_households": 8981,
+      "zone_households": 29722,
+      "sinwol1_household_share": 0.30216675,
+      "non_apartment_housing_share_proxy": 0.78506825,
+      "all_housing_benchmark_tonnes_per_year": 1321.98,
+      "non_apartment_planning_estimate_tonnes_per_year": 1037.84,
+      "non_apartment_planning_estimate_kg_per_calendar_day": 2835.64,
+      "status": "assumption_based_planning_scenario_not_observed",
+      "assumptions": "uniform_waste_per_household|housing_share_equals_household_share|no_separate_commercial_adjustment",
+      "operational_capacity_approved": false
+    },
+    {
+      "year": 2024,
+      "waste_type": "recycling",
+      "observed_zone_annual_tonnes": 2829.0,
+      "sinwol1_households": 8981,
+      "zone_households": 29722,
+      "sinwol1_household_share": 0.30216675,
+      "non_apartment_housing_share_proxy": 0.78506825,
+      "all_housing_benchmark_tonnes_per_year": null,
+      "non_apartment_planning_estimate_tonnes_per_year": null,
+      "non_apartment_planning_estimate_kg_per_calendar_day": null,
+      "status": "service_population_mismatch_hold",
+      "assumptions": "private_apartment_recycling_already_excluded",
+      "operational_capacity_approved": false
+    }
+  ]
+}
