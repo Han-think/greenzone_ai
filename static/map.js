@@ -3,8 +3,14 @@
 // ==========================================
 // 1. 파일 맨 위에 vmap을 전역 변수(var)로 먼저 선언하여 어디서든 접근 가능하게 합니다.
 let vmap;
-let markerLayer; // 마커를 담을 투명 비닐(레이어) 변수 추가
 var selectMarker;
+let popupOverlay;
+
+// let markerLayer; // 마커를 담을 투명 비닐(레이어) 변수 추가
+let searchMarkerLayer = null; // 검색한 주소 핀을 담을 비닐
+let geoJsonMarkerLayer = null; // GeoJSON 핀들을 담을 비닐
+
+let geoJsonRawData = null; // (나중을 위해) 불러온 데이터를 통째로 기억해둘 변수
 
 // HTML이 모두 로드된 후 실행 (window.onload 대신 권장되는 방식)
 document.addEventListener("DOMContentLoaded", function() {
@@ -25,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const keywordInput = document.getElementById("keyword");
     const searchBtn = document.getElementById("searchBtn");
     const loadGeoBtn = document.getElementById("loadGeoBtn");
-    loadGeoBtn.addEventListener("click", loadGeoJsonMarkers);
+    loadGeoBtn.addEventListener("click", toggleGeoJsonMarkers);
 
     // [버튼 클릭] 시 검색
     searchBtn.addEventListener("click", searchAddress);
@@ -110,8 +116,6 @@ function searchAddress() {
     });
 }
 
-// 맨 위에 var markerLayer; 가 선언되어 있어야 합니다.
-
 // ==========================================
 // 주소를 좌표로 변환하고 지도 부드럽게 이동 및 순정 마커 찍기
 // ==========================================
@@ -138,14 +142,14 @@ function displayOnMap(address) {
                 let lat = Number(point.y);
                 // console.log("찾아낸 좌표 - 경도:", lon, "위도:", lat);
                 // 1) 기존 마커 레이어 초기화 (기존 핀 지우기)
-                if (markerLayer != null) {
-                    vmap.removeLayer(markerLayer);
-                    markerLayer = null;
+                if (searchMarkerLayer != null) {
+                    vmap.removeLayer(searchMarkerLayer);
+                    searchMarkerLayer = null;
                 }
 
-                // 2) 브이월드 전용 마커 레이어 새로 생성 후 지도에 추가
-                markerLayer = new vw.ol3.layer.Marker(vmap);
-                vmap.addLayer(markerLayer);
+                // 2) 검색 전용 마커 레이어 생성
+                searchMarkerLayer = new vw.ol3.layer.Marker(vmap);
+                vmap.addLayer(searchMarkerLayer);
 
                 // 3) 마커 옵션 셋팅 (샘플 코드 방식 활용)
                 vw.ol3.markerOption = {
@@ -155,19 +159,19 @@ function displayOnMap(address) {
                     title: '검색된 위치',
                     contents: address,
                     iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png', 
-                    text: {
-                        offsetX: 0.5,
-                        offsetY: 20,
-                        font: '12px Calibri,sans-serif',
-                        fill: {color: '#000'},
-                        stroke: {color: '#fff', width: 2},
-                        text: '검색 위치'
-                    },
-                    attr: {"id": "search_marker", "name": "검색된 주소"}
+                    // text: {
+                    //     offsetX: 0.5,
+                    //     offsetY: 20,
+                    //     font: '12px Calibri,sans-serif',
+                    //     fill: {color: '#000'},
+                    //     stroke: {color: '#fff', width: 2},
+                    //     text: '검색 위치'
+                    // },
+                    attr:{"name": "검색된 위치", "desc": address} // {"id": "search_marker", "name": "검색된 주소"}
                 };
 
                 // 4) 마커 레이어에 마커 추가
-                markerLayer.addMarker(vw.ol3.markerOption);
+                searchMarkerLayer.addMarker(vw.ol3.markerOption);
 
                 // 5) 목적지 좌표 변환
                 let targetCoord = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
@@ -207,81 +211,76 @@ function displayOnMap(address) {
 }
 
 // ==========================================
-// GeoJSON 파일 불러와서 다중 마커 찍기
+// GeoJSON 토글 (켜고 끄기)
 // ==========================================
-async function loadGeoJsonMarkers() {
-    try {
-        // 1. data 폴더에 있는 geojson 파일 불러오기
-        const response = await fetch('/data/greenzone1st.geojson');
-        const geojsonData = await response.json();
+async function toggleGeoJsonMarkers() {
+    const loadGeoBtn = document.getElementById("loadGeoBtn");
 
-        // 2. 기존 마커 레이어가 있다면 지우고 새로 생성
-        if (markerLayer != null) {
-            vmap.removeLayer(markerLayer);
-        }
-        markerLayer = new vw.ol3.layer.Marker(vmap);
-        vmap.addLayer(markerLayer);
+    // 💡 1. 끄기 기능: 이미 레이어가 화면에 있다면? -> 레이어를 지우고 함수 종료
+    if (geoJsonMarkerLayer != null) {
+        vmap.removeLayer(geoJsonMarkerLayer);
+        geoJsonMarkerLayer = null; // 레이어 비우기
+        
+        // 버튼 색상 및 글자 원상복구
+        loadGeoBtn.innerText = "🗺️ 데이터(GeoJSON) 불러오기";
+        loadGeoBtn.style.backgroundColor = "#28a745"; // 초록색
+        return; 
+    }
+
+    // 💡 2. 켜기 기능: 레이어가 없다면? -> 데이터를 불러옵니다.
+    loadGeoBtn.innerText = "⏳ 불러오는 중...";
+    
+    try {
+        const response = await fetch('/data/greenzone1st.geojson');
+        geoJsonRawData = await response.json(); // 나중에 거리 계산을 위해 원본 데이터 저장
+
+        // GeoJSON 전용 레이어 생성
+        geoJsonMarkerLayer = new vw.ol3.layer.Marker(vmap);
+        vmap.addLayer(geoJsonMarkerLayer);
 
         // 3. features 배열을 반복문(forEach)으로 돌면서 핀 찍기
-        geojsonData.features.forEach(function(feature) {
+        geoJsonRawData.features.forEach(function(feature) {
             // 점(Point) 데이터인 경우에만 핀을 찍음
             if (feature.geometry.type === "Point") {
                 const lon = feature.geometry.coordinates[0]; // 경도
                 const lat = feature.geometry.coordinates[1]; // 위도
-                
                 // 💡 1. 필요한 데이터만 정확한 이름으로 콕 집어서 꺼내옵니다.
                 const placeName = feature.properties["이름"] || "이름 없음";
                 const roadAddr = feature.properties["도로명주소"] || feature.properties["지번주소"] || "주소 미상";
-
                 // 💡 2. 말풍선(팝업) 내용에는 주소만 심플하게 넣습니다.
                 const popupHtml = `<div style="font-size:13px; margin-top:5px;">${roadAddr}</div>`;
 
-                // 3. 마커 옵션 설정
                 vw.ol3.markerOption = {
                     x: lon,
                     y: lat,
                     epsg: "EPSG:4326",
                     title: placeName,      // 팝업의 굵은 제목으로 '이름' 사용
                     contents: popupHtml,   // 팝업 내용으로 조립한 '주소' 사용
+                    // 💡 검색 핀(파란색)과 헷갈리지 않게 GeoJSON 핀은 빨간색으로 변경
                     iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png',
-                    
-                    // 💡 4. 핀 아래에 텍스트 표시하는 부분은 완전히 주석 처리(비활성화)
-                    /*
-                    text: {
-                        offsetX: 0.5,
-                        offsetY: 20,
-                        font: '12px Calibri,sans-serif',
-                        fill: {color: '#000'},
-                        stroke: {color: '#fff', width: 2},
-                        text: placeName
-                    },
-                    */
-                    attr: {"id": placeName, "name": placeName}
+                    attr: {"name": placeName, "desc": roadAddr}
                 };
 
-                // 마커 레이어에 방금 만든 마커 추가
-                markerLayer.addMarker(vw.ol3.markerOption);
+                geoJsonMarkerLayer.addMarker(vw.ol3.markerOption);
             }
         });
 
-        // 4. 데이터가 존재하면, 첫 번째 데이터의 위치로 카메라 자동 이동
-        if (geojsonData.features.length > 0) {
-            const firstFeature = geojsonData.features[0];
-            
-            // 데이터가 '점(Point)' 형태일 때만 좌표를 읽어옵니다.
-            if (firstFeature.geometry.type === "Point") {
-                const lon = firstFeature.geometry.coordinates[0];
-                const lat = firstFeature.geometry.coordinates[1];
-                
-                const centerCoord = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
-                
-                vmap.getView().setCenter(centerCoord);
-                vmap.getView().setZoom(15); // 화면에 넓게 들어오도록 줌 조절
-            }
+        // 💡 3. 버튼을 '끄기' 상태로 디자인 변경
+        loadGeoBtn.innerText = "❌ 데이터(GeoJSON) 숨기기";
+        loadGeoBtn.style.backgroundColor = "#dc3545"; // 빨간색 경고톤으로 변경
+
+        // (선택 사항) 카메라 이동 코드 - 원치 않으시면 지워도 됩니다.
+        if (geoJsonRawData.features.length > 0) {
+            const firstLon = geoJsonRawData.features[0].geometry.coordinates[0];
+            const firstLat = geoJsonRawData.features[0].geometry.coordinates[1];
+            const centerCoord = ol.proj.transform([firstLon, firstLat], 'EPSG:4326', 'EPSG:3857');
+            vmap.getView().setCenter(centerCoord);
+            vmap.getView().setZoom(15);
         }
 
     } catch (error) {
         console.error("GeoJSON 로딩 에러:", error);
         alert("데이터를 불러오는 중 문제가 발생했습니다.");
+        loadGeoBtn.innerText = "🗺️ 데이터(GeoJSON) 불러오기"; // 에러 시 복구
     }
 }
