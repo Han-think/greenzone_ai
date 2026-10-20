@@ -31,9 +31,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 지도 클릭 시 주소 가져오기 (역지오코딩)
     vmap.on('singleclick', function(evt) {
-        // 이미 꽂혀있는 핀(마커)을 클릭한 경우엔 주소 변환을 실행하지 않음
-        let hasFeature = vmap.hasFeatureAtPixel(evt.pixel);
-        if (hasFeature) return;
+        let isMarkerClicked = false;
+        // 클릭한 픽셀에 있는 물체들을 검사
+        vmap.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            // 그 물체의 형태가 '점(Point = 핀/마커)'일 때만 true로 체크
+            if (feature.getGeometry().getType() === 'Point') {
+                isMarkerClicked = true;
+            }
+        });
+
+        // 핀을 클릭했을 때만 주소 검색(역지오코딩)을 취소함 (폴리곤은 무시하고 통과!)
+        if (isMarkerClicked) return;
 
         let coords = evt.coordinate;
         // 클릭한 화면 좌표(3857)를 위경도(4326)로 변환
@@ -123,6 +131,13 @@ function reverseGeocode(lon, lat) {
                     <div style="color:#0056b3; font-size:14px; margin-bottom:5px;">${address}</div>
                     <div style="color:#666; font-size:12px;">이 위치를 내 위치로 설정했습니다.</div>
                 `;
+
+                // 생성된 리스트 아이템에 클릭 이벤트(카메라 이동) 추가
+                listItem.onclick = function() {
+                    setSearchMarker(lon, lat, address); // 핀 다시 꽂기 및 카메라 이동
+                    vmap.getView().setZoom(17);         // 줌 레벨 확실하게 당겨주기
+                };
+                
                 resultList.appendChild(listItem);
 
                 // 3. 만약 후보지 탭을 보고 있었다면 자동으로 '주소 검색' 탭으로 전환
@@ -169,12 +184,16 @@ function setSearchMarker(lon, lat, address) {
     const targetCoord = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
     // 6) 출발 전의 현재 위치를 기억해 둡니다.
     const currentCenter = vmap.getView().getCenter();
+    const currentResolution = vmap.getView().getResolution(); 
     // 이동(스르륵) 애니메이션
     const panAnimation = ol.animation.pan({ duration: 500, source: currentCenter });
-    // 좌표 변환 애니메이션 장착
-    vmap.beforeRender(panAnimation);
+    //줌(확대/축소) 애니메이션 추가
+    const zoomAnimation = ol.animation.zoom({ duration: 500, resolution: currentResolution }); // 시작할 때의 줌 상태
+    // 두 개의 애니메이션을 지도 렌더링에 동시에 장착!
+    vmap.beforeRender(panAnimation, zoomAnimation);
     // 해당 좌표로 이동
     vmap.getView().setCenter(targetCoord);
+    vmap.getView().setZoom(17);
 }
 
 // ==========================================
@@ -301,24 +320,6 @@ function displayOnMap(address) {
                 // 공통 마커 생성 함수 호출
                 setSearchMarker(lon, lat, address);
                 vmap.getView().setZoom(17);
-
- 
-
-                // 현재 줌(해상도) 상태를 기억해 둡니다.
-                // let currentResolution = vmap.getView().getResolution(); 
-
-                // 줌(확대/축소) 애니메이션 추가
-                // let zoomAnimation = ol.animation.zoom({
-                //     duration: 500, // 0.5초 동안 확대/축소
-                //     resolution: currentResolution // 시작할 때의 줌 상태
-                // });
-                
-                // 두 개의 애니메이션을 지도 렌더링에 동시에 장착!
-                // vmap.beforeRender(panAnimation, zoomAnimation);
-                // 7) 최종 목적지 좌표와 줌 레벨을 지시하면 
-                // 위에서 장착한 애니메이션과 맞물려 영화처럼 날아갑니다.
-                // vmap.getView().setCenter(targetCoord);
-                // vmap.getView().setZoom(17);
 
             } else {
                 alert("해당 주소의 좌표를 찾을 수 없습니다.");
