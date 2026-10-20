@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
     vw.ol3.MapOptions.basemapType = vw.ol3.BasemapType.GRAPHIC; // 기본 2D 지도 스타일
     vw.ol3.MapOptions.controlDensity = vw.ol3.DensityType.EMPTY; // 불필요한 기본 컨트롤 버튼 숨김
     vw.ol3.MapOptions.interactionDensity = vw.ol3.DensityType.BASIC;
-    
     // 💡 [신규] 초기 중심점을 서울시청에서 신월1동으로 변경
     vw.ol3.MapOptions.center = [126.8251, 37.5312]; 
     vw.ol3.MapOptions.zoom = 15;
@@ -30,7 +29,21 @@ document.addEventListener("DOMContentLoaded", function() {
     // 선언해둔 vmap 변수에 실제 지도를 밀어넣습니다.
     vmap = new vw.ol3.Map("vmap", vw.ol3.MapOptions);
 
-    // --- 💡 [신규] 탭 전환 기능 시작 ---
+    // 지도 클릭 시 주소 가져오기 (역지오코딩)
+    vmap.on('singleclick', function(evt) {
+        // 이미 꽂혀있는 핀(마커)을 클릭한 경우엔 주소 변환을 실행하지 않음
+        let hasFeature = vmap.hasFeatureAtPixel(evt.pixel);
+        if (hasFeature) return;
+
+        let coords = evt.coordinate;
+        // 클릭한 화면 좌표(3857)를 위경도(4326)로 변환
+        let lonlat = ol.proj.transform(coords, 'EPSG:3857', 'EPSG:4326');
+        
+        // 역지오코딩 함수 실행
+        reverseGeocode(lonlat[0], lonlat[1]);
+    });
+
+    // --- 탭 전환 기능 시작 ---
     const tabSearchBtn = document.getElementById("tabSearchBtn");
     const tabDataBtn = document.getElementById("tabDataBtn");
     const tabContentSearch = document.getElementById("tabContentSearch");
@@ -40,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function() {
     tabSearchBtn.addEventListener("click", function() {
         tabSearchBtn.classList.add("active");      // 내 버튼 활성화
         tabDataBtn.classList.remove("active");     // 상대방 버튼 비활성화
-        
         tabContentSearch.classList.add("active");  // 내 화면 켜기
         tabContentData.classList.remove("active"); // 상대방 화면 끄기
     });
@@ -49,7 +61,6 @@ document.addEventListener("DOMContentLoaded", function() {
     tabDataBtn.addEventListener("click", function() {
         tabDataBtn.classList.add("active");
         tabSearchBtn.classList.remove("active");
-        
         tabContentData.classList.add("active");
         tabContentSearch.classList.remove("active");
     });
@@ -77,51 +88,108 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // ==========================================
-// 💡 [신규] 신월1동 경계선 폴리곤 그리기 함수 (브이월드 문법으로 재작성)
+// 💡 [신규] 좌표 -> 주소 변환 (역지오코딩) 및 클릭 결과 띄우기
 // ==========================================
-async function drawBoundary() {
-    try {
-        const response = await fetch('/data/greenzone1st_layer_boundary.geojson');
-        const data = await response.json();
-        
-        // 브이월드(OpenLayers) 방식으로 폴리곤 데이터 읽어오기
-        const format = new ol.format.GeoJSON();
-        const features = format.readFeatures(data, {
-            dataProjection: 'EPSG:4326',      // 원본 데이터 좌표계 (위경도)
-            featureProjection: 'EPSG:3857'    // 브이월드 지도 좌표계(구면 메르카토르)로 자동 변환
-        });
+function reverseGeocode(lon, lat) {
+    $.ajax({
+        url: "https://api.vworld.kr/req/address",
+        type: "GET",
+        dataType: "jsonp",
+        data: {
+            service: "address",
+            request: "getAddress",
+            version: "2.0",
+            crs: "epsg:4326",
+            point: `${lon},${lat}`,
+            type: "BOTH", // 도로명, 지번 모두 탐색
+            zipcode: "false",
+            simple: "false",
+            key: window.VWORLD_KEY
+        },
+        success: function(response) {
+            if (response.response.status === "OK") {
+                const result = response.response.result[0];
+                const address = result.text; // 찾아낸 주소
+                
+                // 1. 파란 핀 꽂기
+                setSearchMarker(lon, lat, address);
 
-        // 💡 테두리 두께 및 내부 색상 디자인 그대로 적용
-        const polygonStyle = new ol.style.Style({
-            stroke: new ol.style.Stroke({ color: '#1b8a4a', width: 3 }),
-            fill: new ol.style.Fill({ color: 'rgba(46, 204, 113, 0.1)' })
-        });
+                // 2. 좌측 리스트에 내가 클릭한 주소 띄우기
+                const resultList = document.getElementById("resultList");
+                resultList.innerHTML = ""; 
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `
+                    <div style="color:#1b6b4a; font-weight:bold; margin-bottom:5px;">📍 [지도에서 선택한 위치]</div>
+                    <div style="color:#0056b3; font-size:14px; margin-bottom:5px;">${address}</div>
+                    <div style="color:#666; font-size:12px;">이 위치를 내 위치로 설정했습니다.</div>
+                `;
+                resultList.appendChild(listItem);
 
-        const vectorSource = new ol.source.Vector({ features: features });
-        boundaryLayer = new ol.layer.Vector({
-            source: vectorSource,
-            style: polygonStyle
-        });
-
-        vmap.addLayer(boundaryLayer);
-    } catch (error) {
-        console.error("경계선 데이터 로딩 에러:", error);
-    }
+                // 3. 만약 후보지 탭을 보고 있었다면 자동으로 '주소 검색' 탭으로 전환
+                document.getElementById("tabSearchBtn").click();
+                
+            } else {
+                console.log("주소를 찾을 수 없는 지역입니다(산, 강 등).");
+            }
+        },
+        error: function() {
+            console.error("역지오코딩 에러");
+        }
+    });
 }
 
 // ==========================================
-// 2. 주소 검색 함수 (버튼 클릭 시 실행됨)
+// 💡 [공통] 검색된 위치에 파란 핀 꽂는 함수 (중복 코드 제거)
+// ==========================================
+function setSearchMarker(lon, lat, address) {
+    // 검색 마커 레이어만 비우기 (GeoJSON 핀은 안 건드림)
+    if (searchMarkerLayer != null) {
+        vmap.removeLayer(searchMarkerLayer);
+        searchMarkerLayer = null;
+    }
+
+    // 2) 검색 전용 마커 레이어 생성
+    searchMarkerLayer = new vw.ol3.layer.Marker(vmap);
+    vmap.addLayer(searchMarkerLayer);
+
+    // 3) 마커 옵션 셋팅 (샘플 코드 방식 활용)
+    vw.ol3.markerOption = {
+        x: lon,
+        y: lat,
+        epsg: "EPSG:4326",
+        title: '내 위치',
+        contents: address,
+        iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png', 
+        attr: {"name": "선택된 위치", "desc": address}
+    };
+
+    // 4) 마커 레이어에 마커 추가
+    searchMarkerLayer.addMarker(vw.ol3.markerOption);
+    // 5) 목적지 좌표 변환
+    const targetCoord = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
+    // 6) 출발 전의 현재 위치를 기억해 둡니다.
+    const currentCenter = vmap.getView().getCenter();
+    // 이동(스르륵) 애니메이션
+    const panAnimation = ol.animation.pan({ duration: 500, source: currentCenter });
+    // 좌표 변환 애니메이션 장착
+    vmap.beforeRender(panAnimation);
+    // 해당 좌표로 이동
+    vmap.getView().setCenter(targetCoord);
+}
+
+// ==========================================
+// 2. 주소 검색 함수 (행안부 API + 더보기 기능)
 // ==========================================
 function searchAddress(page) {
-    const keywordInput = document.getElementById("keyword").value;
+    const keywordInputValue = document.getElementById("keyword").value;
 
     // 💡 1페이지 검색(새로운 검색)일 경우 처리
     if (page === 1) {
-        if (keywordInput.trim() === "") {
+        if (keywordInputValue.trim() === "") {
             alert("검색어를 입력해 주세요.");
             return;
         }
-        currentKeyword = keywordInput; // 현재 검색어 기억
+        currentKeyword = keywordInputValue; // 현재 검색어 기억
         currentPage = 1;               // 페이지 1로 초기화
         document.getElementById("resultList").innerHTML = ""; // 기존 리스트 싹 비우기
     }
@@ -139,7 +207,7 @@ function searchAddress(page) {
             resultType: "json"
         },
         success: function(jsonStr) {
-            if(jsonStr.results.common.errorCode !== "0") {
+            if (jsonStr.results.common.errorCode !== "0") {
                 alert("에러 발생: " + jsonStr.results.common.errorMessage);
                 return;
             }
@@ -150,12 +218,10 @@ function searchAddress(page) {
 
             // 💡 기존에 있던 '더보기' 버튼이 있다면 잠시 삭제 (새로 결과 덧붙인 후 다시 맨 밑에 달기 위함)
             const oldMoreBtn = document.getElementById("loadMoreBtn");
-            if (oldMoreBtn) {
-                oldMoreBtn.remove();
-            }
+            if (oldMoreBtn) { oldMoreBtn.remove(); }
             
             // 검색된 주소 데이터가 1개 이상 있을 때
-            if(jusoArray && jusoArray.length > 0) {
+            if (jusoArray && jusoArray.length > 0) {
                 // for문(반복문)을 사용해 검색된 갯수만큼 목록을 만듭니다.
                 jusoArray.forEach(function(juso) {
                     // <li> 태그(목록 요소)를 하나 만듭니다.
@@ -208,7 +274,7 @@ function searchAddress(page) {
 }
 
 // ==========================================
-// 3. 검색된 주소 마커 찍기 및 지도 이동
+// 3. 주소 문자열 -> 좌표로 바꿔서 지도에 띄우기
 // ==========================================
 function displayOnMap(address) {
     // console.log("좌표를 찾을 주소: ", address);
@@ -224,59 +290,35 @@ function displayOnMap(address) {
             type: "ROAD",
             address: address,
             format: "json",
-            key: window.VWORLD_KEY 
+            key: window.VWORLD_KEY
         },
         success: function(response) {
             if (response.response.status === "OK") {
-                let point = response.response.result.point;
-                let lon = Number(point.x);
-                let lat = Number(point.y);
-                // console.log("찾아낸 좌표 - 경도:", lon, "위도:", lat);
-                // 검색 마커 레이어만 비우기 (GeoJSON 핀은 안 건드림)
-                if (searchMarkerLayer != null) {
-                    vmap.removeLayer(searchMarkerLayer);
-                    searchMarkerLayer = null;
-                }
-                // 2) 검색 전용 마커 레이어 생성
-                searchMarkerLayer = new vw.ol3.layer.Marker(vmap);
-                vmap.addLayer(searchMarkerLayer);
+                const point = response.response.result.point;
+                const lon = Number(point.x); 
+                const lat = Number(point.y);
 
-                // 3) 마커 옵션 셋팅 (샘플 코드 방식 활용)
-                vw.ol3.markerOption = {
-                    x: lon,
-                    y: lat,
-                    epsg: "EPSG:4326",
-                    title: '검색된 위치',
-                    contents: address,
-                    iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png', 
-                    attr:{"name": "검색된 위치", "desc": address}
-                };
+                // 공통 마커 생성 함수 호출
+                setSearchMarker(lon, lat, address);
+                vmap.getView().setZoom(17);
 
-                // 4) 마커 레이어에 마커 추가
-                searchMarkerLayer.addMarker(vw.ol3.markerOption);
+ 
 
-                // 5) 목적지 좌표 변환
-                let targetCoord = ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857');
-                // 6) 출발 전의 현재 위치와 현재 줌(해상도) 상태를 기억해 둡니다.
-                let currentCenter = vmap.getView().getCenter(); 
-                let currentResolution = vmap.getView().getResolution(); 
-                // 이동(스르륵) 애니메이션
-                let panAnimation = ol.animation.pan({
-                    duration: 500, // 0.5초 동안 이동
-                    source: currentCenter
-                });
+                // 현재 줌(해상도) 상태를 기억해 둡니다.
+                // let currentResolution = vmap.getView().getResolution(); 
+
                 // 줌(확대/축소) 애니메이션 추가
-                let zoomAnimation = ol.animation.zoom({
-                    duration: 500, // 0.5초 동안 확대/축소
-                    resolution: currentResolution // 시작할 때의 줌 상태
-                });
+                // let zoomAnimation = ol.animation.zoom({
+                //     duration: 500, // 0.5초 동안 확대/축소
+                //     resolution: currentResolution // 시작할 때의 줌 상태
+                // });
                 
                 // 두 개의 애니메이션을 지도 렌더링에 동시에 장착!
-                vmap.beforeRender(panAnimation, zoomAnimation);
+                // vmap.beforeRender(panAnimation, zoomAnimation);
                 // 7) 최종 목적지 좌표와 줌 레벨을 지시하면 
                 // 위에서 장착한 애니메이션과 맞물려 영화처럼 날아갑니다.
-                vmap.getView().setCenter(targetCoord);
-                vmap.getView().setZoom(17);
+                // vmap.getView().setCenter(targetCoord);
+                // vmap.getView().setZoom(17);
 
             } else {
                 alert("해당 주소의 좌표를 찾을 수 없습니다.");
@@ -301,7 +343,7 @@ async function toggleGeoJsonMarkers() {
         geoJsonMarkerLayer = null; 
         listContainer.innerHTML = ""; // 💡 사이드바 목록 초기화
         
-        loadGeoBtn.innerText = "🗺️ 11개 후보지(GeoJSON) 불러오기";
+        loadGeoBtn.innerText = "🗺️ 9개 후보지(GeoJSON) 불러오기";
         loadGeoBtn.style.backgroundColor = "#28a745"; 
         return; 
     }
@@ -329,7 +371,6 @@ async function toggleGeoJsonMarkers() {
                 // 💡 1. 필요한 데이터만 정확한 이름으로 콕 집어서 꺼내옵니다.
                 const placeName = feature.properties["이름"] || "이름 없음";
                 const roadAddr = feature.properties["도로명주소"] || feature.properties["지번주소"] || "주소 미상";
-                
                 //  디테일한 속성 정보 뽑기
                 const placeNum = feature.properties["번호"] || "-";
                 const placeType = feature.properties["부지유형"] || "";
@@ -344,7 +385,6 @@ async function toggleGeoJsonMarkers() {
                     epsg: "EPSG:4326",
                     title: `[${placeNum}번] ${placeName}`, // 팝업 제목에 번호 추가
                     contents: popupHtml,   // 팝업 내용으로 조립한 '주소' 사용
-                    // 💡 검색 핀(파란색)과 헷갈리지 않게 GeoJSON 핀은 빨간색으로 변경
                     iconUrl: 'http://map.vworld.kr/images/ol3/btn_area.png', // 구분을 위해 마커 임시 변경
                     attr: {"name": placeName, "desc": roadAddr}
                 };
@@ -378,5 +418,38 @@ async function toggleGeoJsonMarkers() {
         console.error("GeoJSON 로딩 에러:", error);
         alert("데이터를 불러오는 중 문제가 발생했습니다.");
         loadGeoBtn.innerText = "🗺️ 데이터(GeoJSON) 불러오기"; // 에러 시 복구
+    }
+}
+
+// ==========================================
+// 💡 [신규] 신월1동 경계선 폴리곤 그리기 함수 (브이월드 문법으로 재작성)
+// ==========================================
+async function drawBoundary() {
+    try {
+        const response = await fetch('/data/greenzone1st_layer_boundary.geojson');
+        const data = await response.json();
+        
+        // 브이월드(OpenLayers) 방식으로 폴리곤 데이터 읽어오기
+        const format = new ol.format.GeoJSON();
+        const features = format.readFeatures(data, {
+            dataProjection: 'EPSG:4326',      // 원본 데이터 좌표계 (위경도)
+            featureProjection: 'EPSG:3857'    // 브이월드 지도 좌표계(구면 메르카토르)로 자동 변환
+        });
+
+        // 💡 테두리 두께 및 내부 색상 디자인 그대로 적용
+        const polygonStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({ color: '#1b8a4a', width: 3 }),
+            fill: new ol.style.Fill({ color: 'rgba(46, 204, 113, 0.1)' })
+        });
+
+        const vectorSource = new ol.source.Vector({ features: features });
+        boundaryLayer = new ol.layer.Vector({
+            source: vectorSource,
+            style: polygonStyle
+        });
+
+        vmap.addLayer(boundaryLayer);
+    } catch (error) {
+        console.error("경계선 데이터 로딩 에러:", error);
     }
 }
