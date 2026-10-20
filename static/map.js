@@ -289,7 +289,7 @@ async function toggleGeoJsonMarkers() {
                     title: `[${placeNum}번] ${placeName}`, // 팝업 제목에 번호 추가
                     contents: popupHtml,   // 팝업 내용으로 조립한 '주소' 사용
                     // 💡 검색 핀(파란색)과 헷갈리지 않게 GeoJSON 핀은 빨간색으로 변경
-                    iconUrl: 'http://map.vworld.kr/images/ol3/marker_blue.png',
+                    iconUrl: 'http://map.vworld.kr/images/ol3/btn_area.png', // 구분을 위해 마커 임시 변경
                     attr: {"name": placeName, "desc": roadAddr}
                 };
 
