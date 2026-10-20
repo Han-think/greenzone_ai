@@ -254,7 +254,7 @@ async function toggleGeoJsonMarkers() {
     loadGeoBtn.innerText = "⏳ 불러오는 중...";
     
     try {
-        const response = await fetch('/data/greenzone1st.geojson');
+        const response = await fetch('/data/greenzone2nd.geojson');
         geoJsonRawData = await response.json(); // 나중에 거리 계산을 위해 원본 데이터 저장
 
         // GeoJSON 전용 레이어 생성
