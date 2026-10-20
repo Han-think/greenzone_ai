@@ -1,0 +1,24 @@
+REQ-DA-001 | 건물·필지 수요 분석 및 분산 배정 | 이원홍 담당 정리
+
+[서비스 한 줄]
+신월1동의 건물·수요와 도로·후보지 자료를 연결해, 주소 검색으로 제안 배출 거점과 선정 근거를 확인하는 웹 서비스입니다.
+
+[구현 상세 — 요구사항 정의서에 입력]
+건축HUB 건축물대장 표제부 API와 VWorld 건물 도형을 PNU로 결합하고 SGIS 2025 행정동 경계로 신월1동을 추출한다. 주건축물 용도로 주거·상가·복합을 분류하고 아파트 포함 필지를 제외한다. 관측 1,738필지 중 대상 1,665필지(주거 1,155·상가 108·복합 402)의 가구·세대 수를 별도 집계한다. 과거 양천구 청소권역 배출량 CSV와 같은 연도 SGIS 가구·주택 통계로 조건부 배출 수요를 참고 추정한다. 결과는 building_id·좌표를 포함한 CSV/JSON으로 전달해 주소 검색·지도에 연결한다. 현재 수요 정리·개발 연결까지 수행했으며 거점별 분산 배정·보행거리 계산은 후속 작업이다.
+
+[출처 — 링크도 함께 입력]
+1. 국토교통부 건축HUB 표제부 API: https://www.data.go.kr/data/15134735/openapi.do
+2. VWorld 도로명주소건물 LT_C_SPBD(WFS): https://www.vworld.kr/
+3. SGIS 행정동 경계: https://sgis.mods.go.kr/developer/html/newOpenApi/api/dataApi/addressBoundary.html
+4. SGIS 가구·주택 통계: https://sgis.mods.go.kr/developer/html/newOpenApi/api/dataApi/census.html
+5. 양천구 구역별 쓰레기 배출량 CSV: https://www.data.go.kr/data/15093944/fileData.do
+
+[API 인증·자료 시점]
+수집 코드의 변수명: BUILDING_API_SERVICE_KEY / VWORLD_API_KEY / SGIS_CONSUMER_KEY / SGIS_CONSUMER_SECRET.
+실제 키·토큰은 제외하며 재분석은 저장된 공식 응답·CSV로 수행한다.
+건축물대장·VWorld는 2026-10-18 취득 스냅샷(원천 전체 기준일 미확인), 경계는 SGIS 2025, 참고 통계는 2021·2024년, 배출량 CSV 파일 기준일은 2026-08-31이다.
+
+[결과 해석]
+가구 3,070과 세대 4,112는 합산하지 않는다. 7,145는 혼합 대리지표이며 실제 거주 세대 수가 아니다. 배출량은 권역 자료를 배분한 조건부 추정이며 건물별 실측량이 아니다. 안전·부지 승인·최종 배정 완료로 보고하지 않는다.
+
+상세 근거: REQ-DA-001_구현상세_데이터출처.md
