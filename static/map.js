@@ -259,6 +259,33 @@ function showClickedAddress(position) {
         box.replaceChildren(textNode('h3', '지도에서 선택한 위치'), textNode('p', address));
         if (row.address && row.road_address) box.append(textNode('p', '지번: ' + row.address.address_name));
         box.append(textNode('small', '위도 ' + position.getLat().toFixed(6) + ', 경도 ' + position.getLng().toFixed(6)));
+        
+        // ==========================================
+        // 💡 [여기 추가] 모든 거점 중 가장 가까운 거점 찾기
+        if (pageData && pageData.hubs) {
+            var minDistance = Infinity;
+            var closestHub = null;
+            
+            for (var i = 0; i < pageData.hubs.features.length; i++) {
+                var hub = pageData.hubs.features[i];
+                // 화면 표시 설정(9곳 보기 or 6곳 보기)에 맞춰 활성화된 거점만 대상으로 함
+                if (!includedInPlan(hub)) continue; 
+                
+                var dist = calculateDistance(position.getLng(), position.getLat(), hub);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestHub = hub;
+                }
+            }
+            
+            if (closestHub) {
+                var hubProps = closestHub.properties;
+                box.append(textNode('p', '📍 가장 가까운 거점: ' + hubProps['이름'] + ' (생활권 ' + hubProps['생활권'] + ')'));
+                box.append(textNode('p', '📏 직선거리: 약 ' + fmt(minDistance) + 'm'));
+            }
+        }
+        // ==========================================
+        
         box.append(textNode('small', '주소 확인 결과입니다. 담당 거점안은 보유 주소·건물명 검색에서 확인하세요.'));
         box.scrollIntoView({block: 'nearest'});
         document.getElementById('mapStatus').textContent = '선택 주소: ' + address;

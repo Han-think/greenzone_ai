@@ -29,6 +29,19 @@ function textNode(tag, text) {
 function fmt(number) {
     return Number(number).toLocaleString('ko-KR', {maximumFractionDigits: 1});
 }
+
+// 💡 [신규 추가] 카카오맵 기능을 이용해 두 지점 간의 직선거리(m)를 계산하는 함수
+function calculateDistance(lon, lat, targetFeature) {
+    var targetCoords = targetFeature.geometry.coordinates;
+    var line = new kakao.maps.Polyline({
+        path: [
+            new kakao.maps.LatLng(lat, lon), 
+            new kakao.maps.LatLng(targetCoords[1], targetCoords[0])
+        ]
+    });
+    return line.getLength();
+}
+
 // 서버에 GET 요청을 보내 JSON 응답을 읽는다. 실패하면 오류 문구를 올린다.
 async function getJSON(url) {
     var response = await fetch(url, {cache: 'no-store'});
@@ -88,6 +101,16 @@ function selectBuilding(row) {
     box.replaceChildren(textNode('h3', row.name || row.address), textNode('p', row.address + ' / ' + row.jibun_address));
     box.append(textNode('p', '팀 대장 기준 ' + fmt(row.units) + ' 주거단위 · ' + row.housing_type));
     box.append(textNode('p', '생활권 ' + row.zone + ' 담당 제안: ' + row.hub_name));
+
+    // ==========================================
+    // 💡 [여기 추가] 담당 거점까지의 직선거리 계산 및 표시
+    var targetHub = findHub(row.hub_id);
+    if (targetHub) {
+        var dist = calculateDistance(row.coordinates[0], row.coordinates[1], targetHub);
+        box.append(textNode('p', '📍 담당 거점까지 직선거리: 약 ' + fmt(dist) + 'm'));
+    }
+    // ==========================================
+
     box.append(textNode('small', '개별 건물의 보행거리는 결과 파일에 없어 표시하지 않습니다. 실제 배출 위치 지정이 아닙니다.'));
     var button = textNode('button', '담당 거점안 보기');
     button.dataset.hubId = row.hub_id;
