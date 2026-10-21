@@ -232,3 +232,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         initializeMap();
     } catch (error) { document.getElementById('dataStatus').textContent = error.message; }
 });
+
+
+const navSearchBtn = document.getElementById("navSearchBtn");
+
+navSearchBtn.addEventListener("click", () => {
+    document.getElementById("tabSearchBtn").click();
+
+    navSearchBtn.classList.add("active");
+});
+

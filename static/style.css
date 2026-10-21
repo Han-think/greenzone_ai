@@ -11,11 +11,16 @@ html,body {
     color:#293e34;
 }
 body {
-    display:flex;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    padding-left: 190px;
 }
+
 aside {
     width:385px;
     min-width:385px;
+    flex-shrink:0;
     padding:18px;
     overflow:hidden;
     display:flex;
@@ -23,6 +28,8 @@ aside {
     background:#fafcfb;
     border-right:1px solid #d8e2dc;
 }
+
+
 main {
     flex:1;
     min-width:0;
