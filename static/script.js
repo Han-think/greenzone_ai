@@ -106,7 +106,15 @@ function selectBuilding(row) {
     // 💡 [여기 추가] 담당 거점까지의 직선거리 계산 및 표시
     var targetHub = findHub(row.hub_id);
     if (targetHub) {
-        var dist = calculateDistance(row.coordinates[0], row.coordinates[1], targetHub);
+        // 💡 1. 건물 좌표와 거점 좌표를 각각 카카오맵 전용 좌표(LatLng)로 예쁘게 포장합니다.
+        var startLatLng = new kakao.maps.LatLng(row.coordinates[1], row.coordinates[0]);
+        var targetCoords = targetHub.geometry.coordinates;
+        var endLatLng = new kakao.maps.LatLng(targetCoords[1], targetCoords[0]);
+        
+        // 💡 2. 포장된 좌표를 함수에 던지기만 하면 끝!
+        var dist = getDistanceMath(startLatLng, endLatLng);
+        drawDistanceLine(startLatLng, endLatLng);
+        
         box.append(textNode('p', '📍 담당 거점까지 직선거리: 약 ' + fmt(dist) + 'm'));
     }
     // ==========================================

@@ -11,24 +11,27 @@ var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfb
 
 // 💡 점선을 기억할 변수와 거리 계산 함수
 var searchDistanceLine = null;
-function calculateDistance(lon, lat, targetFeature) {
-    // 1. 이전 검색에서 그려진 점선이 있다면 지워줍니다.
+
+// [계산용] 카카오맵 좌표 2개를 받아 거리(m)만 계산
+function getDistanceMath(startLatLng, endLatLng) {
+    var poly = new kakao.maps.Polyline({
+        path: [startLatLng, endLatLng]
+    });
+    return poly.getLength();
+}
+
+// [그리기용] 카카오맵 좌표 2개를 받아 빨간 점선을 그림
+function drawDistanceLine(startLatLng, endLatLng) {
     if (searchDistanceLine) {
         searchDistanceLine.setMap(null);
     }
-
-    var targetCoords = targetFeature.geometry.coordinates;
-    
-    // 2. 카카오맵 선 객체를 만들고 점선 스타일을 입힙니다.
     searchDistanceLine = new kakao.maps.Polyline({
-        path: [
-            new kakao.maps.LatLng(lat, lon), 
-            new kakao.maps.LatLng(targetCoords[1], targetCoords[0])
-        ],
-        strokeWeight: 2,           // 선 두께
-        strokeColor: '#657784',    // 선 색상 (팀에서 쓰는 회색)
-        strokeOpacity: 0.9,        // 투명도
-        strokeStyle: 'shortdash'   // 💡 핵심: 짧은 점선 모양
+        path: [startLatLng, endLatLng],
+        strokeWeight: 4,           // 💡 잘 보이게 두께 4
+        strokeColor: '#FF3333',    // 💡 눈에 확 띄는 빨간색!
+        strokeOpacity: 0.9,
+        strokeStyle: 'shortdash', 
+        zIndex: 999                // 💡 다각형 다 무시하고 최상단 배치
     });
     
     // 3. 지도에 실제로 보이게 그립니다!
@@ -257,6 +260,11 @@ function clearSearchPoint() {
     mapAddressRequest += 1;
     if (searchMarker) searchMarker.setMap(null);
     if (selectedPopup) selectedPopup.close();
+
+    // 💡 검색 초기화 시, 우리가 그렸던 점선도 같이 지도에서 지워주기!
+    if (typeof searchDistanceLine !== 'undefined' && searchDistanceLine) {
+        searchDistanceLine.setMap(null);
+    }
 }
 
 // 팀의 지도 클릭 주소 표시를 같은 카카오 JavaScript 키의 좌표→주소 기능으로 연결한다.
@@ -294,20 +302,29 @@ function showClickedAddress(position) {
         if (pageData && pageData.hubs) {
             var minDistance = Infinity;
             var closestHub = null;
-            
+            var startLatLng = position; // 지도를 클릭한 곳의 좌표(이미 카카오맵 좌표 포맷임)
+
+            // 루프 돌면서 순수하게 제일 짧은 거리만 찾기
             for (var i = 0; i < pageData.hubs.features.length; i++) {
                 var hub = pageData.hubs.features[i];
-                // 화면 표시 설정(9곳 보기 or 6곳 보기)에 맞춰 활성화된 거점만 대상으로 함
-                if (!includedInPlan(hub)) continue; 
-                
-                var dist = calculateDistance(position.getLng(), position.getLat(), hub);
+                // if (!includedInPlan(hub)) continue; 
+                var targetCoords = hub.geometry.coordinates;
+                var endLatLng = new kakao.maps.LatLng(targetCoords[1], targetCoords[0]);
+                // 💡 여기서는 그리지 않고 숫자만 받습니다.
+                var dist = getDistanceMath(startLatLng, endLatLng); 
                 if (dist < minDistance) {
                     minDistance = dist;
                     closestHub = hub;
                 }
             }
             
+            // 제일 가까운 거점을 찾았다면 선을 긋습니다!
             if (closestHub) {
+                var finalCoords = closestHub.geometry.coordinates;
+                var finalEndLatLng = new kakao.maps.LatLng(finalCoords[1], finalCoords[0]);
+
+                drawDistanceLine(startLatLng, finalEndLatLng); // 💡 여기서 최종 그리기!
+                
                 var hubProps = closestHub.properties;
                 box.append(textNode('p', '📍 가장 가까운 거점: ' + hubProps['이름'] + ' (생활권 ' + hubProps['생활권'] + ')'));
                 box.append(textNode('p', '📏 직선거리: 약 ' + fmt(minDistance) + 'm'));
