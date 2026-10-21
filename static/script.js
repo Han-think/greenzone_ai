@@ -101,36 +101,6 @@ function selectBuilding(row) {
     box.replaceChildren(textNode('h3', row.name || row.address), textNode('p', row.address + ' / ' + row.jibun_address));
     box.append(textNode('p', '팀 대장 기준 ' + fmt(row.units) + ' 주거단위 · ' + row.housing_type));
     box.append(textNode('p', '생활권 ' + row.zone + ' 담당 제안: ' + row.hub_name));
-
-    // ==========================================
-    // 💡 [여기 추가] 담당 거점까지의 직선거리 계산 및 표시
-    // 💡 [수정됨] 검색된 건물의 '담당 거점' 찾기
-    var targetHub = null;
-    if (pageData && pageData.hubs) {
-        for (var i = 0; i < pageData.hubs.features.length; i++) {
-            if (pageData.hubs.features[i].properties['거점id'] === row.hub_id) {
-                targetHub = pageData.hubs.features[i];
-                break;
-            }
-        }
-    }
-    // 담당 거점을 찾았다면 선 긋고 거리 표시하기
-    if (targetHub) {
-        // 💡 핵심: 다각형 데이터(row.coordinates)는 반드시 mapPoint()를 거쳐야 합니다!
-        var startLatLng = mapPoint(row.coordinates); 
-        
-        // 거점은 '점(Point)' 데이터이므로 기존대로 씁니다.
-        var targetCoords = targetHub.geometry.coordinates;
-        var endLatLng = new kakao.maps.LatLng(targetCoords[1], targetCoords[0]);
-        
-        // 💡 2. 포장된 좌표를 함수에 던지기만 하면 끝!
-        var dist = getDistanceMath(startLatLng, endLatLng);
-        drawDistanceLine(startLatLng, endLatLng);
-        
-        box.append(textNode('p', '📍 담당 거점까지 직선거리: 약 ' + fmt(dist) + 'm'));
-    }
-    // ==========================================
-
     box.append(textNode('small', '개별 건물의 보행거리는 결과 파일에 없어 표시하지 않습니다. 실제 배출 위치 지정이 아닙니다.'));
     var button = textNode('button', '담당 거점안 보기');
     button.dataset.hubId = row.hub_id;
@@ -140,6 +110,25 @@ function selectBuilding(row) {
     renderHubList();
     drawResults();
     showSearchPoint(row);
+    
+    // ==========================================
+    // 💡 (다각형 배열을 mapPoint()로 중심점 변환)
+    if (typeof drawLineToHubById === 'function') {
+        // row.coordinates를 넣으면 mapPoint가 알아서 위도/경도 점으로 딱 뱉어줍니다.
+        var startLatLng = mapPoint(row.coordinates);
+        
+        // 거점 ID와 함께 심부름꾼 호출
+        var dist = drawLineToHubById(startLatLng, row.hub_id);
+        
+        if (dist !== null) {
+            box.append(textNode('p', '📍 담당 거점까지 직선거리: 약 ' + fmt(dist) + 'm'));
+        }
+    } else {
+        // 💡 만약 이 로그가 찍히면 파일 간 함수 공유가 안 되고 있는 것입니다.
+        console.log("🚨 에러: map.js의 drawLineToHubById 함수를 script.js에서 찾을 수 없습니다!");
+    }
+    // ==========================================
+
     box.scrollIntoView({block: 'nearest'});
 }
 // 보유 데이터 검색 결과를 10개씩 받아 기존 목록 뒤에 붙인다.

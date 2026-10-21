@@ -41,6 +41,32 @@ function drawDistanceLine(startLatLng, endLatLng) {
     return searchDistanceLine.getLength();
 }
 
+
+// 💡 거점 ID를 받아서 알아서 찾고 선까지 긋고 거리를 반환해 줌
+function drawLineToHubById(startLatLng, targetHubId) {
+    if (!pageData || !pageData.hubs) {
+        console.log("🚨 에러: pageData나 hubs 데이터가 없습니다.");
+        return null; 
+    }
+    
+    for (var i = 0; i < pageData.hubs.features.length; i++) {
+        var hub = pageData.hubs.features[i];
+        
+        // 💡 핵심: === (일치) 대신 == (동등) 사용! 숫자 1과 문자 "1"을 같다고 쳐줍니다.
+        if (hub.properties['거점id'] == targetHubId) {
+            var targetCoords = hub.geometry.coordinates;
+            var endLatLng = new kakao.maps.LatLng(targetCoords[1], targetCoords[0]);
+            
+            var dist = getDistanceMath(startLatLng, endLatLng);
+            drawDistanceLine(startLatLng, endLatLng);
+            return dist; // 계산된 거리를 script.js로 던져줍니다!
+        }
+    }
+    
+    console.log("🚨 에러: 거점 ID [" + targetHubId + "] 와 일치하는 거점을 지도 데이터에서 찾지 못했습니다.");
+    return null; // 못 찾았을 경우
+}
+
 // GeoJSON 좌표를 카카오 지도 좌표 객체로 바꾼다.
 function mapPoint(coordinates) {
     // 제공 연결: GeoJSON [경도, 위도]를 Kakao LatLng(위도, 경도)로 바꾼다.
