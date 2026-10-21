@@ -218,6 +218,10 @@ ADMIN_PASSWORD=
 - **관리자**: 각자 `ADMIN_PASSWORD`를 16자 이상으로 지정합니다. 미설정·16자 미만이면 관리자 로그인을 허용하지 않습니다. 자동 생성된 공용 계정은 없습니다.
 - 지도 클릭의 좌표→주소 변환은 같은 카카오 키를 사용합니다. 보유 건물 검색에는 별도 API 키가 없습니다.
 - 현재 실행에 Docker·Ollama·VWorld·LLM 키는 필요하지 않습니다.
+- **사진 품목 후보**: [Google AI Studio API Keys](https://aistudio.google.com/apikey)에서 Gemini API 키를 발급해 `GEMINI_API_KEY`에 입력합니다. 키는 서버의 `.env`에만 두며, 키가 없으면 기존 직접 품목 선택 방식이 그대로 동작합니다.
+- 모델에 일시적인 `503` 과부하가 반복되면 `GEMINI_MODEL=gemini-2.5-flash-lite` 또는 `GEMINI_MODEL=gemini-2.5-flash`로 바꿔 다른 멀티모달 모델을 시험하고 서버를 재시작합니다. 프로젝트·계정에 따라 무료 사용 가능 모델과 한도가 다르므로 AI Studio의 모델별 한도를 확인하세요.
+- 키를 설정한 상태에서 `/disposal`의 사진 업로드 버튼을 누르면 사진이 Google Gemini API로 전송됩니다. 서버는 사진을 파일로 저장하지 않습니다. Gemini 요청의 구조화 출력 스키마에서 품목 ID·이름을 현재 등록 목록으로 제한하고, 서버도 목록에 없는 후보를 제외합니다. 규격·수량·수수료는 기존대로 사용자가 직접 확인합니다. Google AI Studio 사용량·요금·데이터 정책을 확인한 뒤 사용하세요.
+- 기존 Python 의존성 외에 Gemini SDK를 설치할 필요는 없습니다. 서버에서 Google Gemini REST API를 호출합니다.
 
 ### ③ 서버 실행
 

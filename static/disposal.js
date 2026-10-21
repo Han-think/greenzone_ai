@@ -32,7 +32,51 @@ function clearPhoto() {
     document.getElementById('photoFile').value = '';
     document.getElementById('photoPreview').removeAttribute('src');
     document.getElementById('photoPreview').hidden = true;
+    document.getElementById('visionCandidates').replaceChildren();
     document.getElementById('photoStatus').textContent = '사진을 지웠습니다. 서버에는 저장하지 않았습니다.';
+}
+
+async function selectVisionItem(itemId) {
+    var select = document.getElementById('itemSelect');
+    if (!Array.prototype.some.call(select.options, function(option) { return option.value === itemId; })) {
+        var data = await readResponse(await fetch('/api/disposal/items', {cache: 'no-store'}));
+        select.replaceChildren();
+        for (var i = 0; i < data.items.length; i++) {
+            var option = makeText('option', data.items[i].name);
+            option.value = data.items[i].item_id;
+            select.append(option);
+        }
+    }
+    select.value = itemId;
+    if (select.value) loadRules();
+}
+
+function showVisionCandidates(candidates) {
+    var box = document.getElementById('visionCandidates');
+    box.replaceChildren();
+    if (!candidates.length) {
+        box.append(makeText('p', '사진에서 선택 가능한 등록 품목 후보를 찾지 못했습니다. 품목명을 직접 검색해 주세요.'));
+        var searchButton = makeText('button', '품목 직접 검색');
+        searchButton.type = 'button';
+        searchButton.onclick = function() {
+            var input = document.getElementById('itemQuery');
+            input.focus();
+            input.scrollIntoView({behavior: 'smooth', block: 'center'});
+        };
+        box.append(searchButton);
+        return;
+    }
+    box.append(makeText('h3', '사진에서 추정한 품목 후보 · 직접 확인하세요'));
+    var candidate = candidates[0];
+    var button = makeText('button', candidate.name + ' 선택');
+    button.type = 'button';
+    button.onclick = function() {
+        selectVisionItem(candidate.item_id).catch(function(error) {
+            document.getElementById('itemStatus').textContent = error.message;
+        });
+    };
+    box.append(button);
+    box.append(makeText('p', '다른 품목이라면 아래 검색창에서 직접 찾아 선택하세요.'));
 }
 
 async function uploadPhoto() {
@@ -43,11 +87,12 @@ async function uploadPhoto() {
     var version = photoRevision;
     var button = document.getElementById('uploadPhoto');
     button.disabled = true;
-    status.textContent = '사진을 전송하고 형식을 확인하고 있습니다.';
+    status.textContent = '사진 형식을 확인하고 설정된 경우 Gemini에 품목 후보를 요청하고 있습니다.';
     try {
         var data = await readResponse(await fetch('/api/vision', {method: 'POST', body: file,
             headers: {'Content-Type': file.type || 'application/octet-stream'}}));
         if (version !== photoRevision) return;
+        showVisionCandidates(data.candidates || []);
         status.textContent = data.message + ' (' + data.width + ' × ' + data.height + ')';
     } catch (error) { if (version === photoRevision) status.textContent = error.message; }
     finally { button.disabled = false; }
@@ -140,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (photoUrl) URL.revokeObjectURL(photoUrl);
         var file = this.files[0];
         var image = document.getElementById('photoPreview'); image.hidden = true; image.removeAttribute('src');
+        document.getElementById('visionCandidates').replaceChildren();
         if (file && ['image/jpeg', 'image/png', 'image/webp'].indexOf(file.type) !== -1 && file.size <= 8 * 1024 * 1024) {
             photoUrl = URL.createObjectURL(file); image.src = photoUrl; image.hidden = false;
         }

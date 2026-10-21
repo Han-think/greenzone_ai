@@ -14,7 +14,7 @@
 </nav>
 <main class="service-page">
     <h1>사진을 확인하고 배출 안내 찾기</h1>
-    <p class="notice">양천구 신월1동 기준 · 자동 인식 API 연결 전 · 사진 없이 직접 선택도 가능합니다.</p>
+    <p class="notice">양천구 신월1동 기준 · 사진 인식은 품목 후보만 제안합니다. 규격·수량·수수료는 직접 확인하세요.</p>
     <div class="service-grid">
     <section class="card">
         <h2>1. 사진 업로드</h2>
@@ -22,8 +22,9 @@
         <label for="photoFile">배출할 물건 사진</label><input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp">
         <img id="photoPreview" alt="선택한 사진 미리보기" hidden>
         <button id="uploadPhoto" type="button">사진 업로드 확인</button><button id="clearPhoto" type="button">사진 지우기</button>
-        <p id="photoStatus" role="status">사진은 서버에서 형식을 확인한 뒤 저장하지 않습니다.</p>
-        <small>사진만으로 크기·수수료를 확정하지 않습니다. 자동 품목 인식은 API 연결 후 추가됩니다.</small>
+        <p id="photoStatus" role="status">사진은 서버에 저장하지 않습니다.</p>
+        <small>GEMINI_API_KEY를 설정하면 업로드 버튼을 누를 때 사진이 Google Gemini API로 전송되어 품목 후보를 추정합니다. 사진만으로 규격·수수료를 확정하지 않습니다.</small>
+        <div id="visionCandidates" aria-live="polite"></div>
     </section>
     <section class="card">
         <h2>2. 품목·규격·수량 확인</h2>
