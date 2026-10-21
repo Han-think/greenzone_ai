@@ -104,7 +104,16 @@ function selectBuilding(row) {
 
     // ==========================================
     // 💡 [여기 추가] 담당 거점까지의 직선거리 계산 및 표시
-    var targetHub = findHub(row.hub_id);
+    // 💡 [수정됨] 검색된 건물의 '담당 거점'을 데이터에서 직접 안전하게 찾기
+    var targetHub = null;
+    if (pageData && pageData.hubs) {
+        for (var i = 0; i < pageData.hubs.features.length; i++) {
+            if (pageData.hubs.features[i].properties['거점id'] === row.hub_id) {
+                targetHub = pageData.hubs.features[i];
+                break;
+            }
+        }
+    }
     if (targetHub) {
         // 💡 1. 건물 좌표와 거점 좌표를 각각 카카오맵 전용 좌표(LatLng)로 예쁘게 포장합니다.
         var startLatLng = new kakao.maps.LatLng(row.coordinates[1], row.coordinates[0]);
