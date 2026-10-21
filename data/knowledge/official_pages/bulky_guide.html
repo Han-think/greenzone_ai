@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    
+    <title>스마트클린 양천</title>
+
+    
+		<link rel="shortcut icon" href="/favicon/favicon.ico">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+
+		<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+	
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no">
+    
+
+    
+        
+            <link rel="stylesheet"
+                  type="text/css"
+                  href="/client/yc/css/online.css?ver=101">
+        
+    
+    <link rel="stylesheet" type="text/css" href="/common/css/common.css?101">
+
+    
+		<meta name="_csrf" 			content="158503fb-c8cf-4f00-91cd-86255c19ef50"/>
+		<meta name="_csrf_header"	content="X-CSRF-TOKEN"/>
+
+		<script>
+			// getter
+			function getCsrfHeader(){
+				return $("meta[name='_csrf_header']").attr("content");
+			}
+			// getter
+			function getCsrfToken(){
+				return $("meta[name='_csrf']").attr("content");
+			}
+			// csrf config
+			function configCsrfAjax(xhr) {
+				xhr.setRequestHeader(getCsrfHeader(), getCsrfToken());
+			}
+		</script>
+	
+    
+		<!-- css -->
+		<link rel="stylesheet" type="text/css" href="/vendor/jquery-ui/jquery-ui.min.css?101" />
+		<!-- js -->
+		<script	src="/vendor/jquery/jquery-3.5.1.js?101"></script>
+		<script src="/vendor/jquery-ui/jquery-ui.min.js?101"></script>
+
+		<style>
+			.datepicker-holiday,
+			.datepicker-holiday a,
+			.datepicker-holiday span {
+				background-color: #ff403e !important;
+				color: #000 !important;
+			}
+		</style>
+
+		<script type="text/javascript">
+			;let JqueryUtil = (function() {
+				'use strict';
+				let _returnUtils = {};
+
+				/**
+				 * <input>에 "jquery-ui 의 datePicker"를 등록한다
+				 * @param {id, class, selector} id
+				 */
+				_returnUtils.setDatePicker = function(id) {
+					$(id).datepicker({
+						dateFormat 			: 'yy.mm.dd',
+						prevText			: '이전 달',
+						nextText			: '다음 달',
+						monthNames			: [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월' ],
+						monthNamesShort		: [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월' ],
+						dayNames			: [ '일', '월', '화', '수', '목', '금', '토' ],
+						dayNamesShort		: [ '일', '월', '화', '수', '목', '금', '토' ],
+						dayNamesMin			: [ '일', '월', '화', '수', '목', '금', '토' ],
+						yearSuffix			: '년',
+						showMonthAfterYear	: true,
+					});
+				}
+
+				_returnUtils.setLimitWeeks = function(options) {
+					const {
+						$datepicker,
+						limitWeeks = 3,
+						startDate = new Date(),
+					} = options;
+					$datepicker.datepicker("option", "minDate", startDate);
+					const limitDate = moment(startDate).add(limitWeeks * 7, 'days').endOf('day').toDate();
+					$datepicker.datepicker("option", "maxDate", limitDate);
+				}
+
+				_returnUtils.setHolidays = function(options) {
+					const {
+						$datepicker,
+						holidays = [],
+						block = true,
+					} = options;
+					$datepicker.datepicker("option", "beforeShowDay", function(date) {
+						const dateString = moment(date).format('YYYYMMDD');
+						if (holidays.includes(dateString)) {
+							return [!block, 'datepicker-holiday', ''];
+						}
+						return [true, '', ''];
+					});
+				}
+
+				return init();
+				function init() {
+					return _returnUtils;
+				}
+			})();
+		</script>
+	
+    
+	<!-- js -->
+	<script src="/vendor/vue/vue-3.2.45.js?101"></script>
+
+	<script>
+		const { createApp } = Vue
+
+		const VueMomentMixin = function() {
+			return {
+				data() {
+					return {
+						xMoment: moment,
+					}
+				},
+				methods: {
+					mix$momentFormat(date, format) {
+						try {
+							return !date || !format ? '' : moment(date).format(format);
+						} catch (e) {
+							console.error(e)
+							return '';
+						}
+					},
+				},
+			}
+		}
+
+		const VueLshUtilMixin = function() {
+			return {
+				data() {
+					return {
+						xLshUtil: LshUtil,
+					}
+				},
+			}
+		}
+
+		const VueBulkyMixin = function() {
+			return {
+				mounted() {},
+				computed: {},
+				methods: {
+					/**
+					 * @Deprecated
+					 * lsh-util.js에 있는 formatByPatternWithJoiner 사용할 것
+					 */
+					mix$formatOrderNo(text, joinChar = '-') {
+						let formattedString;
+						try {
+							const parts = text.match(/^(\d{6})(\d{4})$/);
+							if (parts)
+								formattedString = parts.slice(1).join(joinChar);
+							else
+								formattedString = text;
+						} catch (e) {
+							formattedString = text;
+						}
+						return formattedString;
+					},
+					/**
+					 * @Deprecated
+					 * lsh-util.js에 있는 formatByPatternWithJoiner 사용할 것
+					 */
+					mix$formatDetailNo(detailNo, joinChar = '-') {
+						let formattedString;
+						try {
+							const parts = detailNo.match(/^(\d{6})(\d{4})(\d{3})$/);
+							if (parts)
+								formattedString = parts.slice(1).join(joinChar);
+							else
+								formattedString = detailNo;
+						} catch (e) {
+							formattedString = detailNo;
+						}
+						return formattedString;
+					},
+				},
+			}
+		}
+	</script>
+
+    
+	<script type="text/javascript">
+		const isMobile = false;
+	</script>
+
+
+    <script src="/common/js/common.js?101"></script>
+    <script src="/common/js/lsh-util.js?101"></script>
+    <script src="/common/js/loading-spinner.js?101"></script>
+</head>
+<body>
+<div class="clientBody">
+    <div class="headerBox">
+        
+        
+        <div class="headerInner">
+            <div class="headerLogo" style="position: relative">
+                <a class="headerLogoHref" href="/" style="position: absolute">
+                    <img class="comImgH" src="/client/yc/img/main-logo.png">
+                </a>
+            </div>
+
+            <div class="moIcon">
+                <div class="moLine"></div>
+                <div class="moLine"></div>
+                <div class="moLine"></div>
+            </div>
+
+
+            <div class="headerMenuList">
+               <div class="headerMenuInner">
+                    <div class="headerMenuUnit">
+                         <a class="headerMenu">이용 안내</a>
+                         <div class="headerSubList">
+                             <a class="headerSub a-tag-care" href="/online/bulky/guide">이용 방법</a>
+                             <a class="headerSub a-tag-care" href="/online/bulky/item">수수료 안내</a>
+                         </div>
+                    </div>
+                    <div class="headerMenuUnit">
+                         <a class="headerMenu headerPoint">온라인 신청</a>
+                         <div class="headerSubList">
+                             <a class="headerSub a-tag-care" href="/online/bulky/request">배출신청</a>
+                             <a class="headerSub a-tag-care" href="/online/bulky/list">결과조회 / 배출취소</a>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            $(function() {
+                controlDropdown();
+
+                if (window.innerWidth <= 839) {
+                    $('.headerLogo').on('click',function(){
+                        $('.headerInner').toggleClass('moAct');
+                        $('.headerMenuList').css('display','none');
+                        $('.headerMenuListToHome').css('display','flex');
+                    })
+                } else {
+                    const _headerLogo = document.getElementsByClassName('headerLogo')[0];
+
+                    _headerLogo.addEventListener('click', function() {
+                        const goHomePC = document.getElementsByClassName('goHomePC')[0];
+                        if (!goHomePC.classList.contains('is-hide')) goHomePC.classList.add('is-hide');
+                        else goHomePC.classList.remove('is-hide');
+                    })
+                }
+
+                $('.moIcon').on('click',function(){
+                    $('.headerInner').toggleClass('moAct');
+                    $('.headerMenuListToHome').css('display','none');
+                    $('.headerMenuList').css('display','flex');
+                });
+
+            });
+
+
+            // 드랍다운 메뉴
+            function controlDropdown() {
+                const _headerSubList = document.getElementsByClassName('headerSubList');
+                const _headerMenu = document.getElementsByClassName('headerMenu');
+
+                for (let i = 0; i < _headerMenu.length; i++) {
+                    _headerMenu[i].addEventListener('click', function() {
+                        for (let j = 0; j < _headerMenu.length; j++) {
+                            if (_headerSubList[j].classList.contains('toggleOn')) {
+                                _headerSubList[j].classList.remove('toggleOn');
+                            }
+                        }
+                        _headerSubList[i].classList.add('toggleOn');
+                    });
+                }
+
+                // 마우스가 헤더를 떠나면 드랍다운 메뉴가 사라짐
+                $('.headerInner').on('mouseleave', function() {
+                    for (let j = 0; j < _headerMenu.length; j++) {
+                        if (_headerSubList[j].classList.contains('toggleOn')) {
+                            _headerSubList[j].classList.remove('toggleOn');
+                        }
+                    }
+                })
+            }
+
+
+        </script>
+    
+    
+    </div>
+    <div class="clientContent">
+        <div class="contentInner">
+            <div class="max1200">
+                <div class="nav-container client-color-border">
+                    
+        
+        <style>
+            .nav-header {
+                display: flex;
+                margin: 0;
+                height: 55px;
+                font-size: 22px;
+                text-align: center; justify-content: center; align-items: center;
+                border-bottom: 1px solid #e0e0e0;
+                color: white;
+            }
+            .nav-item {
+                display: flex;
+                height: 45px;
+                text-align: center; justify-content: center; align-items: center;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        </style>
+        <div>
+            <h1 class="nav-header client-color-bg">이용 안내</h1>
+            <a class="a-tag-care" href="/online/bulky/guide"><p class="nav-item">이용 방법</p></a>
+            <a class="a-tag-care" href="/online/bulky/item"><p class="nav-item">수수료 안내</p></a>
+        </div>
+        <div>
+            <h1 class="nav-header client-color-bg">온라인 신청</h1>
+            <a class="a-tag-care" href="/online/bulky/request"><p class="nav-item">배출신청</p></a>
+            <a class="a-tag-care" href="/online/bulky/list"><p class="nav-item">결과조회 / 배출취소</p></a>
+        </div>
+    
+    
+                </div>
+                <main class="max850">
+
+                    <!-- maintenance notice -->
+                    
+
+    <style>
+        .maintenance-notice {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 24px 0;
+            padding: 18px 22px;
+            border: 1px solid;
+            border-left-width: 5px;
+            border-radius: 6px;
+            max-width: 1200px;
+            justify-self: center;
+        }
+
+        /* 점검 예정 */
+        .maintenance-notice--scheduled {
+            background-color: #fff8e1;
+            border-color: #e6c766;
+            border-left-color: #d39e00;
+            color: #4f421f;
+        }
+
+        .maintenance-notice--scheduled .maintenance-notice__title {
+            color: #795f00;
+        }
+
+        .maintenance-notice--scheduled .maintenance-notice__period {
+            color: #6c5400;
+        }
+
+        /* 점검 중 */
+        .maintenance-notice--in-progress {
+            background-color: #fff0f0;
+            border-color: #e3a3a3;
+            border-left-color: #c83e3e;
+            color: #542828;
+        }
+
+        .maintenance-notice--in-progress .maintenance-notice__title {
+            color: #a32626;
+        }
+
+        .maintenance-notice--in-progress .maintenance-notice__period {
+            color: #a32626;
+        }
+
+        .maintenance-notice__title {
+            display: block;
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .maintenance-notice__message {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.7;
+            word-break: keep-all;
+        }
+
+        .maintenance-notice__period {
+            display: inline-block;
+            margin-right: 4px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .maintenance-notice {
+                margin: 16px 0;
+                padding: 15px 16px;
+            }
+
+            .maintenance-notice__title {
+                margin-bottom: 6px;
+                font-size: 15px;
+            }
+
+            .maintenance-notice__message {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+        }
+    </style>
+
+    
+
+    
+
+
+
+
+                    <!-- BULKY -->
+                    
+                    
+                    
+                    
+                    
+                    
+                        
+    
+        <!-- css -->
+        <link rel="stylesheet" type="text/css" href="/vendor/toast-ui/tui-pagination.css?101" />
+        <link rel="stylesheet" type="text/css" href="/vendor/toast-ui/tui-grid.css?101" />
+        <link rel="stylesheet" type="text/css" href="/common/css/apsol-tui-grid.css?101" />
+        <!-- js -->
+        <script src="/vendor/toast-ui/tui-code-snippet.js?101"></script>
+        <script src="/vendor/toast-ui/tui-pagination.js?101"></script>
+        <script src="/vendor/toast-ui/tui-grid.js?101"></script>
+            <!-- custom js -->
+        <script src="/common/js/tui-custom-renderer.js?101"></script>
+        <script src="/common/js/tui-custom-editor.js?101"></script>
+    
+    <script src="/common/js/common.js?101"></script>
+
+    <style>
+        span.redfont { color: #f00; }
+        span.blufont { color: #0B4C5F; }
+        table { border-collapse: collapse; }
+        td { border: 1px solid grey; text-align: center; }
+
+        .bulky-guide { padding: 10px; margin-bottom: 40px; font-size: 0.9rem; line-height: 1.2rem; border-bottom: 1px solid grey; }
+        .bulky-guide:last-child { border-bottom: none; }
+        .bulky-guide > .guide-title { font-size: 20px; font-weight: 700; color: var(--client-color); margin-bottom: 20px; padding: 5px 0; }
+        .bulky-guide .company-title { font-size: 15px; font-weight: 600; }
+        .bulky-guide > ul > li,
+        .bulky-guide > ol > li { margin-bottom: 8px; line-height: 1.6; }
+        .bulky-guide > ul,
+        .bulky-guide > ol { padding-bottom: 10px; padding-left: 20px; }
+    </style>
+
+    <div>
+        <div class="big-header-box client-color-bg">
+            <p class="big-header-text">대형생활폐기물</p><br>
+            <p class="big-header-text">이용 방법</p>
+        </div>
+
+        <!-- guide-contents client branch -->
+        
+        
+        <div class="bulky-guide">
+            <div class="guide-title">대형 생활 폐기물이란?</div>
+            <ul>
+                <li>생활폐기물 중 종량제봉투에 담기 어려운 폐기물</li>
+                <li>가전제품류 : 텔레비전, 냉장고, 세탁기 등</li>
+                <li>가구류 : 장롱, 침대, 책상 등</li>
+                <li>생활용품류 : 거울, 항아리, 세면대 등</li>
+            </ul>
+        </div>
+
+        <div class="bulky-guide">
+            <div class="guide-title">대형폐기물 배출 신고 절차</div>
+            <ol>
+                <li><a href="/online/bulky/request">배출신청 페이지</a>로 이동</li>
+                <li>신고자 정보 입력 및 휴대폰 인증</li>
+                <li>배출 장소 및 배출 일시 입력</li>
+                <li>배출 품목 선택</li>
+                <li>수수료 결제</li>
+                <li>배출 물품에 <span class="red-point">배출증(출력 또는 수기작성) 부착하시고(필수)</span> 후 사진 업로드(선택)</li>
+                <li>배출 장소에 배출</li>
+            </ol>
+        </div>
+
+        <div class="bulky-guide">
+            <div class="guide-title">대형폐기물 배출 취소 절차</div>
+            <ol>
+                <li><a href="/online/bulky/list">배출신청 결과조회 페이지</a>로 이동</li>
+                <li>신고자 정보 입력 후 휴대폰 인증</li>
+                <li>신고한 주문번호 클릭</li>
+                <li>취소할 품목 선택 후 취소</li>
+            </ol>
+        </div>
+
+        <div class="bulky-guide">
+            <div class="guide-title">대형폐기물 배출시 유의사항</div>
+            <ul>
+                <li>
+                    일부 가전제품의 경우 무상수거 대상일 수 있습니다.
+                    <a  href="/client/yc/img/tiny-guide.png"
+                        target="_blank"
+                        class="free-a-tag client-color-bg"
+                        tabindex="-1"
+                    >소형폐가전</a>
+                    <a  href="https://www.15990903.or.kr/portal/cnts/selectContents.do?cntnts_id=A1000005"
+                        target="_blank"
+                        class="free-a-tag client-color-bg"
+                        tabindex="-1"
+                    >대형폐가전</a>
+                </li>
+                <li>대형생활폐기물 배출일 전날까지 배출신고 하여야합니다.</li>
+                <li>배출일 다음날부터 순차적 수거(주말, 공휴일 제외)하나 접수물량이 많을 경우 지연될 수 있습니다.</li>
+                <li>배출일시 변경은 각 대행업체에 전화로 문의하시기 바랍니다.</li>
+                <li class="red-point">취소는 신고일로부터 10일이내에만 가능하며, 이미 수거된 품목은 취소, 환불 불가합니다.</li>
+                <li class="red-point">환불은 영업일 기준 통상 3~5일정도 걸릴 수 있습니다.</li>
+                <li>대형폐기물 종류가 없는 물품은 유사한 품목으로 신청할 수 있으며 상세한 문의사항은 아래 각 대행업체로 문의 바랍니다.</li>
+                <li>가정에서 일반적으로 사용되는 제품과 비교하여 크기나 무게가 2배 이상 차이가 날 경우 그에 비례하여 가격을 산정합니다.</li>
+                <li>깨진 유리, 도자기 조각 등 불에 타지 않는 폐기물은 불연성종량제봉투에 담아 배출하여야 합니다.</li>
+                <li>대형폐기물을 신고 없이 배출하면 무단투기로 간주되어 100만원 이하의 과태료가 부과됩니다.</li>
+                <li>신고 내역과 배출 품목이 다르거나 수수료납부금액이 부족한 경우 수거하지 않으며 무단투기로 간주됩니다.</li>
+                <li>기타 문의사항은 양천구청 청소행정과(02-2620-3420)으로 문의 바랍니다.</li>
+            </ul>
+        </div>
+
+        <div class="bulky-guide" id="areas">
+            <div class="guide-title">수거 대행업체 관할구역</div>
+            <div style="margin-bottom: 20px;" class="red-point">
+                ※ 전화번호를 누르면 자동으로 연결됩니다.
+            </div>
+            
+    <style>
+        #companyCardsApp { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 12px; margin-bottom: 40px; }
+        /* 카드 */
+        #companyCardsApp .company-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; padding: 14px; background: #fff; border: 1px solid #e2e2e2; border-radius: 12px; box-shadow: 0 2px 7px rgba(0, 0, 0, 0.05); }
+        #companyCardsApp .company-title { width: 100%; color: #222; font-size: 25px; font-weight: 700; line-height: 1.3; }
+        /* 전화번호 */
+        #companyCardsApp .company-phone-list { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; }
+        #companyCardsApp .company-phone { display: inline-flex; align-items: center; gap: 4px; min-height: 30px; box-sizing: border-box; padding: 4px 8px; color: var(--client-color); font-size: 12px; font-weight: 600; line-height: 1; text-decoration: none; white-space: nowrap; background: #eef6ff; border: 1px solid #cfe3fb; border-radius: 999px; -webkit-tap-highlight-color: transparent; }
+        #companyCardsApp .company-phone:active { transform: scale(0.97); opacity: 0.8; }
+        #companyCardsApp .company-phone-icon { width: 13px; height: 13px; object-fit: contain; opacity: 0.75; }
+        /* 행정동 */
+        #companyCardsApp .company-area-list { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 9px; width: 100%; }
+        #companyCardsApp .company-area-badge { display: inline-flex; align-items: center; max-width: 100%; box-sizing: border-box; padding: 4px 7px; color: #4d4d4d; font-size: 15px; font-weight: 500; line-height: 1.4; word-break: keep-all; background: #f3f4f5; border: 1px solid #e1e3e5; border-radius: 6px; }
+        /* 제외 지역 */
+        #companyCardsApp .company-exclude { display: flex; align-items: flex-start; gap: 6px; box-sizing: border-box; padding: 8px; color: #c62828; font-size: 12px; line-height: 1.45; background: #fff4f4; border: 1px solid #f2cdcd; border-radius: 7px; }
+        #companyCardsApp .company-exclude-label { flex-shrink: 0; padding: 1px 5px; color: #fff; font-size: 10px; font-weight: 700; line-height: 1.5; background: #d32f2f; border-radius: 4px; }
+        #companyCardsApp .company-exclude-content { min-width: 0; word-break: keep-all; overflow-wrap: break-word; }
+        /* 모바일 */
+        @media (max-width: 480px) {
+            /*.bulky-guide { padding-right: 8px; padding-left: 8px; }*/
+            #companyCardsApp { gap: 16px; }
+            #companyCardsApp .company-card { gap: 13px; padding: 13px; border-radius: 10px; }
+            #companyCardsApp .company-title { font-size: 23px; }
+            #companyCardsApp .company-phone-list { gap: 5px; }
+            #companyCardsApp .company-phone { min-height: 27px; padding: 4px 6px; font-size: 13px; }
+            #companyCardsApp .company-phone-icon { width: 12px; height: 12px; }
+            #companyCardsApp .company-area-list { gap: 8px; }
+            #companyCardsApp .company-area-badge { padding: 3px 6px; font-size: 15px; }
+            #companyCardsApp .company-exclude { flex-direction: column; gap: 4px; padding: 7px; font-size: 13px; }
+        }
+    </style>
+
+    <div id="companyCardsApp">
+        <div v-for="company in model.companies" :key="company.name"
+             class="company-card">
+            <div class="company-title">
+                {{ company.name }}
+            </div>
+            <div class="company-phone-list">
+                <a v-for="phone in company.phone"
+                   :key="phone"
+                   class="company-phone"
+                   :href="`tel:${phone}`">
+                    <img src="/vendor/material-icon/call_24dp_000000.png"
+                         alt=""
+                         class="company-phone-icon">
+                    <span>{{ phone }}</span>
+                </a>
+            </div>
+
+            <div class="company-area-list">
+            <span v-for="area in company.area"
+                  :key="area"
+                  class="company-area-badge">
+                {{ area }}
+            </span>
+            </div>
+            <div v-if="company?.exclude?.length > 0"
+                 class="company-exclude">
+                <span class="company-exclude-label">
+                    제외
+                </span>
+                <span class="company-exclude-content">
+                    {{ company.exclude.join(", ") }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript" charset='UTF-8' >
+        const companyCardsApp = createApp({
+            mixins: [VueLshUtilMixin()],
+            data() {
+                return {
+                    flag: { },
+                    model: {
+                        companies: [],
+                    },
+                }
+            },
+            mounted() {
+
+            },
+            updated() {},
+            watch: {},
+            computed: {},
+            methods: {
+                setCompanies(companies) {
+                    this.model.companies = companies;
+                }
+            },
+        }).mount("#companyCardsApp");
+    </script>
+
+
+        </div>
+
+        <script>
+
+            $(document).ready(function () {
+                const interval = setInterval(() => {
+                    if (companyCardsApp) {
+                        companyCardsApp.setCompanies(bulky_guide_areas);
+                        clearInterval(interval);
+                    }
+                }, 100);
+            });
+
+            const bulky_guide_areas = [
+                {
+                    name: "동남용역",
+                    phone: ["02-2644-8488", ],
+                    area: [
+                        "신월 1, 2, 3, 5 동",
+                    ],
+                },
+                {
+                    name: "양천환경",
+                    phone: ["02-2693-6348", ],
+                    area: [
+                        "신월 4, 6, 7, 신정 3 동",
+                        "신정 1 동 일부 (1031, 1032번지)",
+                    ],
+                },
+                {
+                    name: "한성용역",
+                    phone: ["02-2693-3844", ],
+                    area: [
+                        "목 1, 신정 2 동",
+                        "신정 4 동 일부 (943~1013, 1090, 1093, 1095, 1302, 1329번지)",
+                    ],
+                },
+                {
+                    name: "신원지엘",
+                    phone: ["02-2646-8618", ],
+                    area: [
+                        "신정 1 동 일부 (1031, 1032번지 제외)",
+                        "신정 6, 7 동",
+                    ],
+                },
+                {
+                    name: "청송환경",
+                    phone: ["02-2644-2744", ],
+                    area: [
+                        "목 2, 3, 4 동",
+                        "신정 4 동 일부 (872~942번지, 1060, 1091, 1305, 1308번지)",
+                    ],
+                },
+                {
+                    name: "신목실업",
+                    phone: ["02-2646-3954", ],
+                    area: [
+                        "목 5 동",
+                    ],
+                },
+            ];
+
+        </script>
+
+    
+    
+    </div>
+
+    <script type="text/javascript" charset='UTF-8' >
+
+        $(document).ready(() => {
+            controlHash();
+        });
+        function controlHash() {
+            const hash = window.location.hash;
+            const hashValue = hash.substring(1);
+            if (LshUtil.isBlank(hashValue)) {
+                return;
+            }
+            const target = $(`#${CSS.escape(hashValue)}`);
+            if (!target || target.length === 0) {
+                return;
+            }
+            // scroll to target (offset - 80)
+            $('html, body').animate({
+                scrollTop: target.offset().top - 80
+            }, 500);
+            // highlight target
+            target.css({
+                transition: 'background-color 1s ease',
+                backgroundColor: '#fff8b6'
+            });
+            setTimeout(() => {
+                target.css('backgroundColor', '');
+            }, 1500);
+        }
+
+    </script>
+
+
+                    
+                    
+                    
+                    <!-- MARKET -->
+                    
+                    <!-- MINWON -->
+                    
+                    
+                    
+                </main>
+            </div>
+        </div>
+    </div>
+    <div class="clearBoth"></div>
+    <div class="footerBox">
+        
+        
+        <div class="footerInner">
+            <div class="footerInfoBox">
+                <p class="footerInfo">사업장명 : 양천구청 | 대표자명 : 이기재</p>
+                <p class="footerInfo">주소: 서울특별시 양천구 목동동로 105(신정동)</p>
+                <p class="footerInfo">대표전화 : 02-2620-3420 | 사업자등록번호 : 117-83-00596</p>
+            </div>
+            <p class="footerCopy">Copyright© 2024 YANGCHEON-GU all rights reserved.</p>
+        </div>
+    
+    
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        // console.log("serverVersion", "101");
+        setTimeout(function() {
+            let windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            let windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            console.log("Window Width: " + windowWidth);
+            console.log("Window Height: " + windowHeight);
+        }, 1000);
+    });
+</script>
+</body>
+</html>

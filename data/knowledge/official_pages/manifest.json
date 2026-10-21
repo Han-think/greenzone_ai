@@ -1,0 +1,65 @@
+[
+  {
+    "file": "waste_act_article15.html",
+    "url": "https://law.go.kr/LSW/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1029875887",
+    "final_url": "https://law.go.kr/LSW/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1029875887",
+    "checked_at": "2026-10-21",
+    "bytes": 15404,
+    "sha256": "38036846af98322fd0d38e276ae5186644acebf93aea46173dcf4f8881512a77",
+    "note": "동적 페이지는 HTML에 조문 본문이 없을 수 있음. 본문 수집 성공 여부는 별도 검토."
+  },
+  {
+    "file": "yangcheon_ordinance.html",
+    "url": "https://law.go.kr/LSW/ordinInfoP.do?ordinSeq=2176939",
+    "final_url": "https://law.go.kr/LSW/ordinInfoP.do?ordinSeq=2176939",
+    "checked_at": "2026-10-21",
+    "bytes": 69908,
+    "sha256": "1d55bab19503985c4dc775267d2e07d0d8402df767741f886c49c34c80fe033f",
+    "note": "동적 페이지는 HTML에 조문 본문이 없을 수 있음. 본문 수집 성공 여부는 별도 검토."
+  },
+  {
+    "file": "yangcheon_ordinance_body.html",
+    "url": "https://law.go.kr/LSW/ordinInfoR.do?ordinSeq=2176939&gubun=ELIS&chrClsCd=010202",
+    "final_url": "https://law.go.kr/LSW/ordinInfoR.do?ordinSeq=2176939&gubun=ELIS&chrClsCd=010202",
+    "checked_at": "2026-10-21",
+    "bytes": 100905,
+    "sha256": "0b68996409df9b8764c161b301da7b38cc523b5290f2492d6bb94e1e0f4e3ece",
+    "note": "동적 페이지는 HTML에 조문 본문이 없을 수 있음. 본문 수집 성공 여부는 별도 검토."
+  },
+  {
+    "file": "yangcheon_annex.hwp",
+    "url": "https://law.go.kr/LSW/flDownload.do?gubun=ELIS&flSeq=170344617&flNm=%EC%97%98%EB%A6%AC%EC%8A%A4%EC%9E%90%EC%B9%98%EB%B2%95%EA%B7%9C",
+    "final_url": "https://law.go.kr/LSW/flDownload.do?gubun=ELIS&flSeq=170344617&flNm=%EC%97%98%EB%A6%AC%EC%8A%A4%EC%9E%90%EC%B9%98%EB%B2%95%EA%B7%9C",
+    "checked_at": "2026-10-21",
+    "bytes": 88064,
+    "sha256": "090c3375a163101c39fc0d697e52f2b544f2bb0ec84b788c48f9ab3346bb772d",
+    "note": "동적 페이지는 HTML에 조문 본문이 없을 수 있음. 본문 수집 성공 여부는 별도 검토."
+  },
+  {
+    "file": "yangcheon_rule.html",
+    "url": "https://www.law.go.kr/LSW/ordinLinkProc.do?chrClsCd=&mode=20&ordinNm=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%EC%96%91%EC%B2%9C%EA%B5%AC%ED%8F%90%EA%B8%B0%EB%AC%BC%EA%B4%80%EB%A6%AC%EC%A1%B0%EB%A1%80%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99",
+    "final_url": "https://www.law.go.kr/LSW/ordinLinkProc.do?chrClsCd=&mode=20&ordinNm=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%EC%96%91%EC%B2%9C%EA%B5%AC%ED%8F%90%EA%B8%B0%EB%AC%BC%EA%B4%80%EB%A6%AC%EC%A1%B0%EB%A1%80%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99",
+    "checked_at": "2026-10-21",
+    "bytes": 69935,
+    "sha256": "2df960dde9e49f294fa335b527a5e6a92dbae6ed0038939e5d707d485f6ae914",
+    "note": "동적 페이지는 HTML에 조문 본문이 없을 수 있음. 본문 수집 성공 여부는 별도 검토."
+  },
+  {
+    "file": "bulky_guide.html",
+    "url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+    "final_url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+    "checked_at": "2026-10-21",
+    "bytes": 30307,
+    "sha256": "ed3b2d6a8d3ad99b13e94cfa1f4a4ebac3d6cc975434ece6e038289af91cb787",
+    "note": "동적 페이지는 HTML에 조문 본문이 없을 수 있음. 본문 수집 성공 여부는 별도 검토."
+  },
+  {
+    "file": "yangcheon_rule_body.html",
+    "url": "https://law.go.kr/LSW/ordinInfoR.do?ordinSeq=1933131&gubun=ELIS&chrClsCd=010202",
+    "final_url": "https://law.go.kr/LSW/ordinInfoR.do?ordinSeq=1933131&gubun=ELIS&chrClsCd=010202",
+    "checked_at": "2026-10-21",
+    "bytes": 18640,
+    "sha256": "fbf47ee48607c0752cfeda206e9a937c28332a45063c28e84a077de651b01974",
+    "note": "동적 페이지는 HTML에 조문 본문이 없을 수 있음. 본문 수집 성공 여부는 별도 검토."
+  }
+]

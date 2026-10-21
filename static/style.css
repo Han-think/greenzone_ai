@@ -11,11 +11,16 @@ html,body {
     color:#293e34;
 }
 body {
-    display:flex;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    padding-left: 190px;
 }
+
 aside {
     width:385px;
     min-width:385px;
+    flex-shrink:0;
     padding:18px;
     overflow:hidden;
     display:flex;
@@ -23,6 +28,8 @@ aside {
     background:#fafcfb;
     border-right:1px solid #d8e2dc;
 }
+
+
 main {
     flex:1;
     min-width:0;
@@ -216,6 +223,7 @@ a {
 }
 @media(max-width:760px) {
     body {
+        padding-left:0;
         flex-direction:column;
     }
     aside {
@@ -276,7 +284,7 @@ a {
 /* 인쇄할 때 검색 목록·버튼은 줄이고, 현재 비교 수치·선택 경로·지도를 남긴다. */
 @media print {
     html,body { height:auto; }
-    body { display:block; }
+    body { display:block; padding-left:0; overflow:visible; height:auto; }
     aside { width:100%; min-width:0; padding:10px; height:auto; overflow:visible; border:0; }
     .sidebar-content { overflow:visible; }
     .tab-container,#tabContentSearch,#hubList,#hubDetail,button,.layer-checks,.route-stops,details:not(#routeDisclosure) { display:none !important; }
@@ -287,3 +295,21 @@ a {
     #routeResult { background:white; }
     #routeResult ol { columns:2; }
 }
+
+/* 경로 도구는 상단 버튼과 주황 테두리로 쉽게 찾도록 표시한다. */
+.map-toolbar { flex-wrap: wrap; }
+#openRoute { background: #a84d1e; color: white; border-color: #a84d1e; }
+.route-panel { border: 2px solid #d58a50; border-radius: 8px; padding: 10px; background: #fff9f1; margin: 12px 0; }
+.route-panel summary { color: #88421e; font-weight: bold; }
+.route-steps { font-size: 12px; color: #88421e; }
+@media(max-width:760px) {
+    body { height: auto; min-height: 100vh; overflow: auto; }
+    aside { height: auto; max-height: 60vh; }
+    main { flex: none; height: 55vh; }
+}
+
+/* 직접 순서 지정은 번호 선택만 사용해 드래그 없이 키보드로도 조정한다. */
+.manual-route-list { margin: 8px 0; padding: 0; list-style: none; }
+.manual-route-list li { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.manual-route-list select { width: 70px; flex: none; }
+.manual-route-list span { font-size: 12px; }

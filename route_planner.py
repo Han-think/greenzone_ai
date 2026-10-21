@@ -71,8 +71,10 @@ def restore_path(previous, start, end, nodes):
     return path
 
 
-def plan_route(data, hub_ids, start, minimum_width, return_to_start):
+def plan_route(data, hub_ids, start, minimum_width, return_to_start, order_mode='auto'):
     # 입력 검토: 현재 9개 거점에서 2~9개, 도로폭은 전체(0) 또는 7m 이상만 허용한다.
+    if order_mode not in ['auto', 'manual']:
+        raise ValueError('방문 순서는 자동 또는 직접 지정으로 선택하세요.')
     if minimum_width not in [0, 7]:
         raise ValueError('도로폭 조건은 전체 또는 등록폭 7m 이상을 선택하세요.')
     if len(hub_ids) < 2 or len(hub_ids) > 9:
@@ -91,6 +93,8 @@ def plan_route(data, hub_ids, start, minimum_width, return_to_start):
             raise ValueError(hub_id + ': ' + hub['reason'])
     if start not in hub_ids:
         raise ValueError('출발 거점은 선택한 거점 중에서 고르세요.')
+    if order_mode == 'manual' and start != hub_ids[0]:
+        raise ValueError('직접 지정에서는 1번 거점이 출발 거점입니다.')
     connections = make_connections(graph)
     paths = {}
     for hub_id in hub_ids:
@@ -100,20 +104,25 @@ def plan_route(data, hub_ids, start, minimum_width, return_to_start):
         node = graph['hubs'][hub_id]['node']
         if node not in paths[start]['distances']:
             raise ValueError('선택 조건의 받은 도로망에서 ' + hub_id + '까지 연결되지 않습니다. 거점·도로폭 조건을 확인하세요.')
-    # 최근접 이웃법: 현재 거점에서 도로거리가 가장 가까운 미방문 거점을 다음으로 고른다.
-    order = [start]
-    while len(order) < len(hub_ids):
-        current = order[-1]
-        next_hub = None
-        shortest = float('inf')
-        for hub_id in hub_ids:
-            if hub_id in order:
-                continue
-            distance = paths[current]['distances'][graph['hubs'][hub_id]['node']]
-            if distance < shortest:
-                shortest = distance
-                next_hub = hub_id
-        order.append(next_hub)
+    # 직접 지정에서는 화면에서 받은 1번~마지막 순서를 그대로 사용한다.
+    # 방문 순서만 사람이 정하며, 각 거점 사이 도로 구간은 동일한 최단거리 계산을 쓴다.
+    if order_mode == 'manual':
+        order = list(hub_ids)
+    else:
+        # 최근접 이웃법: 현재 거점에서 도로거리가 가장 가까운 미방문 거점을 다음으로 고른다.
+        order = [start]
+        while len(order) < len(hub_ids):
+            current = order[-1]
+            next_hub = None
+            shortest = float('inf')
+            for hub_id in hub_ids:
+                if hub_id in order:
+                    continue
+                distance = paths[current]['distances'][graph['hubs'][hub_id]['node']]
+                if distance < shortest:
+                    shortest = distance
+                    next_hub = hub_id
+            order.append(next_hub)
     if return_to_start:
         order.append(start)
     legs = []
@@ -133,7 +142,10 @@ def plan_route(data, hub_ids, start, minimum_width, return_to_start):
         stop['id'] = hub_id
         stop['road_coordinates'] = graph['nodes'][stop['node']]
         stops.append(stop)
-    return {'status': 'proposal', 'method': 'road_shortest_path_then_nearest_neighbour',
+    method = 'road_shortest_path_then_nearest_neighbour'
+    if order_mode == 'manual':
+        method = 'manual_order_road_shortest_paths'
+    return {'status': 'proposal', 'method': method, 'order_mode': order_mode,
             'minimum_width_m': minimum_width, 'return_to_start': return_to_start,
             'order': order, 'distance_m': round(total, 1), 'legs': legs, 'stops': stops,
             'basis': '팀 1차 내보낸 도로 162구간을 이용한 별도 경로안. 팀 2차의 3.22km 재현값이 아닙니다.',

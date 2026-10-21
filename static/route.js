@@ -3,6 +3,7 @@
 var routeLayers = [];
 var routeRequest = 0;
 var routeVisible = false;
+var manualRouteOrder = [];
 
 function includedInPlan(feature) {
     // 6곳 보기에서는 A로 시작하는 새 대안 3곳을 숨긴다. 원본 거점은 바꾸지 않는다.
@@ -36,10 +37,66 @@ function refreshRouteStart() {
     for (var j = 0; j < select.options.length; j++) {
         if (select.options[j].value === previous) select.value = previous;
     }
-    clearRoute('선택 조건이 바뀌었습니다. 경로안 계산을 누르세요.');
+    // 선택 해제한 거점만 빼고, 새로 체크한 거점은 현재 직접 순서의 끝에 넣는다.
+    var selected = [];
+    for (var k = 0; k < checks.length; k++) if (checks[k].checked) selected.push(checks[k].value);
+    var nextOrder = [];
+    for (var n = 0; n < manualRouteOrder.length; n++) {
+        if (selected.indexOf(manualRouteOrder[n]) !== -1) nextOrder.push(manualRouteOrder[n]);
+    }
+    for (var m = 0; m < selected.length; m++) {
+        if (nextOrder.indexOf(selected[m]) === -1) nextOrder.push(selected[m]);
+    }
+    manualRouteOrder = nextOrder;
+    refreshOrderMode();
+}
+
+function renderManualOrder() {
+    // 번호를 바꿀 때 항목 하나를 이동한다. 다른 거점의 번호는 다시 매겨 중복되지 않는다.
+    var box = document.getElementById('manualRouteList');
+    box.replaceChildren();
+    for (var i = 0; i < manualRouteOrder.length; i++) {
+        var id = manualRouteOrder[i];
+        var feature = findHub(id);
+        var item = document.createElement('li');
+        var select = document.createElement('select');
+        select.dataset.hubId = id;
+        select.setAttribute('aria-label', id + ' 방문 순서');
+        for (var j = 0; j < manualRouteOrder.length; j++) {
+            var option = textNode('option', (j + 1) + '번'); option.value = j; select.append(option);
+        }
+        select.value = i;
+        select.onchange = function() { moveRouteStop(this.dataset.hubId, Number(this.value)); };
+        item.append(select, textNode('span', id + ' · ' + feature.properties['이름']));
+        box.append(item);
+    }
+}
+
+function moveRouteStop(id, position) {
+    // splice는 배열에서 한 항목을 빼거나 원하는 위치에 넣는 JavaScript 기본 함수다.
+    var previous = manualRouteOrder.indexOf(id);
+    if (previous === -1) return;
+    manualRouteOrder.splice(previous, 1);
+    manualRouteOrder.splice(position, 0, id);
+    renderManualOrder();
+    document.getElementById('routeStart').value = manualRouteOrder[0] || '';
+    clearRoute('방문 순서를 바꿨습니다. 경로안 계산을 눌러주세요.');
+}
+
+function refreshOrderMode() {
+    // 직접 지정의 1번과 출발지 선택값이 서로 어긋나지 않게 맞춘다.
+    var manual = document.getElementById('routeOrderMode').value === 'manual';
+    document.getElementById('manualRoutePanel').hidden = !manual;
+    document.getElementById('routeStart').disabled = manual;
+    if (manual) document.getElementById('routeStart').value = manualRouteOrder[0] || '';
+    renderManualOrder();
+    clearRoute(manual ? '번호를 정한 뒤 경로안 계산을 누르세요. 1번이 출발 거점입니다.' : '출발 거점을 고른 뒤 자동 경로안을 계산하세요.');
 }
 
 function refreshPlan() {
+    // 6곳/9곳 보기 전환 때 이전 검색의 점선과 설명을 남기지 않는다.
+    clearSearchPoint();
+    document.getElementById('selectedBuilding').replaceChildren();
     // 받은 비교표 수치를 표시한다. 화면에서 주거 수요·생활권 분석을 재실행하지 않는다.
     var nine = document.getElementById('planFilter').value === 'nine';
     var comparison = pageData.summary.comparisons[nine ? 1 : 2];
@@ -106,7 +163,9 @@ async function calculateRoute() {
     var ids = [];
     var checks = document.querySelectorAll('#routeStops input');
     for (var i = 0; i < checks.length; i++) if (checks[i].checked) ids.push(checks[i].value);
-    var params = new URLSearchParams({ids: ids.join(','), start: document.getElementById('routeStart').value,
+    var mode = document.getElementById('routeOrderMode').value;
+    if (mode === 'manual') ids = manualRouteOrder.slice();
+    var params = new URLSearchParams({ids: ids.join(','), order_mode: mode, start: document.getElementById('routeStart').value,
         min_width: document.getElementById('roadWidthFilter').value, closed: document.getElementById('routeClosed').checked});
     var button = document.getElementById('calculateRoute');
     button.disabled = true;
@@ -116,6 +175,7 @@ async function calculateRoute() {
         if (requestNumber !== routeRequest) return;
         if (!response.ok) throw new Error(result.detail || '경로 조건을 확인하세요.');
         var box = document.getElementById('routeResult');
+        box.append(textNode('p', result.order_mode === 'manual' ? '직접 지정한 순서로 연결한 경로안' : '가까운 거점부터 자동으로 연결한 경로안'));
         box.append(textNode('strong', '도로 순회 약 ' + (result.distance_m / 1000).toFixed(2) + 'km'));
         box.append(textNode('p', result.order.join(' → ')));
         var list = document.createElement('ol');
@@ -139,9 +199,19 @@ async function calculateRoute() {
     } finally { button.disabled = false; }
 }
 
+function openRoutePanel(event) {
+    // 상단/왼쪽 메뉴에서 숨겨진 후보 탭과 경로 영역을 한 번에 연다.
+    if (event) event.preventDefault();
+    showPanel('data');
+    var panel = document.getElementById('routeDisclosure');
+    panel.open = true;
+    panel.scrollIntoView({block: 'start', behavior: 'smooth'});
+}
+
 function initializeAnalysis() {
     // 처음 자료를 받았을 때 버튼·필터 동작을 연결한다. 각 클릭은 이 함수들을 실행한다.
     document.getElementById('planFilter').onchange = refreshPlan;
+    document.getElementById('routeOrderMode').onchange = refreshOrderMode;
     document.getElementById('roadWidthFilter').onchange = function() {
         clearRoute('도로폭 조건이 바뀌었습니다. 경로안을 다시 계산하세요.'); drawResults();
     };
@@ -155,4 +225,8 @@ function initializeAnalysis() {
         window.print();
     };
     refreshPlan();
+    document.getElementById('openRoute').disabled = false;
+    document.getElementById('openRoute').onclick = openRoutePanel;
+    document.getElementById('navRouteBtn').onclick = openRoutePanel;
+    if (new URLSearchParams(window.location.search).get('view') === 'route') openRoutePanel();
 }

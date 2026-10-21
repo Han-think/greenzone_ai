@@ -41,3 +41,13 @@ service_input / downloadable_evidence는 현재 코드 연결, reference_archive
 `route_graph.json`만 새로 가공했습니다. 받은 도로·거점 GeoJSON은 그대로 보존합니다. `scripts/prepare_route_graph.py`를 프로젝트 폴더에서 실행하면 같은 두 입력으로 다시 준비할 수 있습니다(추가 패키지 없음).
 
 도형이 만나는 지점을 연결하고, 선택 도로에 거점을 투영합니다. 도로에서 40m 넘게 떨어진 거점은 자동 연결하지 않습니다. 근거리 미터 환산을 쓴 근사 도로 길이이며 실제 진입로·입체교차·일방통행은 검증하지 않았습니다. 1차 내보낸 도로 범위가 제한되어 있으므로 팀 2차의 전체 도로망 계산과 구분합니다.
+
+
+## 배출 안내 초기 자료
+
+`knowledge/`에 C 프리뷰의 `waste_catalog.json`(91품목/163별칭/268규칙), `knowledge_documents.json`(19개 안내 요약), `waste_schema.sql` 참고본을 원본 그대로 복사했습니다. `source_manifest.json`에 공식 URL·기존 확인일·복사 SHA256·검토 대기 항목을 기록했습니다.
+
+2026-10-18 확인 스냅샷입니다. 새 배출 안내/관리자 화면의 첫 조회 때 `local/service.sqlite3`로 적재하도록 연결했습니다. 강서구 문서는 원본 보존만 하고 서비스 적재에서는 제외합니다. 초기 안내 요약은 검토 대기로 두며 금액은 참고값으로 표시합니다. 현재 코드 반영 상태는 [핸드북 14절](../docs/HANDBOOK.md#14-사진배출-안내관리자와-법령-자료)을 우선합니다.
+
+
+`knowledge/legal_documents.json`은 공식 법령 선택 발췌 4건과 최신 배출 절차 요약 1건입니다. 취득 원문/별표 첨부는 `knowledge/official_pages/`에 파일·URL·해시와 함께 보존합니다. 별표 상세 대조와 신월1동 상세 요일은 추가 확인이 필요합니다.

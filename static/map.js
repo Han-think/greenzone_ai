@@ -9,6 +9,39 @@ var addressGeocoder;
 var mapAddressRequest = 0;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
+// 팀 지도 브랜치의 거리/점선 함수. 원래 배정은 유지하고 두 대표점의 관계만 표시한다.
+var searchDistanceLine = null;
+
+// [계산용] 카카오맵 좌표 2개를 받아 거리(m)만 계산
+function getDistanceMath(startLatLng, endLatLng) {
+    var poly = new kakao.maps.Polyline({
+        path: [startLatLng, endLatLng]
+    });
+    return poly.getLength();
+}
+
+// [그리기용] 카카오맵 좌표 2개를 받아 빨간 점선을 그림
+function drawDistanceLine(startLatLng, endLatLng) {
+    if (!map) return;
+    if (searchDistanceLine) {
+        searchDistanceLine.setMap(null);
+    }
+    searchDistanceLine = new kakao.maps.Polyline({
+        path: [startLatLng, endLatLng],
+        strokeWeight: 4,           // 💡 잘 보이게 두께 4
+        strokeColor: '#c2413a',    // 수거 도로 경로(주황)와 구분하는 빨간 점선
+        strokeOpacity: 0.9,
+        strokeStyle: 'shortdash', 
+        zIndex: 45                // 일반 도형보다 위, 팝업보다 아래
+    });
+    
+    // 3. 지도에 실제로 보이게 그립니다!
+    searchDistanceLine.setMap(map);
+    
+    // 4. 거리를 반환합니다.
+    return searchDistanceLine.getLength();
+}
+
 // GeoJSON 좌표를 카카오 지도 좌표 객체로 바꾼다.
 function mapPoint(coordinates) {
     // 제공 연결: GeoJSON [경도, 위도]를 Kakao LatLng(위도, 경도)로 바꾼다.
@@ -228,6 +261,12 @@ function clearSearchPoint() {
     mapAddressRequest += 1;
     if (searchMarker) searchMarker.setMap(null);
     if (selectedPopup) selectedPopup.close();
+
+    // 💡 검색 초기화 시, 우리가 그렸던 점선도 같이 지도에서 지워주기!
+    if (searchDistanceLine) {
+        searchDistanceLine.setMap(null);
+        searchDistanceLine = null;
+    }
 }
 
 // 팀의 지도 클릭 주소 표시를 같은 카카오 JavaScript 키의 좌표→주소 기능으로 연결한다.
@@ -259,7 +298,43 @@ function showClickedAddress(position) {
         box.replaceChildren(textNode('h3', '지도에서 선택한 위치'), textNode('p', address));
         if (row.address && row.road_address) box.append(textNode('p', '지번: ' + row.address.address_name));
         box.append(textNode('small', '위도 ' + position.getLat().toFixed(6) + ', 경도 ' + position.getLng().toFixed(6)));
-        box.append(textNode('small', '주소 확인 결과입니다. 담당 거점안은 보유 주소·건물명 검색에서 확인하세요.'));
+        
+        // ==========================================
+        // 💡 [여기 추가] 모든 거점 중 가장 가까운 거점 찾기
+        if (pageData && pageData.hubs) {
+            var minDistance = Infinity;
+            var closestHub = null;
+            var startLatLng = position; // 지도를 클릭한 곳의 좌표(이미 카카오맵 좌표 포맷임)
+
+            // 루프 돌면서 순수하게 제일 짧은 거리만 찾기
+            for (var i = 0; i < pageData.hubs.features.length; i++) {
+                var hub = pageData.hubs.features[i];
+                if (!includedInPlan(hub)) continue; 
+                var targetCoords = hub.geometry.coordinates;
+                var endLatLng = new kakao.maps.LatLng(targetCoords[1], targetCoords[0]);
+                // 💡 여기서는 그리지 않고 숫자만 받습니다.
+                var dist = getDistanceMath(startLatLng, endLatLng); 
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestHub = hub;
+                }
+            }
+            
+            // 제일 가까운 거점을 찾았다면 선을 긋습니다!
+            if (closestHub) {
+                var finalCoords = closestHub.geometry.coordinates;
+                var finalEndLatLng = new kakao.maps.LatLng(finalCoords[1], finalCoords[0]);
+
+                drawDistanceLine(startLatLng, finalEndLatLng); // 💡 여기서 최종 그리기!
+                
+                var hubProps = closestHub.properties;
+                box.append(textNode('p', '표시 중인 거점안에서 직선으로 가까운 참고 거점: ' + hubProps['이름'] + ' (생활권 ' + hubProps['생활권'] + ')'));
+                box.append(textNode('p', '직선거리: 약 ' + fmt(minDistance) + 'm'));
+            }
+        }
+        // ==========================================
+        
+        box.append(textNode('small', '빨간 점선은 직선 관계선이며 보행·수거 경로가 아닙니다. 담당 거점안은 보유 건물 검색에서 확인하세요.'));
         box.scrollIntoView({block: 'nearest'});
         document.getElementById('mapStatus').textContent = '선택 주소: ' + address;
     });

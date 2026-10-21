@@ -1,0 +1,158 @@
+{
+  "prepared_on": "2026-10-21",
+  "transfer_type": "local_preview_seed_handoff",
+  "status": "copied_reference_not_loaded_into_app_or_database",
+  "application_code_changed": false,
+  "database_created": false,
+  "sql_executed": false,
+  "embedding_created": false,
+  "api_called": false,
+  "git_commit_or_push": false,
+  "counts": {
+    "items": 91,
+    "aliases": 163,
+    "item_rules": 268,
+    "document_summaries": 19
+  },
+  "document_region_counts": {
+    "11470": 7,
+    "ALL": 7,
+    "11500": 5
+  },
+  "files": [
+    {
+      "file": "waste_catalog.json",
+      "origin": "C:\\AI_PROJECT\\LearningHub\\greenzone-preview\\data\\waste_catalog.json",
+      "relative_path": "data/knowledge/waste_catalog.json",
+      "bytes": 273256,
+      "sha256": "669653193573ad070df3407e8e89fa049e81490e671c5c50203e020e0b0623b6",
+      "transformation": "none_byte_for_byte_copy"
+    },
+    {
+      "file": "knowledge_documents.json",
+      "origin": "C:\\AI_PROJECT\\LearningHub\\greenzone-preview\\data\\knowledge_documents.json",
+      "relative_path": "data/knowledge/knowledge_documents.json",
+      "bytes": 18571,
+      "sha256": "71c5bd395aa4d257ea9600549440be9efd8cf53ef904c6f6717666944e31a86d",
+      "transformation": "none_byte_for_byte_copy"
+    },
+    {
+      "file": "waste_schema.sql",
+      "origin": "C:\\AI_PROJECT\\LearningHub\\greenzone-preview\\data\\waste_schema.sql",
+      "relative_path": "data/knowledge/waste_schema.sql",
+      "bytes": 1983,
+      "sha256": "f13655a1ef12a55b47cf114b19f7876b11cf7487e86fb301f51f05f9bfc23f23",
+      "transformation": "none_byte_for_byte_copy"
+    }
+  ],
+  "catalog_sources_as_recorded": [
+    {
+      "source_id": "YC_BULKY_FEES",
+      "title": "양천구 대형생활폐기물 품목·수수료 안내",
+      "url": "https://smartclean.yangcheon.go.kr/online/bulky/item",
+      "reference_date": null,
+      "checked_at": "2026-10-18",
+      "content_hash": "ed7b796fa9c172fe33e93b494a7609f51d28d6481fa27887f5106932f8d4bfe7",
+      "note": "공식 웹 원문 취득. 원문 발행일·시행기간 미명시. 확인일은 시행일이 아님."
+    },
+    {
+      "source_id": "YC_BULKY_GUIDE",
+      "title": "양천구 대형생활폐기물 이용 방법",
+      "url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+      "reference_date": null,
+      "checked_at": "2026-10-18",
+      "content_hash": "b990a904598f85ac0393f25df51011aeab2c88a55ade5109c1cb1b6886163298",
+      "note": "공식 웹 원문 취득. 원문 발행일·시행기간 미명시. 확인일은 시행일이 아님."
+    }
+  ],
+  "document_sources_as_recorded": [
+    {
+      "url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+      "checked_at_recorded_in_preview": [
+        "2026-10-18"
+      ],
+      "reference_dates_recorded": [],
+      "effective_dates_recorded": []
+    },
+    {
+      "url": "https://www.wasteguide.or.kr/front/bbsList.do?bbsId=BBS_0003",
+      "checked_at_recorded_in_preview": [
+        "2026-10-18"
+      ],
+      "reference_dates_recorded": [],
+      "effective_dates_recorded": []
+    },
+    {
+      "url": "https://www.wasteguide.or.kr/front/summary/introductionWebsite.do",
+      "checked_at_recorded_in_preview": [
+        "2026-10-18"
+      ],
+      "reference_dates_recorded": [],
+      "effective_dates_recorded": []
+    },
+    {
+      "url": "https://www.yangcheon.go.kr/site/yangcheon/ex/bbs/List.do?cbIdx=279",
+      "checked_at_recorded_in_preview": [
+        "2026-10-18"
+      ],
+      "reference_dates_recorded": [],
+      "effective_dates_recorded": []
+    },
+    {
+      "url": "https://www.gangseo.seoul.kr/env/env010401",
+      "checked_at_recorded_in_preview": [
+        "2026-10-18"
+      ],
+      "reference_dates_recorded": [],
+      "effective_dates_recorded": []
+    },
+    {
+      "url": "https://www.gangseo.seoul.kr/env/env010101",
+      "checked_at_recorded_in_preview": [
+        "2026-10-18"
+      ],
+      "reference_dates_recorded": [],
+      "effective_dates_recorded": [
+        "2025-02-01"
+      ]
+    }
+  ],
+  "rules_for_use": [
+    "Only Yangcheon (11470) and reviewed national-common documents apply to this Sinwol1 project.",
+    "Gangseo (11500) material remains preserved in the original snapshot and must be excluded from runtime answers.",
+    "active=1/source_checked are preview fields, not a new current-content approval.",
+    "checked_at is observation date; do not substitute it for publication or effective dates.",
+    "Missing dates remain null and are marked source_not_stated; do not invent values.",
+    "No new retrieval of official fee rows or government raw responses was performed for this transfer.",
+    "Recorded official content hashes are preserved metadata; government raw HTML/JSON is not included here.",
+    "The SQL file is a reference subset of the preview schema, not a complete migration for the team project."
+  ],
+  "source_review_queue": [
+    {
+      "topic": "bulky_fees",
+      "url": "https://smartclean.yangcheon.go.kr/online/bulky/item",
+      "status": "refresh_official_rows_and_compare_to_2026_10_18_snapshot"
+    },
+    {
+      "topic": "bulky_procedure",
+      "url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+      "status": "review_stored_summaries_against_current_official_text"
+    },
+    {
+      "topic": "sinwol1_schedule",
+      "url": "https://www.yangcheon.go.kr/site/yangcheon/ex/bbs/List.do?cbIdx=279",
+      "status": "common_time_and_place_available_but_dong_specific_days_need_separate_source"
+    },
+    {
+      "topic": "yangcheon_waste_ordinance",
+      "url": "https://law.go.kr/LSW/ordinInfoP.do?ordinSeq=2176939",
+      "effective_date_header_verified_previously": "2026-10-08",
+      "status": "collect_relevant_article_and_annex_text_before_indexing"
+    },
+    {
+      "topic": "waste_management_act",
+      "url": "https://www.law.go.kr/법령/폐기물관리법",
+      "status": "verify_current_article_text_effective_date_and_legal_identifier_before_indexing"
+    }
+  ]
+}

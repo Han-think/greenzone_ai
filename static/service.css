@@ -1,0 +1,26 @@
+/* 새 배출/관리자 화면만 사용하는 스타일. 기존 지도 스타일과 섞지 않는다. */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; padding-left: 190px; color: #293e34; background: #f5f8f6; font: 15px/1.6 'Malgun Gothic', sans-serif; }
+.service-page { max-width: 1180px; margin: auto; padding: 24px; }
+h1 { font-size: 25px; } h2 { font-size: 19px; margin-top: 0; }
+.service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.card { background: white; border: 1px solid #d5e2d8; border-radius: 10px; padding: 20px; margin-bottom: 18px; min-width: 0; }
+.notice { background: #e5f0e9; padding: 12px; border-left: 4px solid #267555; }
+label { display: block; margin: 12px 0 4px; font-weight: bold; }
+input,select,textarea,button { font: inherit; border: 1px solid #b9cec1; border-radius: 6px; padding: 9px; }
+input:not([type=checkbox]),select,textarea { width: 100%; background: white; color: inherit; }
+textarea { min-height: 130px; resize: vertical; }
+button { cursor: pointer; background: #267555; color: white; margin: 8px 4px 8px 0; }
+button:disabled { opacity: .5; cursor: wait; }
+a { color: #176d59; overflow-wrap: anywhere; }
+small { display: block; color: #617569; }
+#photoPreview { display: block; max-width: 100%; max-height: 280px; margin: 12px auto; object-fit: contain; }
+#guideResult { border-top: 1px solid #d5e2d8; margin-top: 14px; padding-top: 8px; }
+details { margin: 10px 0; padding: 10px; border: 1px solid #d5e2d8; border-radius: 6px; }
+summary { cursor: pointer; font-weight: bold; }
+.document-text { white-space: pre-wrap; }
+.history-value { white-space: pre-wrap; word-break: break-word; max-height: 280px; overflow: auto; font-size: 12px; }
+.inline-check { display: flex; gap: 8px; align-items: center; }
+:focus-visible { outline: 3px solid #80aebd; outline-offset: 2px; }
+@media(max-width: 760px) { body { padding-left: 0; } .service-page { padding: 14px; } .service-grid { grid-template-columns: 1fr; } }

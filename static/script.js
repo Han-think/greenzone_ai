@@ -29,6 +29,7 @@ function textNode(tag, text) {
 function fmt(number) {
     return Number(number).toLocaleString('ko-KR', {maximumFractionDigits: 1});
 }
+
 // 서버에 GET 요청을 보내 JSON 응답을 읽는다. 실패하면 오류 문구를 올린다.
 async function getJSON(url) {
     var response = await fetch(url, {cache: 'no-store'});
@@ -88,6 +89,19 @@ function selectBuilding(row) {
     box.replaceChildren(textNode('h3', row.name || row.address), textNode('p', row.address + ' / ' + row.jibun_address));
     box.append(textNode('p', '팀 대장 기준 ' + fmt(row.units) + ' 주거단위 · ' + row.housing_type));
     box.append(textNode('p', '생활권 ' + row.zone + ' 담당 제안: ' + row.hub_name));
+
+    // 팀의 기존 ID 연결 함수로 '배정된 거점'을 찾는다. 최근접 거점으로 바꾸지 않는다.
+    var targetHub = findHub(row.hub_id);
+    if (targetHub && map) {
+        var startLatLng = mapPoint(row.coordinates);
+        var endLatLng = mapPoint(targetHub.geometry.coordinates);
+        var dist = getDistanceMath(startLatLng, endLatLng);
+        box.append(textNode('p', '담당 거점까지 직선거리: 약 ' + fmt(dist) + 'm'));
+    } else if (targetHub) {
+        // 지도 SDK가 준비되지 않아도 건물·생활권 검색은 계속 사용할 수 있다.
+        box.append(textNode('small', '직선거리는 지도 준비 후 건물을 다시 선택하면 확인할 수 있습니다.'));
+    }
+
     box.append(textNode('small', '개별 건물의 보행거리는 결과 파일에 없어 표시하지 않습니다. 실제 배출 위치 지정이 아닙니다.'));
     var button = textNode('button', '담당 거점안 보기');
     button.dataset.hubId = row.hub_id;
@@ -97,6 +111,10 @@ function selectBuilding(row) {
     renderHubList();
     drawResults();
     showSearchPoint(row);
+    // showSearchPoint가 이전 표시를 지운 뒤에 새 직선을 그려야 선이 남는다.
+    if (targetHub && map) {
+        drawDistanceLine(mapPoint(row.coordinates), mapPoint(targetHub.geometry.coordinates));
+    }
     box.scrollIntoView({block: 'nearest'});
 }
 // 보유 데이터 검색 결과를 10개씩 받아 기존 목록 뒤에 붙인다.
@@ -232,3 +250,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         initializeMap();
     } catch (error) { document.getElementById('dataStatus').textContent = error.message; }
 });
+
+// 주소 검색 메뉴는 현재 페이지를 새로 열지 않고 기존 검색 탭으로 돌아간다.
+var navSearchBtn = document.getElementById('navSearchBtn');
+if (navSearchBtn) {
+    navSearchBtn.onclick = function(event) {
+        event.preventDefault();
+        showPanel('search');
+    };
+}

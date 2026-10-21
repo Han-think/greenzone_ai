@@ -11,6 +11,7 @@ from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 from route_planner import load_route_data, plan_route
 from folium_report import build_folium_report, ZONE_COLORS
+from service_routes import router as service_router
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / '.env')
@@ -20,6 +21,21 @@ TEAM = DATA / 'received' / 'team_second_stage'
 app = FastAPI()
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 templates = Jinja2Templates(directory=ROOT / 'templates')
+# 기존 지도 앱에 사진·배출 안내·관리자 URL을 추가한다. 같은 데이터 폴더를 사용한다.
+app.include_router(service_router)
+
+
+# @app.middleware는 요청과 응답 사이에 공통 처리를 넣는다.
+@app.middleware('http')
+async def protect_service_cache(request: Request, call_next):
+    # 관리자 정보와 수정된 수수료가 브라우저 캐시에 남지 않게 한다.
+    response = await call_next(request)
+    if request.url.path.startswith(('/admin', '/disposal', '/api/admin', '/api/disposal', '/api/vision')):
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['Referrer-Policy'] = 'same-origin'
+    return response
 
 
 def read_json(path):
@@ -208,7 +224,7 @@ def waste_data():
 # /api/route는 화면에서 선택한 거점·도로폭 조건을 받아 계산 결과만 JSON으로 보낸다.
 # 기존 생활권·거점 위치·배출량을 재배정하거나 데이터 파일에 저장하지 않는다.
 @app.get('/api/route')
-def collection_route(ids: str = '', start: str = '', min_width: int = 7, closed: bool = True):
+def collection_route(ids: str = '', start: str = '', min_width: int = 7, closed: bool = True, order_mode: str = 'auto'):
     # 예: ?ids=G06,G01&start=G06&min_width=7&closed=true
     # 함수에 적은 기본값은 화면에서 값을 보내지 않았을 때 적용된다.
     if len(ids) > 150:
@@ -218,7 +234,8 @@ def collection_route(ids: str = '', start: str = '', min_width: int = 7, closed:
         if hub_id.strip():
             selected.append(hub_id.strip())
     try:
-        return plan_route(route_data, selected, start, min_width, closed)
+        # manual은 받은 ID 순서대로, auto는 가까운 거점부터 계산한다.
+        return plan_route(route_data, selected, start, min_width, closed, order_mode)
     except ValueError as error:
         # 자료·조건상 경로가 없을 때는 사유를 알린다. 직선 대체 경로를 만들지 않는다.
         raise HTTPException(status_code=422, detail=str(error))
