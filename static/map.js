@@ -9,6 +9,35 @@ var addressGeocoder;
 var mapAddressRequest = 0;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
+// 💡 점선을 기억할 변수와 거리 계산 함수
+var searchDistanceLine = null;
+function calculateDistance(lon, lat, targetFeature) {
+    // 1. 이전 검색에서 그려진 점선이 있다면 지워줍니다.
+    if (searchDistanceLine) {
+        searchDistanceLine.setMap(null);
+    }
+
+    var targetCoords = targetFeature.geometry.coordinates;
+    
+    // 2. 카카오맵 선 객체를 만들고 점선 스타일을 입힙니다.
+    searchDistanceLine = new kakao.maps.Polyline({
+        path: [
+            new kakao.maps.LatLng(lat, lon), 
+            new kakao.maps.LatLng(targetCoords[1], targetCoords[0])
+        ],
+        strokeWeight: 2,           // 선 두께
+        strokeColor: '#657784',    // 선 색상 (팀에서 쓰는 회색)
+        strokeOpacity: 0.9,        // 투명도
+        strokeStyle: 'shortdash'   // 💡 핵심: 짧은 점선 모양
+    });
+    
+    // 3. 지도에 실제로 보이게 그립니다!
+    searchDistanceLine.setMap(map);
+    
+    // 4. 거리를 반환합니다.
+    return searchDistanceLine.getLength();
+}
+
 // GeoJSON 좌표를 카카오 지도 좌표 객체로 바꾼다.
 function mapPoint(coordinates) {
     // 제공 연결: GeoJSON [경도, 위도]를 Kakao LatLng(위도, 경도)로 바꾼다.
