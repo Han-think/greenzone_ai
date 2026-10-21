@@ -1,0 +1,17 @@
+/* 두 분석 지도에만 사용한다. 배경을 옅게 해 생활권·도로·거점을 먼저 읽게 한다. */
+.leaflet-container { background:#f1f5f9; font-family:'Malgun Gothic',sans-serif; }
+.leaflet-tile-pane { filter:grayscale(1); opacity:0.65; }
+.hub-icon { background:transparent; border:0; }
+.hub-badge {
+    display:flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border:3px solid white;
+    color:white; font-size:15px; line-height:1; font-weight:bold;
+    box-shadow:0 2px 6px #142f4b70;
+    box-sizing:border-box;
+}
+.existing-hub { background:#047857; border-radius:50%; }
+.alternative-hub { background:#c2410c; border-radius:7px; }
+.leaflet-control-layers { font:12px/1.7 'Malgun Gothic',sans-serif; border:1px solid #bccbd6; }
+.leaflet-control-layers label { padding:2px 0; }
+.leaflet-control-layers input { accent-color:#075985; }
+.hub-icon:focus-visible { outline:3px solid #1d4ed8; outline-offset:3px; }

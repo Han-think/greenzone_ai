@@ -33,6 +33,20 @@ header {
     margin-bottom:12px;
     flex-shrink:0;
 }
+.analysis-links { display:flex; gap:6px; margin-top:10px; }
+.analysis-link {
+    display:block;
+    flex:1;
+    padding:10px;
+    border-radius:5px;
+    background:#257455;
+    color:white;
+    text-align:center;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:bold;
+}
+.analysis-link-note { margin-top:4px; }
 .tab-container {
     display:flex;
     flex-shrink:0;
@@ -246,4 +260,30 @@ a {
     min-width: 180px;
     max-width: 280px;
     white-space: normal;
+}
+
+/* 경로 선택은 작은 체크 목록으로 둔다. 기존 검색/후보 탭 구조는 그대로 쓴다. */
+.route-stops { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:10px 0; }
+.route-stops label,.route-option { display:flex; align-items:center; gap:5px; min-height:32px; }
+.route-actions { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+#routeResult { padding:10px; background:#f1f5f2; border-radius:5px; }
+#routeResult:empty { display:none; }
+#routeResult ol { padding-left:20px; font-size:12px; line-height:1.8; }
+.route-marker { display:flex; align-items:center; justify-content:center; width:23px; height:23px; color:white; background:#a95315; border:2px solid white; border-radius:50%; font-size:12px; font-weight:bold; }
+.route-start { background:#245f9c; }
+#planComparison { font-weight:bold; color:#27624a; }
+@media(pointer:coarse) { .route-stops label,.route-option { min-height:44px; } }
+/* 인쇄할 때 검색 목록·버튼은 줄이고, 현재 비교 수치·선택 경로·지도를 남긴다. */
+@media print {
+    html,body { height:auto; }
+    body { display:block; }
+    aside { width:100%; min-width:0; padding:10px; height:auto; overflow:visible; border:0; }
+    .sidebar-content { overflow:visible; }
+    .tab-container,#tabContentSearch,#hubList,#hubDetail,button,.layer-checks,.route-stops,details:not(#routeDisclosure) { display:none !important; }
+    #tabContentData { display:block !important; margin:8px 0; }
+    main { height:450px; break-inside:avoid; }
+    #map { min-height:400px; }
+    .map-toolbar { display:none; }
+    #routeResult { background:white; }
+    #routeResult ol { columns:2; }
 }

@@ -4,3 +4,6 @@ fastapi
 
 python-dotenv
 jinja2
+
+# Python에서 분석 보고용 HTML 지도를 만드는 도구
+folium==0.20.0

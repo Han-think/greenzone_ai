@@ -5,31 +5,37 @@ import json
 import os
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
+from route_planner import load_route_data, plan_route
+from folium_report import build_folium_report, ZONE_COLORS
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / '.env')
 DATA = ROOT / 'data'
 TEAM = DATA / 'received' / 'team_second_stage'
+# app은 웹 요청을 받을 FastAPI 객체다. 아래 @app.get이 이 객체에 URL을 등록한다.
 app = FastAPI()
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 templates = Jinja2Templates(directory=ROOT / 'templates')
 
 
 def read_json(path):
+    # JSON 파일 하나를 Python 딕셔너리/리스트로 읽어 돌려준다.
     with open(path, encoding='utf-8-sig') as file:
         return json.load(file)
 
 
 def read_csv(name):
+    # 분석 CSV의 각 행을 딕셔너리로 읽는다. 배출량 출처 파일에 사용한다.
     with open(DATA / 'analysis' / name, encoding='utf-8-sig', newline='') as file:
         return list(csv.DictReader(file))
 
 
 def lot_address(pnu):
+    # 지번 식별자(PNU)의 본번·부번으로 사람이 읽을 지번 주소를 만든다.
     address = '신월동 '
     if pnu[10] == '2':
         address += '산 '
@@ -47,6 +53,10 @@ households = read_json(TEAM / 'greenzone2nd_layer_households.geojson')
 candidates = read_json(TEAM / 'greenzone2nd_layer_candidates.geojson')
 alternatives = read_json(TEAM / 'greenzone2nd_layer_alternatives.geojson')
 boundary = read_json(DATA / 'greenzone1st_layer_boundary.geojson')
+# 필터는 팀 도로·보호시설 반경 도형을 그대로 표시한다. 새 안전 판정이 아니다.
+roads = read_json(DATA / 'received/team_results/roads.geojson')
+protection = read_json(DATA / 'received/team_results/protection_zones.geojson')
+route_data = load_route_data()
 original = read_json(DATA / 'received' / 'sinwol1_demand.json')
 supplement = read_json(DATA / 'processed' / 'sinwol1_address_supplement.json')
 
@@ -95,8 +105,10 @@ if len(buildings) != summary['parcel_count']:
 
 
 # 2. 화면은 지도 자료를 받고, 검색창은 보유 주소·건물명만 찾는다.
+# @app.get('/')는 브라우저가 첫 화면 주소(/)를 요청하면 아래 함수를 실행하라는 뜻이다.
 @app.get('/')
 def home(request: Request):
+    # HTML 화면을 돌려주고 카카오 JavaScript 키를 지도 SDK에 전달한다.
     return templates.TemplateResponse(
         request=request,
         name='index.html',
@@ -104,12 +116,55 @@ def home(request: Request):
     )
 
 
+# /analysis로 접속하면 아래 함수를 실행한다. 받은 팀 자료를 체크해 보는 별도 화면이다.
+@app.get('/analysis')
+def analysis_view(request: Request):
+    # Leaflet 화면 틀만 보낸다. 데이터는 기존 /api/map-data를 함께 사용한다.
+    return templates.TemplateResponse(request=request, name='analysis.html', context={'zone_colors': ZONE_COLORS})
+
+
+def check_report_options(plan, min_width):
+    # 주소에 직접 값을 적어도 화면에서 제공하는 6곳/9곳·등록폭 조건만 받는다.
+    if plan not in ['nine', 'six'] or min_width not in [0, 7]:
+        raise HTTPException(status_code=422, detail='거점안과 도로 등록폭 조건을 확인하세요.')
+
+
+# 이 @app.get은 Folium 보고서의 설명·조건 선택 화면을 여는 주소를 등록한다.
+@app.get('/analysis/folium')
+def folium_view(request: Request, plan: str = 'nine', min_width: int = 7):
+    # 비교 수치는 Leaflet과 같은 받은 엑셀 행을 쓴다. 필터로 다시 계산하지 않는다.
+    check_report_options(plan, min_width)
+    result = summary['comparisons'][1]
+    if plan == 'six':
+        result = summary['comparisons'][2]
+    road_count = 0
+    for feature in roads['features']:
+        if float(feature['properties']['도로폭_m']) >= min_width:
+            road_count += 1
+    return templates.TemplateResponse(request=request, name='analysis_folium.html', context={
+        'plan': plan, 'min_width': min_width, 'zone_colors': ZONE_COLORS, 'mean': round(result['mean_m'], 1),
+        'coverage': round(result['coverage_300'] * 100, 1),
+        'hub_count': result['hub_count'], 'road_count': road_count, 'parcel_count': len(buildings)})
+
+
+# 이 @app.get은 위 화면의 iframe 안에 넣을 Folium 지도 HTML을 돌려주는 주소다.
+@app.get('/analysis/folium-map', response_class=HTMLResponse)
+def folium_map(plan: str = 'nine', min_width: int = 7):
+    # map_data()를 함수로 호출해 같은 자료를 넘긴다. HTTP 요청·자료 수집은 하지 않는다.
+    check_report_options(plan, min_width)
+    return HTMLResponse(build_folium_report(map_data(), plan, min_width))
+
+
+# @app.get은 GET 주소를 등록하는 데코레이터다. 함수의 결과는 JSON 응답으로 바뀐다.
 @app.get('/api/map-data')
 def map_data():
+    # 지도·필터가 사용할 받은 결과를 전달한다. 원본 데이터 자체는 수정하지 않는다.
     return {'summary': summary, 'hubs': hubs, 'zones': zones, 'candidates': candidates,
-            'alternatives': alternatives, 'boundary': boundary, 'buildings': buildings}
+            'alternatives': alternatives, 'boundary': boundary, 'buildings': buildings,
+            'roads': roads, 'protection': protection}
 
 
+# ?q=검색어&page=번호를 함수의 q, page에 넣어 검색한다.
 @app.get('/api/buildings')
 def search_buildings(q: str = '', page: int = 1):
     # 팀의 더보기 방식을 보유 데이터 검색에 연결한다. 한 번에 10개씩 보낸다.
@@ -134,6 +189,7 @@ def search_buildings(q: str = '', page: int = 1):
             'page_size': page_size, 'has_more': end < len(result)}
 
 
+# 배출량 펼치기를 눌렀을 때만 이 주소로 공식값·조건부 추정을 요청한다.
 @app.get('/api/waste')
 def waste_data():
     # 2024 공식 결합권역 물량과 기존 조건부 추정은 참고값으로만 보존한다.
@@ -149,13 +205,34 @@ def waste_data():
     return {'observed': observed, 'estimate': estimate}
 
 
+# /api/route는 화면에서 선택한 거점·도로폭 조건을 받아 계산 결과만 JSON으로 보낸다.
+# 기존 생활권·거점 위치·배출량을 재배정하거나 데이터 파일에 저장하지 않는다.
+@app.get('/api/route')
+def collection_route(ids: str = '', start: str = '', min_width: int = 7, closed: bool = True):
+    # 예: ?ids=G06,G01&start=G06&min_width=7&closed=true
+    # 함수에 적은 기본값은 화면에서 값을 보내지 않았을 때 적용된다.
+    if len(ids) > 150:
+        raise HTTPException(status_code=422, detail='거점 선택을 확인하세요.')
+    selected = []
+    for hub_id in ids.split(','):
+        if hub_id.strip():
+            selected.append(hub_id.strip())
+    try:
+        return plan_route(route_data, selected, start, min_width, closed)
+    except ValueError as error:
+        # 자료·조건상 경로가 없을 때는 사유를 알린다. 직선 대체 경로를 만들지 않는다.
+        raise HTTPException(status_code=422, detail=str(error))
+
+
 # 자료는 정해 둔 결과 파일만 내려받는다. 원본 전체 폴더를 공개하지 않는다.
 downloads = {'report': TEAM / 'greenzone2nd.md', 'workbook': TEAM / 'greenzone2nd.xlsx',
              'manifest': TEAM / 'source_manifest.json', 'hubs': DATA / 'greenzone2nd.geojson'}
 
 
+# {name}은 URL의 한 부분이다. 예: /api/source/report이면 name='report'다.
 @app.get('/api/source/{name}')
 def source_file(name: str):
+    # 정해 둔 분석 원본만 내려받는다. 임의 경로를 파일 이름으로 받지 않는다.
     if name not in downloads:
         raise HTTPException(status_code=404, detail='등록된 결과 자료가 아닙니다.')
     return FileResponse(downloads[name], filename=downloads[name].name)

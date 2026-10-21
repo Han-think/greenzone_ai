@@ -15,6 +15,12 @@
             <h1>그린존 · 신월1동</h1>
             <p id="dataStatus">팀 2차 자료를 읽는 중입니다.</p>
             <small>운영 승인 전 분석 제안입니다.</small>
+            <!-- 분석 지도는 새 탭에서 열어 현재 주소 검색 결과를 유지한다. -->
+            <div class="analysis-links" role="group" aria-label="지도 분석 보기">
+                <a class="analysis-link" href="/analysis" target="_blank" rel="noopener">Leaflet 보기</a>
+                <a class="analysis-link" href="/analysis/folium" target="_blank" rel="noopener">Folium 보기</a>
+            </div>
+            <small class="analysis-link-note">6곳/9곳·도로·보호시설을 체크하며 비교 · 새 탭</small>
         </header>
         <!-- 팀의 검색/후보지 탭을 유지하고 보유 데이터 검색과 연결한다. -->
         <nav class="tab-container" aria-label="검색과 후보지">
@@ -39,14 +45,45 @@
         </section>
         <section id="tabContentData" hidden>
             <h2>생활권과 거점안</h2>
+            <!-- select는 화면에서 볼 거점안을 고른다. 주민의 담당 생활권을 다시 계산하지 않는다. -->
+            <label for="planFilter">분석 보기</label>
+            <select id="planFilter">
+                <option value="nine">기존 6곳 + 새 대안 3곳 = 9곳</option>
+                <option value="six">기존 후보 중 6곳만</option>
+            </select>
+            <p id="planComparison" role="status"></p>
+            <small id="planNote">비교표는 최근접 거점 기준입니다. 주민 검색은 기존 9생활권 담당 안내를 사용합니다.</small>
             <label for="zoneFilter">생활권 선택</label>
             <select id="zoneFilter"><option value="all">생활권 전체</option></select>
             <div class="layer-checks">
                 <label><input id="showOriginal" type="checkbox">1차 후보 11곳 함께 보기</label>
                 <label><input id="showHouseholds" type="checkbox">주거 필지 보기</label>
                 <label><input id="showAlternatives" type="checkbox">대안 2·3순위 보기</label>
+                <label><input id="showRoads" type="checkbox" checked>팀 도로선 보기</label>
+                <label><input id="showProtection" type="checkbox">보호시설 반경 200m 보기(분석 가정)</label>
             </div>
+            <label for="roadWidthFilter">표시·경로에 사용할 등록 도로폭</label>
+            <select id="roadWidthFilter">
+                <option value="7">등록폭 7m 이상</option>
+                <option value="0">전체 도로 · 좁은 도로 포함</option>
+            </select>
             <small>초록: 기존 후보에서 선택 · 주황: 새 대안(부지 미확인) · 회색: 1차 후보</small>
+            <details id="routeDisclosure">
+                <summary>수거 순회 경로안 만들기</summary>
+                <p>수거할 거점과 출발 거점을 고르면 가까운 거점부터 도로를 따라 연결합니다. 생활권 보기와 별개로 아래에서 체크한 거점을 방문합니다.</p>
+                <div id="routeStops" class="route-stops" aria-label="수거할 거점 선택"></div>
+                <label for="routeStart">출발 거점(차고지 아님)</label>
+                <select id="routeStart"></select>
+                <label class="route-option"><input id="routeClosed" type="checkbox" checked>출발 거점으로 돌아오기</label>
+                <div class="route-actions">
+                    <button id="calculateRoute" type="button">경로안 계산</button>
+                    <button id="clearRoute" type="button">경로 지우기</button>
+                </div>
+                <p id="routeStatus" role="status">현재 도로폭 조건으로 계산합니다. 실제 운행 안내가 아닙니다.</p>
+                <div id="routeResult" aria-live="polite"></div>
+                <small>차고지·일방통행·회전·정차는 미반영. 도로 위 거점 투영점 사이의 경로이며, 부지 진입 구간은 별도 확인이 필요합니다.</small>
+            </details>
+            <button id="printReport" type="button">현재 분석 보기 인쇄</button>
             <div id="hubList"></div>
             <div id="hubDetail" aria-live="polite"></div>
         </section>
@@ -82,6 +119,8 @@
         <p id="mapStatus" role="status">지도를 준비하고 있습니다.</p>
     </main>
     <script src="/static/map.js"></script>
+    <!-- route.js는 분석 필터·선택 거점·경로 요청과 지도 표시만 담당한다. -->
+    <script src="/static/route.js"></script>
     <script src="/static/script.js"></script>
 </body>
 </html>

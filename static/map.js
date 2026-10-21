@@ -9,16 +9,19 @@ var addressGeocoder;
 var mapAddressRequest = 0;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
+// GeoJSON 좌표를 카카오 지도 좌표 객체로 바꾼다.
 function mapPoint(coordinates) {
     // 제공 연결: GeoJSON [경도, 위도]를 Kakao LatLng(위도, 경도)로 바꾼다.
     return new kakao.maps.LatLng(coordinates[1], coordinates[0]);
 }
 
+// 생활권 보기 선택과 해당 자료의 생활권이 같은지 확인한다.
 function matchesZone(zone) {
     var selected = document.getElementById('zoneFilter').value;
     return selected === 'all' || Number(selected) === zone;
 }
 
+// 기존 표시 도형을 지운다. 경로 전용 도형은 route.js에서 따로 관리한다.
 function clearResults() {
     for (var i = 0; i < resultLayers.length; i++) {
         resultLayers[i].setMap(null);
@@ -27,6 +30,7 @@ function clearResults() {
     if (selectedPopup) selectedPopup.close();
 }
 
+// 받은 다각형 좌표를 Kakao Polygon으로 표시한다.
 function addGeometry(geometry, color, opacity) {
     // 제공 연결: 팀 경계·생활권의 Polygon/MultiPolygon을 지도에 그린다.
     if (geometry.type === 'MultiPolygon') {
@@ -52,10 +56,12 @@ function addGeometry(geometry, color, opacity) {
     resultLayers.push(polygon);
 }
 
+// 받은 신월1동 경계를 모두 볼 수 있도록 지도 범위를 맞춘다.
 function showStudyArea() {
     if (map) map.setBounds(studyBounds, 20, 20, 20, 20);
 }
 
+// 다각형의 모든 점을 담는 Kakao 지도 범위를 만든다.
 function geometryBounds(geometry) {
     // 제공 SDK 연결: 다각형을 모두 담는 지도 범위를 구한다.
     var bounds = new kakao.maps.LatLngBounds();
@@ -69,6 +75,7 @@ function geometryBounds(geometry) {
     return bounds;
 }
 
+// 선택한 생활권의 경계를 찾아 지도 범위를 맞춘다.
 function showSelectedZone() {
     if (!map) return;
     var selected = document.getElementById('zoneFilter').value;
@@ -84,6 +91,7 @@ function showSelectedZone() {
     }
 }
 
+// 좌표에 작은 설명 창을 표시한다.
 function showPointPopup(point, text) {
     if (selectedPopup) selectedPopup.close();
     var content = textNode('p', text);
@@ -92,6 +100,7 @@ function showPointPopup(point, text) {
     selectedPopup.open(map);
 }
 
+// 거점 ID로 상세 정보를 찾고 지도를 해당 위치로 옮긴다.
 function openHub(id) {
     var feature = findHub(id);
     if (!feature) return;
@@ -105,6 +114,7 @@ function openHub(id) {
     showPointPopup(feature.geometry.coordinates, feature.properties['이름'] + ' / 분석 제안, 운영 승인 전');
 }
 
+// 주거 필지 대표점을 작은 원으로 그린다.
 function drawBuilding(row) {
     // 제공 SDK 연결: 필지 한 개를 그린다. 클릭하면 그 필지의 정보를 표시한다.
     var dot = new kakao.maps.Circle({center: mapPoint(row.coordinates), radius: 3, strokeWeight: 0, fillColor: '#397d66', fillOpacity: 0.7});
@@ -116,6 +126,7 @@ function drawBuilding(row) {
     resultLayers.push(dot);
 }
 
+// 원본 후보나 예비 대안을 보조 마커로 표시한다.
 function drawReference(feature, label, color, description) {
     // 보조 마커: 1차 후보 또는 대안 2·3순위. 거점안을 바꾸는 기능은 아니다.
     var button = textNode('button', label);
@@ -132,6 +143,7 @@ function drawReference(feature, label, color, description) {
     resultLayers.push(marker);
 }
 
+// 현재 거점안을 생활권 번호 마커로 표시한다.
 function drawHub(feature) {
     var row = feature.properties;
     var button = textNode('button', row['생활권']);
@@ -148,13 +160,15 @@ function drawHub(feature) {
     resultLayers.push(marker);
 }
 
+// 현재 표시 조건에 따라 도형과 마커를 다시 그린다.
 function drawResults() {
     if (!map || !pageData) return;
     clearResults();
     addGeometry(pageData.boundary.features[0].geometry, '#34785d', 0);
+    drawAnalysisLayers();
     for (var i = 0; i < pageData.zones.features.length; i++) {
         var zone = pageData.zones.features[i];
-        if (matchesZone(zone.properties['생활권'])) {
+        if (document.getElementById('planFilter').value === 'nine' && matchesZone(zone.properties['생활권'])) {
             addGeometry(zone.geometry, zoneColors[zone.properties['생활권'] - 1], 0.4);
         }
     }
@@ -183,11 +197,33 @@ function drawResults() {
     }
     for (var m = 0; m < pageData.hubs.features.length; m++) {
         var hub = pageData.hubs.features[m];
-        if (matchesZone(hub.properties['생활권'])) drawHub(hub);
+        // 경로 표시 중에는 생활권 번호 대신 방문 순서만 보여, 두 종류의 번호를 섞지 않는다.
+        if (!routeVisible && includedInPlan(hub) && matchesZone(hub.properties['생활권'])) drawHub(hub);
     }
-    document.getElementById('mapStatus').textContent = document.getElementById('zoneFilter').selectedOptions[0].text + ' · 숫자는 생활권 번호. 초록: 기존 후보 / 주황: 새 대안';
+    var numberMeaning = routeVisible ? '지도 숫자는 방문 순서' : '지도 숫자는 생활권 번호';
+    document.getElementById('mapStatus').textContent = document.getElementById('planFilter').selectedOptions[0].text + ' · ' + numberMeaning + ' · 실제 차량 통행은 미확인';
 }
 
+function drawAnalysisLayers() {
+    // 받은 도로를 필터링해 그린다. 화면 표시만 바꾸며 기존 생활권·배출량은 바꾸지 않는다.
+    if (document.getElementById('showProtection').checked) {
+        for (var i = 0; i < pageData.protection.features.length; i++) {
+            addGeometry(pageData.protection.features[i].geometry, '#bb6570', 0.08);
+        }
+    }
+    if (!document.getElementById('showRoads').checked) return;
+    var minimum = Number(document.getElementById('roadWidthFilter').value);
+    for (var j = 0; j < pageData.roads.features.length; j++) {
+        var road = pageData.roads.features[j];
+        if (Number(road.properties['도로폭_m']) < minimum) continue;
+        var path = [];
+        for (var k = 0; k < road.geometry.coordinates.length; k++) path.push(mapPoint(road.geometry.coordinates[k]));
+        var line = new kakao.maps.Polyline({path: path, strokeWeight: 3, strokeColor: '#638b9c', strokeOpacity: 0.6});
+        line.setMap(map); resultLayers.push(line);
+    }
+}
+
+// 검색한 위치 표시와 대기 중인 클릭 주소 요청을 초기화한다.
 function clearSearchPoint() {
     mapAddressRequest += 1;
     if (searchMarker) searchMarker.setMap(null);
@@ -196,6 +232,7 @@ function clearSearchPoint() {
 
 // 팀의 지도 클릭 주소 표시를 같은 카카오 JavaScript 키의 좌표→주소 기능으로 연결한다.
 // 클릭한 주소를 보유 필지의 담당 거점으로 임의 배정하지 않는다.
+// 카카오 좌표→주소 기능을 호출한다. 담당 생활권 배정과는 별개다.
 function showClickedAddress(position) {
     if (!addressGeocoder) return;
     mapAddressRequest += 1;
@@ -228,6 +265,7 @@ function showClickedAddress(position) {
     });
 }
 
+// 선택한 보유 건물의 좌표를 지도에서 강조한다.
 function showSearchPoint(building) {
     if (!map) return;
     clearSearchPoint();
@@ -238,9 +276,10 @@ function showSearchPoint(building) {
     showPointPopup(building.coordinates, building.address + ' / 주거 필지 대표점');
 }
 
+// 카카오 SDK가 준비되면 지도를 만들고 첫 결과를 표시한다.
 function initializeMap() {
     if (!window.kakao || !kakao.maps) {
-        document.getElementById('mapStatus').textContent = '카카오 JavaScript 키와 허용 도메인 localhost:8003을 확인하세요. 보유 데이터 검색은 사용할 수 있습니다.';
+        document.getElementById('mapStatus').textContent = '카카오 JavaScript 키와 허용 웹 도메인을 확인하세요. http://localhost:8000/으로 접속하고, 보유 데이터 검색도 사용할 수 있습니다.';
         return;
     }
     // 지도와 클릭 좌표→주소 확인은 같은 JavaScript 키를 사용한다. 검색창은 보유 데이터를 쓴다.

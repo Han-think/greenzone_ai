@@ -14,6 +14,7 @@
 | received/archive/source_delivery_manifest.json | 임시 폴더의 5개 원본 파일 → 정식 보존 경로·크기·SHA256 대응표 |
 | received/sinwol1_demand.json / processed/sinwol1_address_supplement.json | 기존 필지·주소와 건물명 보완. 원본 해시·지번 확인 후 현재 필지와 연결 |
 | processed/team_second_stage_summary.json | 현재 결과 엑셀의 비교 수치·셀 위치·원본 해시를 기록한 화면용 요약 |
+| processed/route_graph.json | 도로 162구간을 교차점에서 나눈 별도 경로용 점·연결 목록. 전체/등록폭 7m 이상, 도로·거점 입력 해시 포함 |
 | raw/ / analysis/ | 보유 API 응답·공식 자료·과거 배출량·추정·분모·출처 검토 원본 |
 | data_inventory.csv | 파일별 출처·기준시점·SHA256·연결 상태. 목록 자체는 제외 |
 
@@ -34,3 +35,9 @@
 service_input / downloadable_evidence는 현재 코드 연결, reference_archive는 근거 보관, metadata는 목록·설명입니다.
 임시 `새 폴더` 경로는 웹 입력으로 사용하지 않습니다. 원본 5개는 대응표의 정식 경로에 보존했습니다.
 코드·기준일·후속 작업은 [핸드북](../docs/HANDBOOK.md)을 참고합니다.
+
+## 경로용 가공 자료
+
+`route_graph.json`만 새로 가공했습니다. 받은 도로·거점 GeoJSON은 그대로 보존합니다. `scripts/prepare_route_graph.py`를 프로젝트 폴더에서 실행하면 같은 두 입력으로 다시 준비할 수 있습니다(추가 패키지 없음).
+
+도형이 만나는 지점을 연결하고, 선택 도로에 거점을 투영합니다. 도로에서 40m 넘게 떨어진 거점은 자동 연결하지 않습니다. 근거리 미터 환산을 쓴 근사 도로 길이이며 실제 진입로·입체교차·일방통행은 검증하지 않았습니다. 1차 내보낸 도로 범위가 제한되어 있으므로 팀 2차의 전체 도로망 계산과 구분합니다.

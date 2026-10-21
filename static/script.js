@@ -19,30 +19,36 @@ function showPanel(panel) {
     document.querySelector('.sidebar-content').scrollTop = 0;
 }
 
+// 요소를 만들고 textContent로 글자를 넣는다. HTML 문자열로 사용자 입력을 해석하지 않는다.
 function textNode(tag, text) {
     var node = document.createElement(tag);
     node.textContent = text;
     return node;
 }
+// 화면에 보여줄 숫자에 천 단위 구분과 소수 한 자리 형식을 적용한다.
 function fmt(number) {
     return Number(number).toLocaleString('ko-KR', {maximumFractionDigits: 1});
 }
+// 서버에 GET 요청을 보내 JSON 응답을 읽는다. 실패하면 오류 문구를 올린다.
 async function getJSON(url) {
     var response = await fetch(url, {cache: 'no-store'});
     if (!response.ok) throw new Error('자료 요청에 실패했습니다. 서버와 데이터 파일을 확인하세요.');
     return await response.json();
 }
+// 거점 ID와 같은 항목을 현재 결과에서 찾아 돌려준다.
 function findHub(id) {
     for (var i = 0; i < pageData.hubs.features.length; i++) {
         if (pageData.hubs.features[i].properties['거점id'] === id) return pageData.hubs.features[i];
     }
     return null;
 }
+// 보기 조건에 맞는 거점을 버튼 목록으로 만든다.
 function renderHubList() {
     if (!pageData) return;
     var box = document.getElementById('hubList');
     box.replaceChildren();
     for (var i = 0; i < pageData.hubs.features.length; i++) {
+        if (!includedInPlan(pageData.hubs.features[i])) continue;
         var row = pageData.hubs.features[i].properties;
         if (!matchesZone(row['생활권'])) continue;
         var button = textNode('button', '생활권 ' + row['생활권'] + ' · ' + row['이름']);
@@ -54,6 +60,7 @@ function renderHubList() {
         box.append(button);
     }
 }
+// 클릭한 거점의 받은 분석 수치와 확인할 점을 후보 탭에 표시한다.
 function showHubDetail(feature) {
     showPanel('data');
     var row = feature.properties;
@@ -69,7 +76,13 @@ function showHubDetail(feature) {
     box.append(textNode('small', '팀이 보고한 도로 중심선 추정값입니다. 모든 지점의 실제 정차·보행·부지 사용 승인은 미확인입니다.'));
     box.scrollIntoView({block: 'nearest'});
 }
+// 선택 건물을 팀 생활권·담당 거점과 연결해 검색 화면과 지도에 표시한다.
 function selectBuilding(row) {
+    // 주민 안내는 팀이 정한 9생활권 결과로 고정한다. 6곳 비교가 배정을 바꾸지 않는다.
+    if (document.getElementById('planFilter').value !== 'nine') {
+        document.getElementById('planFilter').value = 'nine';
+        refreshPlan();
+    }
     showPanel('search');
     var box = document.getElementById('selectedBuilding');
     box.replaceChildren(textNode('h3', row.name || row.address), textNode('p', row.address + ' / ' + row.jibun_address));
@@ -86,6 +99,7 @@ function selectBuilding(row) {
     showSearchPoint(row);
     box.scrollIntoView({block: 'nearest'});
 }
+// 보유 데이터 검색 결과를 10개씩 받아 기존 목록 뒤에 붙인다.
 async function loadSearchPage(page) {
     if (searchBusy) return;
     searchBusy = true;
@@ -121,6 +135,7 @@ async function loadSearchPage(page) {
         document.getElementById('keyword').disabled = false;
     }
 }
+// 검색 폼의 기본 새로고침을 막고 첫 페이지를 요청한다.
 function searchBuildings(event) {
     event.preventDefault();
     if (searchBusy) return;
@@ -138,6 +153,7 @@ function searchBuildings(event) {
     clearSearchPoint();
     loadSearchPage(1);
 }
+// 팀 엑셀에서 옮긴 비교 수치와 분석 가정을 보여준다.
 function showSummary() {
     var summary = pageData.summary;
     var box = document.getElementById('analysisSummary');
@@ -150,6 +166,7 @@ function showSummary() {
     }
     box.append(textNode('small', '자료: 팀 결과 엑셀의 안 비교 시트. 원본 표제부·도로 SHP와 중간 거리행렬이 없어 전체 분석은 재실행하지 않았습니다.'));
 }
+// 배출량 펼치기를 열면 공식 관측값·조건부 추정을 구분해 읽는다.
 async function loadWaste() {
     if (wasteLoaded || !document.getElementById('wasteDisclosure').open) return;
     var box = document.getElementById('wasteFacts');
@@ -192,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         showSelectedZone();
         document.getElementById('hubDetail').replaceChildren();
     };
-    var checkboxes = ['showOriginal', 'showHouseholds', 'showAlternatives'];
+    var checkboxes = ['showOriginal', 'showHouseholds', 'showAlternatives', 'showRoads', 'showProtection'];
     for (var i = 0; i < checkboxes.length; i++) document.getElementById(checkboxes[i]).onchange = drawResults;
     document.getElementById('showArea').onclick = function() {
         document.getElementById('zoneFilter').value = 'all';
@@ -210,7 +227,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             var option = textNode('option', '생활권 ' + zone); option.value = zone;
             document.getElementById('zoneFilter').append(option);
         }
-        renderHubList();
+        initializeAnalysis();
         showSummary();
         initializeMap();
     } catch (error) { document.getElementById('dataStatus').textContent = error.message; }

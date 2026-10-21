@@ -1,0 +1,11 @@
+<!-- 같은 공통 색 목록으로 두 화면의 범례를 만든다. 번호도 함께 적어 색에만 의존하지 않는다. -->
+<div class="legend" aria-label="지도 범례">
+    <span><i class="existing"></i>기존 후보 · 원</span><span><i class="alternative"></i>새 대안 · 사각</span>
+    <span><i class="road"></i>도로선</span><span><i class="protection"></i>보호시설 반경 · 점선</span>
+</div>
+<div class="zone-legend" aria-label="생활권과 필지 색 범례">
+    <b>생활권·필지</b>
+    {% for color in zone_colors %}
+    <span style="border-color:{{ color }}"><i style="background:{{ color }}"></i>{{ loop.index }}</span>
+    {% endfor %}
+</div>

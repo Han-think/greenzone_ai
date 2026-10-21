@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>그린존 · Leaflet 분석 보기</title>
+    <!-- 팀이 받은 분석 HTML과 같은 Leaflet 버전. 지도 표시용이며 분석 알고리즘은 아니다. -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="/static/analysis.css?v=20261021">
+    <link rel="stylesheet" href="/static/analysis_map.css?v=20261021">
+</head>
+<body>
+    <header>
+        <div><h1>그린존 · Leaflet 분석 보기</h1><p>분석 필터를 펼쳐 체크하고, 지도 마커·도로를 눌러보세요.</p></div>
+        <nav class="report-nav" aria-label="지도 보기 선택">
+            <a href="/analysis" aria-current="page">Leaflet 보기</a>
+            <a href="/analysis/folium">Folium 보기</a>
+            <a href="/">주소 검색 화면으로</a>
+        </nav>
+    </header>
+    <div class="analysis-layout">
+        <aside>
+            <details class="filter-panel" open>
+                <summary>분석 필터 · 체크하면 지도에 바로 반영</summary>
+                <div class="filter-content">
+                    <label for="analysisPlan">비교할 거점안</label>
+                    <select id="analysisPlan">
+                        <option value="nine">기존 6곳 + 새 대안 3곳 = 9곳</option>
+                        <option value="six">기존 후보 중 6곳만</option>
+                    </select>
+                    <div class="metrics" aria-live="polite">
+                        <div><span>평균 도로망 거리</span><strong id="analysisMean">—</strong></div>
+                        <div><span>300m 안 등록 주거단위</span><strong id="analysisCoverage">—</strong></div>
+                    </div>
+                    <small>받은 비교표의 최근접 거점 기준. 주민 검색의 담당 생활권 배정과 구분합니다.</small>
+                    <label for="analysisZone">생활권 보기</label>
+                    <select id="analysisZone"><option value="all">생활권 전체</option></select>
+                    <fieldset>
+                        <legend>보여줄 자료</legend>
+                        <label><input id="layerHubs" type="checkbox" checked>현재 거점안</label>
+                        <label><input id="layerZones" type="checkbox" checked>9생활권 색면</label>
+                        <label><input id="layerBuildings" type="checkbox">주거 필지 1,585곳</label>
+                        <label><input id="layerRoads" type="checkbox" checked>팀 도로선</label>
+                        <label><input id="layerProtection" type="checkbox">보호시설 반경 200m</label>
+                        <label><input id="layerOriginal" type="checkbox">1차 후보 11곳</label>
+                        <label><input id="layerAlternatives" type="checkbox">대안 2·3순위</label>
+                    </fieldset>
+                    <label for="analysisWidth">표시할 도로의 등록폭</label>
+                    <select id="analysisWidth">
+                        <option value="7">등록폭 7m 이상</option>
+                        <option value="0">전체 도로 · 좁은 도로 포함</option>
+                    </select>
+                    <small id="analysisNote">도로폭은 도로선의 표시 조건입니다. 거점 위치를 다시 선정하지 않습니다.</small>
+                    <button id="analysisFit" type="button">선택 범위 전체 보기</button>
+                </div>
+            </details>
+            <details class="help-panel">
+                <summary>어떻게 보면 되나요?</summary>
+                <ol>
+                    <li><b>6곳/9곳</b>을 바꾸면 거점 마커와 비교 수치가 바뀝니다.</li>
+                    <li><b>자료를 체크</b>하면 필지·도로·보호시설 반경을 겹쳐 볼 수 있습니다.</li>
+                    <li><b>마커·도로를 클릭</b>하면 이름과 받은 분석 값을 확인합니다.</li>
+                </ol>
+                <p>숫자는 생활권 번호입니다. 6곳 비교에서는 기존 9생활권 색면을 숨깁니다.</p>
+                <p>Leaflet 보기는 화면에서 바로 필터를 바꿉니다. 위쪽 Folium 보기를 누르면 Python으로 만든 같은 자료의 HTML 지도를 볼 수 있습니다.</p>
+            </details>
+            <details class="source-panel">
+                <summary>출처와 해석 범위</summary>
+                <p>팀 2차 결과(2026-10-20 확인)와 보존된 1차 도로·보호시설 반경 자료를 사용합니다.</p>
+                <p>보호시설 반경 200m는 분석 가정이며 법정 보호구역 확정 경계가 아닙니다. 도로폭은 등록값으로 실제 유효폭과 다를 수 있습니다.</p>
+                <p>표시 필터입니다. 후보 재선정·경로 계산·품목 인식은 이 화면에서 실행하지 않습니다.</p>
+                <a href="/api/source/report">팀 분석 설명</a> · <a href="/api/source/workbook">결과 엑셀</a>
+            </details>
+        </aside>
+        <main>
+            <div id="analysisMap" aria-label="신월1동 분석 자료를 필터로 비교하는 지도"></div>
+            {% include 'analysis_legend.html' %}
+            <p id="analysisStatus" role="status">팀 분석 자료를 읽고 있습니다.</p>
+            <small id="backgroundStatus" role="status">배경: OpenStreetMap · 거점은 운영 승인 전 분석 제안</small>
+        </main>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script id="analysisColors" type="application/json">{{ zone_colors | tojson }}</script>
+    <script src="/static/analysis.js?v=20261021"></script>
+</body>
+</html>

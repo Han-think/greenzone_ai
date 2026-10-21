@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>그린존 · Folium 분석 보기</title>
+    <link rel="stylesheet" href="/static/analysis.css?v=20261021">
+</head>
+<body>
+    <header>
+        <div><h1>그린존 · Folium 분석 보기</h1><p>Python으로 만든 지도입니다. 오른쪽 위 체크박스로 자료를 겹쳐 보세요.</p></div>
+        <nav class="report-nav" aria-label="지도 보기 선택">
+            <a href="/analysis">Leaflet 보기</a>
+            <a href="/analysis/folium" aria-current="page">Folium 보기</a>
+            <a href="/">주소 검색 화면으로</a>
+        </nav>
+    </header>
+    <div class="analysis-layout">
+        <aside>
+            <details class="filter-panel" open>
+                <summary>Folium 지도 조건</summary>
+                <!-- GET은 선택한 값을 주소의 ?plan=...&min_width=...로 서버에 보낸다. -->
+                <form class="filter-content" action="/analysis/folium" method="get">
+                    <label for="foliumPlan">비교할 거점안</label>
+                    <select id="foliumPlan" name="plan">
+                        <option value="nine" {% if plan == 'nine' %}selected{% endif %}>기존 6곳 + 새 대안 3곳 = 9곳</option>
+                        <option value="six" {% if plan == 'six' %}selected{% endif %}>기존 후보 중 6곳만</option>
+                    </select>
+                    <label for="foliumWidth">표시할 도로의 등록폭</label>
+                    <select id="foliumWidth" name="min_width">
+                        <option value="7" {% if min_width == 7 %}selected{% endif %}>등록폭 7m 이상</option>
+                        <option value="0" {% if min_width == 0 %}selected{% endif %}>전체 도로 · 좁은 도로 포함</option>
+                    </select>
+                    <button type="submit">조건 적용 · 지도 만들기</button>
+                    <small>조건 적용 시 Python에서 지도를 다시 만듭니다. 지도 체크·확대는 초기화됩니다.</small>
+                    <div class="metrics">
+                        <div><span>평균 도로망 거리</span><strong>{{ mean }}m</strong></div>
+                        <div><span>300m 안 등록 주거단위</span><strong>{{ coverage }}%</strong></div>
+                    </div>
+                    <small>받은 비교표의 최근접 거점 기준. 필지 팝업은 원래 9생활권 배정입니다.</small>
+                </form>
+            </details>
+            <details class="help-panel" open>
+                <summary>어디를 체크하나요?</summary>
+                <ol>
+                    <li><b>지도 오른쪽 위</b>에서 도로·주거 필지·보호시설 등의 자료를 체크합니다.</li>
+                    <li><b>마커·도로를 클릭</b>하면 이름과 받은 값을 확인합니다. 숫자는 생활권 번호입니다.</li>
+                    <li><b>6곳/9곳·도로폭</b>은 왼쪽에서 고르고 조건 적용을 누릅니다.</li>
+                </ol>
+                <p>Leaflet 보기는 화면에서 바로 필터를 바꿉니다. Folium 보기는 Python 코드로 같은 자료의 HTML 지도를 만듭니다.</p>
+                {% if plan == 'six' %}<p>6곳 비교에서는 9생활권 색면을 숨깁니다. 필지의 원래 담당 배정은 변경하지 않습니다.</p>{% endif %}
+            </details>
+            <details class="source-panel">
+                <summary>출처와 해석 범위</summary>
+                <p>Leaflet과 같은 팀 2차 결과(2026-10-20 확인)·1차 도로·보호시설 반경 자료입니다.</p>
+                <p>도로 등록폭은 실제 유효폭과 다를 수 있습니다. 보호시설 반경 200m는 분석 가정이며 법정 경계 확정값이 아닙니다.</p>
+                <p>표시 필터이며 재분석·후보 재선정·경로 계산을 실행하지 않습니다.</p>
+                <a href="/api/source/report">팀 분석 설명</a> · <a href="/api/source/workbook">결과 엑셀</a>
+            </details>
+        </aside>
+        <main>
+            <!-- iframe은 서버에서 Folium으로 만든 실제 지도 HTML을 이 영역에 보여준다. -->
+            <iframe id="foliumMap" title="Folium 신월1동 분석 지도" src="/analysis/folium-map?plan={{ plan }}&amp;min_width={{ min_width }}"></iframe>
+            {% include 'analysis_legend.html' %}
+            <p class="folium-status">준비한 자료 · 거점안 {{ hub_count }}곳 · 도로 {{ road_count }}구간 · 주거 필지 {{ parcel_count }}곳 (체크하면 표시)</p>
+            <small class="folium-status">배경: OpenStreetMap · 거점은 운영 승인 전 분석 제안 · 지도 배경·도구 로딩에 인터넷 필요</small>
+        </main>
+    </div>
+</body>
+</html>
