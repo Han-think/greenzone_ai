@@ -49,9 +49,9 @@
     .app-nav h2 { flex-basis: 100%; margin: 0; font-size: 18px; }
     .app-nav .nav-btn { flex: 1; padding: 8px; text-align: center; white-space: nowrap; font-size: 12px; }
 }
-@media (max-height: 500px) and (orientation: landscape) {
+@media (max-width: 1100px) and (orientation: landscape) {
     body.map-page {
-        --app-nav-width: 108px;
+        --app-nav-width: clamp(88px, 12.8vw, 148px);
     }
     body.map-page .app-nav {
         position: fixed;
@@ -74,6 +74,38 @@
         text-align: left;
         white-space: normal;
         font-size: 11px;
+    }
+}
+@media (max-width: 1100px) and (orientation: landscape) {
+    body:not(.map-page) {
+        --app-nav-width: clamp(88px, 12.8vw, 148px);
+    }
+    body:not(.map-page) > .app-nav {
+        position: fixed;
+        width: var(--app-nav-width);
+        padding: 12px 7px;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 4px;
+        border-right: 1px solid #d5e2d8;
+        border-bottom: 0;
+    }
+    body:not(.map-page) > .app-nav h2 {
+        flex-basis: auto;
+        margin: 0 0 8px;
+        font-size: 16px;
+    }
+    body:not(.map-page) > .app-nav .nav-btn {
+        flex: none;
+        padding: 7px 5px;
+        text-align: left;
+        white-space: normal;
+        font-size: 11px;
+    }
+}
+@media (min-width: 1101px) and (max-width: 1517px) and (orientation: landscape) {
+    body {
+        --app-nav-width: clamp(88px, 12.8vw, 148px);
     }
 }
 @media print { .app-nav { display: none !important; } }
