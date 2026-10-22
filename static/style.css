@@ -306,10 +306,57 @@ a {
 .alternative-dot { background: #ab6425; }
 .reference-dot { font-size: 8px; }
 .map-popup {
-    padding: 9px 24px 9px 9px;
-    min-width: 180px;
-    max-width: 280px;
-    white-space: normal;
+    position:relative;
+    width:max-content;
+    max-width:min(240px, calc(100vw - 32px));
+    padding:8px 30px 8px 10px;
+    border:1px solid rgba(64, 91, 75, .35);
+    border-radius:7px;
+    background:rgba(255, 255, 255, .78);
+    box-shadow:0 2px 8px rgba(20, 42, 29, .2);
+    backdrop-filter:blur(2px);
+    color:#17291e;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.4;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    text-shadow:0 1px 0 rgba(255, 255, 255, .95);
+}
+.map-popup::after {
+    position:absolute;
+    bottom:-7px;
+    left:calc(50% - 7px);
+    width:12px;
+    height:12px;
+    border-right:1px solid rgba(64, 91, 75, .35);
+    border-bottom:1px solid rgba(64, 91, 75, .35);
+    background:rgba(255, 255, 255, .78);
+    content:'';
+    transform:rotate(45deg);
+}
+.map-popup-text {
+    display:block;
+}
+.map-popup-close {
+    position:absolute;
+    top:2px;
+    right:3px;
+    z-index:1;
+    width:24px;
+    height:24px;
+    padding:0;
+    border:0;
+    background:transparent;
+    color:#33483a;
+    font-size:19px;
+    font-weight:400;
+    line-height:1;
+    text-shadow:none;
+}
+.map-popup-close:hover {
+    border-radius:4px;
+    background:rgba(39, 89, 58, .12);
 }
 
 /* 경로 선택은 작은 체크 목록으로 둔다. 기존 검색/후보 탭 구조는 그대로 쓴다. */

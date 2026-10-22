@@ -62,7 +62,7 @@ function clearResults() {
         resultLayers[i].setMap(null);
     }
     resultLayers = [];
-    if (selectedPopup) selectedPopup.close();
+    closeSelectedPopup();
 }
 
 // 받은 다각형 좌표를 Kakao Polygon으로 표시한다.
@@ -126,13 +126,40 @@ function showSelectedZone() {
     }
 }
 
-// 좌표에 작은 설명 창을 표시한다.
+function closeSelectedPopup() {
+    if (!selectedPopup) return;
+    selectedPopup.setMap(null);
+    selectedPopup = null;
+}
+
+// 좌표에 반투명한 설명 창을 표시해 지도 선과 위치를 함께 볼 수 있게 한다.
 function showPointPopup(point, text) {
-    if (selectedPopup) selectedPopup.close();
-    var content = textNode('p', text);
+    closeSelectedPopup();
+    var content = textNode('div', '');
     content.className = 'map-popup';
-    selectedPopup = new kakao.maps.InfoWindow({position: mapPoint(point), content: content, removable: true});
-    selectedPopup.open(map);
+    content.setAttribute('role', 'status');
+    var popupText = textNode('span', text);
+    popupText.className = 'map-popup-text';
+    content.append(popupText);
+    var closeButton = textNode('button', '×');
+    closeButton.type = 'button';
+    closeButton.className = 'map-popup-close';
+    closeButton.setAttribute('aria-label', '팝업 닫기');
+    var popup = new kakao.maps.CustomOverlay({
+        position: mapPoint(point),
+        content: content,
+        xAnchor: 0.5,
+        yAnchor: 1,
+        zIndex: 100,
+        clickable: true
+    });
+    closeButton.onclick = function() {
+        popup.setMap(null);
+        if (selectedPopup === popup) selectedPopup = null;
+    };
+    content.append(closeButton);
+    selectedPopup = popup;
+    popup.setMap(map);
 }
 
 // 거점 ID로 상세 정보를 찾고 지도를 해당 위치로 옮긴다.
@@ -262,7 +289,7 @@ function drawAnalysisLayers() {
 function clearSearchPoint() {
     mapAddressRequest += 1;
     if (searchMarker) searchMarker.setMap(null);
-    if (selectedPopup) selectedPopup.close();
+    closeSelectedPopup();
 
     // 💡 검색 초기화 시, 우리가 그렸던 점선도 같이 지도에서 지워주기!
     if (searchDistanceLine) {
