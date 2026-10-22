@@ -154,11 +154,25 @@ async function loadRules() {
     try {
         var data = await readResponse(await fetch('/api/disposal/rules?item_id=' + encodeURIComponent(id), {cache: 'no-store'}));
         if (request !== ruleRequest) return;
+        if (data.rules.length === 1) {
+            var onlyRule = data.rules[0];
+            var option = makeText('option', onlyRule.specification + ' · 참고 ' + Number(onlyRule.fee_krw).toLocaleString('ko-KR') + '원');
+            option.value = onlyRule.rule_id;
+            select.append(option);
+            select.value = onlyRule.rule_id;
+            document.getElementById('itemStatus').textContent = '선택한 품목은 규격이 1개라 자동 선택했습니다. 규격과 참고 금액을 확인하세요.';
+            return;
+        }
         var placeholder = makeText('option', '규격을 직접 선택하세요'); placeholder.value = ''; select.append(placeholder);
         for (var i = 0; i < data.rules.length; i++) {
             var row = data.rules[i];
             var option = makeText('option', row.specification + ' · 참고 ' + Number(row.fee_krw).toLocaleString('ko-KR') + '원');
             option.value = row.rule_id; select.append(option);
+        }
+        if (!data.rules.length) {
+            document.getElementById('itemStatus').textContent = '선택한 품목에 현재 선택 가능한 규격이 없습니다.';
+        } else {
+            document.getElementById('itemStatus').textContent = '규격이 여러 개입니다. 맞는 규격을 직접 선택하세요.';
         }
     } catch (error) { if (request === ruleRequest) document.getElementById('itemStatus').textContent = error.message; }
 }
