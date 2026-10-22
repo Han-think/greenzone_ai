@@ -7,6 +7,8 @@ var searchMarker;
 var selectedPopup;
 var addressGeocoder;
 var mapAddressRequest = 0;
+var mapRelayoutTimer = null;
+var mapResizeObserver = null;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
 // 팀 지도 브랜치의 거리/점선 함수. 원래 배정은 유지하고 두 대표점의 관계만 표시한다.
@@ -360,6 +362,10 @@ function initializeMap() {
     // 지도와 클릭 좌표→주소 확인은 같은 JavaScript 키를 사용한다. 검색창은 보유 데이터를 쓴다.
     kakao.maps.load(function() {
         map = new kakao.maps.Map(document.getElementById('map'), {center: new kakao.maps.LatLng(37.533, 126.835), level: 5});
+        if (window.ResizeObserver) {
+            mapResizeObserver = new ResizeObserver(scheduleMapRelayout);
+            mapResizeObserver.observe(document.getElementById('map'));
+        }
         map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
         if (kakao.maps.services) addressGeocoder = new kakao.maps.services.Geocoder();
         kakao.maps.event.addListener(map, 'click', function(event) { showClickedAddress(event.latLng); });
@@ -369,6 +375,25 @@ function initializeMap() {
     });
 }
 
-window.addEventListener('resize', function() {
-    if (map) map.relayout();
-});
+function relayoutMap() {
+    if (!map) return;
+    var center = map.getCenter();
+    map.relayout();
+    map.setCenter(center);
+}
+
+function scheduleMapRelayout() {
+    if (mapRelayoutTimer) window.clearTimeout(mapRelayoutTimer);
+    // Orientation changes and sidebar transitions can report intermediate sizes.
+    mapRelayoutTimer = window.setTimeout(function() {
+        window.requestAnimationFrame(function() {
+            window.requestAnimationFrame(relayoutMap);
+        });
+    }, 280);
+}
+
+window.addEventListener('resize', scheduleMapRelayout);
+window.addEventListener('orientationchange', scheduleMapRelayout);
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', scheduleMapRelayout);
+}

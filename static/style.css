@@ -467,6 +467,79 @@ a {
         width:30px;
     }
 }
+@media(max-height:500px) and (orientation:landscape) {
+    body.map-page {
+        --sidebar-width:260px;
+        display:flex;
+        flex-direction:row;
+        height:100vh;
+        height:100dvh;
+        min-height:0;
+        padding-left:var(--app-nav-width);
+        overflow:hidden;
+    }
+    body.map-page aside {
+        width:var(--sidebar-width);
+        min-width:var(--sidebar-width);
+        height:100%;
+        max-height:none;
+        flex:0 0 var(--sidebar-width);
+        padding:10px;
+        overflow:hidden;
+    }
+    body.map-page.sidebar-collapsed aside {
+        width:0;
+        min-width:0;
+        flex-basis:0;
+        padding-left:0;
+        padding-right:0;
+        border:0;
+    }
+    body.map-page main {
+        flex:1 1 0;
+        width:0;
+        height:100%;
+        min-height:0;
+    }
+    body.map-page .map-toolbar {
+        flex-wrap:nowrap;
+        gap:6px;
+        padding:5px 8px;
+    }
+    body.map-page .map-toolbar > span {
+        min-width:0;
+        flex:1 1 auto;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+    body.map-page .map-toolbar-actions {
+        flex:none;
+        gap:4px;
+    }
+    body.map-page #openRoute,
+    body.map-page #showArea {
+        margin:0;
+        padding:5px 6px;
+        white-space:nowrap;
+        font-size:11px;
+    }
+    body.map-page .sidebar-toggle,
+    body.map-page.sidebar-collapsed .sidebar-toggle {
+        position:fixed;
+        top:50%;
+        left:calc(var(--app-nav-width) + var(--sidebar-width) - 13px);
+        align-self:auto;
+        width:26px;
+        height:56px;
+        margin:0;
+        transform:translate(-50%, -50%);
+        border-radius:0 8px 8px 0;
+    }
+    body.map-page.sidebar-collapsed .sidebar-toggle {
+        left:var(--app-nav-width);
+    }
+}
 
 /* 직접 순서 지정은 번호 선택만 사용해 드래그 없이 키보드로도 조정한다. */
 .manual-route-list { margin: 8px 0; padding: 0; list-style: none; }

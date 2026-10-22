@@ -31,11 +31,7 @@ function setSidebarCollapsed(collapsed) {
         : '주소 검색·후보지 창 접기');
     button.dataset.collapsed = String(collapsed);
     window.setTimeout(function() {
-        if (map) {
-            var center = map.getCenter();
-            map.relayout();
-            map.setCenter(center);
-        }
+        relayoutMap();
     }, 240);
 }
 

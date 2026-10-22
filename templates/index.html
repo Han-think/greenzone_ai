@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>그린존 · 신월1동</title>
-    <link rel="stylesheet" href="/static/nav.css">
-    <link rel="stylesheet" href="/static/style.css?v=20261022-toolbar-handle">
+    <link rel="stylesheet" href="/static/nav.css?v=20261022-landscape-map">
+    <link rel="stylesheet" href="/static/style.css?v=20261022-landscape-map">
     {% if kakao_key %}
     <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&autoload=false&libraries=services"></script>
     {% endif %}
 </head>
-<body>
+<body class="map-page">
 <nav class="app-nav" aria-label="메인메뉴">
     <h2>GreenZone</h2>
     <a id="navSearchBtn" class="nav-btn active" href="/" aria-current="page">주소 검색</a>
@@ -141,9 +141,9 @@
     <div id="map" aria-label="신월1동 생활권과 거점 지도"></div>
     <p id="mapStatus" role="status">지도를 준비하고 있습니다.</p>
 </main>
-<script src="/static/map.js"></script>
+<script src="/static/map.js?v=20261022-orientation-layout"></script>
 <!-- route.js는 분석 필터·선택 거점·경로 요청과 지도 표시만 담당한다. -->
 <script src="/static/route.js"></script>
-<script src="/static/script.js"></script>
+<script src="/static/script.js?v=20261022-orientation-layout"></script>
 </body>
 </html>
