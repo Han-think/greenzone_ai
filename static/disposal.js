@@ -33,6 +33,37 @@ function clearPhoto() {
     document.getElementById('photoPreview').removeAttribute('src');
     document.getElementById('photoPreview').hidden = true;
     document.getElementById('photoStatus').textContent = '사진을 지웠습니다. 서버에는 저장하지 않았습니다.';
+    document.getElementById('visionCandidates').replaceChildren();
+}
+
+function showCandidates(candidates) {
+    // 공식 ID와 이름은 서버에서 검사했다. 버튼을 누른 사용자가 최종 품목을 고른다.
+    var box = document.getElementById('visionCandidates');
+    box.replaceChildren();
+    if (!candidates.length) return;
+    box.append(makeText('p', 'AI 품목 후보 · 실제 물건과 맞는지 확인한 뒤 선택하세요.'));
+    for (var i = 0; i < candidates.length; i++) {
+        var candidate = candidates[i];
+        var card = document.createElement('div'); card.className = 'candidate-card';
+        var button = makeText('button', candidate.name + ' 선택');
+        button.type = 'button'; button.className = 'candidate-button';
+        button.dataset.itemId = candidate.item_id; button.dataset.name = candidate.name;
+        button.onclick = async function() {
+            var id = this.dataset.itemId;
+            var selectedPhoto = photoRevision;
+            document.getElementById('itemQuery').value = this.dataset.name;
+            await loadItems();
+            if (selectedPhoto !== photoRevision) return;
+            var select = document.getElementById('itemSelect');
+            select.value = id;
+            if (select.value) await loadRules();
+            select.focus();
+        };
+        card.append(button);
+        if (candidate.reason) card.append(makeText('small', 'AI의 참고 설명: ' + candidate.reason));
+        box.append(card);
+    }
+    box.append(makeText('small', '맞는 후보가 없으면 품목 검색에서 직접 찾아보세요. AI 설명도 틀릴 수 있습니다.'));
 }
 
 async function uploadPhoto() {
@@ -43,12 +74,15 @@ async function uploadPhoto() {
     var version = photoRevision;
     var button = document.getElementById('uploadPhoto');
     button.disabled = true;
-    status.textContent = '사진을 전송하고 형식을 확인하고 있습니다.';
+    document.getElementById('visionCandidates').replaceChildren();
+    status.textContent = '사진을 확인하고 품목 후보를 찾고 있습니다.';
     try {
         var data = await readResponse(await fetch('/api/vision', {method: 'POST', body: file,
             headers: {'Content-Type': file.type || 'application/octet-stream'}}));
         if (version !== photoRevision) return;
         status.textContent = data.message + ' (' + data.width + ' × ' + data.height + ')';
+        status.dataset.state = data.state || '';
+        showCandidates(Array.isArray(data.candidates) ? data.candidates : []);
     } catch (error) { if (version === photoRevision) status.textContent = error.message; }
     finally { button.disabled = false; }
 }
@@ -137,6 +171,7 @@ async function loadDocuments() {
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('photoFile').onchange = function() {
         photoRevision += 1;
+        document.getElementById('visionCandidates').replaceChildren();
         if (photoUrl) URL.revokeObjectURL(photoUrl);
         var file = this.files[0];
         var image = document.getElementById('photoPreview'); image.hidden = true; image.removeAttribute('src');

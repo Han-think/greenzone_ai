@@ -1,0 +1,115 @@
+{
+  "prepared_on": "2026-10-21",
+  "status": "metadata_prepared_not_connected_to_application",
+  "source_root_configuration": "FURNITURE_SOURCE_DIR (proposed .env name; not set or read by current application)",
+  "source_root_hint": "User-provided folder named 폐기물가구이미지; absolute local path remains outside shared inventory",
+  "image_subfolder": "원천데이터/가구류",
+  "label_subfolder": "라벨링데이터/가구류",
+  "source_image_files": 1248,
+  "source_label_files": 1259,
+  "inventory_rows": 1374,
+  "pair_status_counts": {
+    "matched": 1133,
+    "image_only": 115,
+    "label_only": 126
+  },
+  "classes": {
+    "밥상": {
+      "matched": 145,
+      "image_only": 5,
+      "label_only": 5
+    },
+    "서랍장": {
+      "matched": 131,
+      "image_only": 20,
+      "label_only": 21
+    },
+    "소파": {
+      "matched": 140,
+      "label_only": 10,
+      "image_only": 10
+    },
+    "수납장": {
+      "matched": 135,
+      "image_only": 15,
+      "label_only": 15
+    },
+    "싱크대": {
+      "matched": 20,
+      "label_only": 5,
+      "image_only": 5
+    },
+    "의자": {
+      "matched": 145,
+      "label_only": 5,
+      "image_only": 5
+    },
+    "장롱": {
+      "matched": 137,
+      "image_only": 10,
+      "label_only": 15
+    },
+    "책상": {
+      "matched": 95,
+      "image_only": 5,
+      "label_only": 5
+    },
+    "침대": {
+      "label_only": 10,
+      "matched": 20,
+      "image_only": 5
+    },
+    "협탁": {
+      "matched": 70,
+      "image_only": 30,
+      "label_only": 30
+    },
+    "화장대": {
+      "matched": 95,
+      "image_only": 5,
+      "label_only": 5
+    }
+  },
+  "label_metadata_issues": {},
+  "counts_are": "file-path matching and label metadata inspection only, not model performance or image quality review",
+  "pair_key": "class/group/stem, case-insensitive; duplicates are not automatically selected",
+  "sample_id_basis": "SHA256 of normalized relative path, truncated to 16 hex; NOT image content hash",
+  "omitted_label_fields": [
+    "GPS",
+    "DATE",
+    "MAKE",
+    "Camera Model Name",
+    "exif_fields"
+  ],
+  "analyst_outputs": [
+    "sample_inventory.csv with selection/review columns filled",
+    "class_mapping.json with reviewed official item candidates"
+  ],
+  "selection_values": [
+    "pending",
+    "demo",
+    "evaluation",
+    "excluded"
+  ],
+  "review_status_values": [
+    "pending",
+    "confirmed",
+    "needs_review"
+  ],
+  "reuse_policy": "demo and evaluation groups separated by source_group as a provisional rule; true independence still requires review",
+  "proposed_private_locations": {
+    "uploads": "data/local/uploads/",
+    "results": "data/local/vision_results/"
+  },
+  "not_done": [
+    "human_sample_selection",
+    "image_copy",
+    "source_rename",
+    "image_quality_review",
+    "external_api_call",
+    "model_inference",
+    "upload_storage_implementation",
+    "git_commit_or_push"
+  ],
+  "source_attribution": "사용자 제공 가구 이미지/라벨 샘플. AIHub 패키지의 원래 데이터셋 URL·이용조건은 분석 담당 확인 후 보강."
+}

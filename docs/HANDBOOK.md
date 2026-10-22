@@ -173,8 +173,8 @@ PNU 한 자리 변환, 파일 해시, 지도 도형과 SDK 콜백은 프로젝�
 | 주소 | 읽는 자료·처리 | 응답·화면 사용 |
 |---|---|---|
 | GET / | .env의 KAKAO_JAVASCRIPT_KEY를 HTML에 전달 | 로컬 카카오 화면 |
-| GET /analysis | 같은 /api/map-data를 쓰는 화면 틀 | Leaflet 분석 필터 |
-| GET /analysis/folium | plan=nine/six, min_width=7/0, 받은 비교표 | Folium 조건 선택 화면 |
+| GET /analysis | 같은 /api/map-data와 팀 비교표 | Leaflet·Folium 통합 화면 |
+| GET /analysis/folium | plan=nine/six, min_width=7/0 | 통합 페이지 Folium 보기로 이동 |
 | GET /analysis/folium-map | 같은 map_data() → folium_report.py | iframe 안의 실제 Folium 생성 HTML 지도 |
 | GET /api/map-data | 현재 거점·생활권·필지·후보·대안·경계·비교 요약·도로·보호시설 반경 | summary / hubs / zones / candidates / alternatives / boundary / buildings / roads / protection |
 | GET /api/buildings?q=검색어&page=1 | 보유 도로명·지번·건물명을 공백 제외/소문자로 비교, 검색어의 각 단어 포함 확인 | items 최대 10개, total, page, page_size, has_more. 2자 미만·100자 초과는 빈 결과 |
@@ -239,9 +239,9 @@ Folium은 Python에서 Leaflet 기반 HTML 지도를 만드는 도구입니다. 
 
 ## 11. 분석 필터와 수거 경로안
 
-### 별도 Leaflet 분석 화면
+### 한 페이지에서 두 지도 보기
 
-첫 화면 헤더의 `Leaflet 보기 / Folium 보기`는 각각 새 탭을 엽니다. `/analysis`의 `main.py/analysis_view`는 `templates/analysis.html`을 전달하고, `static/analysis.js`가 기존 `/api/map-data`의 같은 결과를 읽습니다. `analysis.css`는 두 보고 화면에만 적용합니다. 기존 카카오 화면·검색 상태·경로 계산은 별도로 유지합니다.
+서비스 메뉴는 ‘분석 지도’ 하나입니다. /analysis의 main.py/analysis_view가 통합 화면을 전달합니다. 상단 ‘필터로 탐색 · Leaflet’은 즉시 필터 탐색, ‘Python 보고 지도 · Folium’은 Python이 생성한 보고 지도 확인 용도입니다. Folium도 Leaflet 기반이며 두 지도는 같은 팀 자료를 사용합니다. 두 보기의 필터는 독립적이고 자동 동기화하지 않습니다. 보기 전환은 기존 지도·체크 값을 유지하며, Folium 조건 적용은 페이지/지도를 다시 만듭니다. static/analysis.js의 showReportView가 영역을 전환하고 Folium iframe은 처음 선택할 때 불러옵니다. 기존 카카오 서비스와 경로 계산은 그대로입니다.
 
 `initializeReport → changeAnalysisPlan → drawAnalysis` 순서로 읽습니다. 체크 변경은 도형을 다시 그리며, 생활권 변경·전체 보기 버튼만 지도 범위를 맞춥니다. 6곳 비교는 새 대안 3곳과 기존 9생활권 색면을 숨기고, 비교 수치는 받은 엑셀의 최근접 거점 기준을 사용합니다. 도로폭은 도로선 표시 조건이며 거점을 자동 제외하거나 재선정하는 조건이 아닙니다. 마커·도로의 팝업은 `textContent`로 만들어 받은 이름을 HTML로 실행하지 않습니다.
 
@@ -253,9 +253,9 @@ Folium은 Python에서 Leaflet 기반 HTML 지도를 만드는 도구입니다. 
 
 `folium_report.py/ZONE_COLORS`의 1~9 순서 색을 `main.py`가 두 템플릿에 전달합니다. Leaflet은 HTML의 JSON 목록을 읽고 Folium은 같은 Python 목록을 씁니다. 필지도 소속 생활권 색을 따릅니다. `templates/analysis_legend.html`은 두 화면의 공통 번호 범례, `static/analysis_map.css`는 옅은 배경·번호 마커 스타일입니다. 기존 거점은 초록 원, 새 대안은 주황 사각형, 도로는 진한 파랑, 보호시설 반경은 빨간 점선입니다. 표시를 바꾸어도 팀 비교표·생활권·거점 위치는 그대로입니다.
 
-### 별도 Folium 분석 화면
+### 통합 화면의 Folium 영역
 
-`main.py/folium_view → templates/analysis_folium.html → iframe의 /analysis/folium-map → folium_report.py/build_folium_report` 순서로 읽습니다. Folium은 이미 읽은 `map_data()` 자료로 실제 HTML 지도를 만듭니다. 파일 수집·분석 재실행·생활권 재배정은 하지 않습니다. 함수와 `@app.get` 옆에 역할을 주석으로 적었습니다.
+main.py/analysis_view → templates/analysis.html → 포함 템플릿 analysis_folium.html → iframe의 /analysis/folium-map → folium_report.py/build_folium_report 순서로 읽습니다. 예전 /analysis/folium 주소는 조건을 유지해 통합 페이지의 Folium 보기로 이동합니다. Folium은 이미 읽은 `map_data()` 자료로 실제 HTML 지도를 만듭니다. 파일 수집·분석 재실행·생활권 재배정은 하지 않습니다. 함수와 `@app.get` 옆에 역할을 주석으로 적었습니다.
 
 왼쪽에서 6곳/9곳·등록폭 전체/7m 이상을 선택해 적용합니다. 지도 오른쪽 위의 `LayerControl` 체크로 거점·필지·도로·보호시설·1차 후보·대안을 켜고 끕니다. 6곳에서는 9생활권 색면을 숨기고 필지 팝업에 원래 배정임을 표시합니다. 조건 적용 시 체크·확대가 초기화되며, Leaflet 보기의 생활권별 선택 기능과는 차이가 있습니다.
 
@@ -348,7 +348,7 @@ LLM이 자체 출력한 숫자를 검증된 정확도/확률로 표시하지 않
 | 위치 | 작성할 역할 |
 |---|---|
 | main.py | 기존 app에 업로드·배출 안내·관리자 URL 연결. 기존 지도/검색 유지 |
-| service_routes.py (현재) / vision_service.py (추후) | 현재 파일 검증과 수동 확인 상태 반환. 외부 API 연결 시 별도 분류 함수 분리 |
+| service_routes.py / vision_service.py | 업로드 검증 → 촬영정보 제거·축소 → Gemini 공식 품목 후보 → 사용자 선택. Opik은 사진 없는 선택적 실호출 기록 |
 | guide_service.py (현재) | list_items, rules_for_item, make_guide: SQLite 조회·선택 규격 금액·검토한 문서/출처 반환. LLM 답변 미연결 |
 | guide_service.py의 connect_database (현재) | 최초 적재와 seed 버전 기록. 기존 관리자 수정값 유지. 추후 원문 갱신용 차이 검토 별도 |
 | templates/disposal.html / static/disposal.js (현재) | 공통 메뉴로 여는 사진 업로드·공식 품목/규격/수량 수동 확인·안내 표시 |
@@ -428,7 +428,7 @@ LLM·임베딩 API가 없을 때도 수동 품목 선택과 구조화 DB 조회�
 | 법령 | 공식 조문 4건 + 현재 배출 절차 요약 1건, 확인일·시행일·법규 식별자·원문 해시 | 별표 상세 추출·금액 대조, 신월1동 상세 요일 |
 | 관리자 | 계정 로그인/로그아웃, 자료 조회·수정·사유·이전/새 값 이력, 수정 충돌 방지 | 실제 로그인/저장/사용자 반영 확인 |
 | REQ-AI-003 | `/api/vision`이 파일 검증 후 수동 확인 상태를 반환 | 외부 이미지 API/모델 선택·분류 연결. 인식 결과를 생성하지 않음 |
-| REQ-AI-004 | 확인한 문서의 DB 조회·출처 표시 | 임베딩·문서 검색·LLM/Opik은 미구현. 현재는 RAG라고 부르지 않음 |
+| REQ-AI-004 | 확인한 문서의 DB 조회·출처 표시 | 임베딩·문서 검색·RAG 답변은 미구현. Opik 실호출 기록은 연결했으나 환각 자동심사는 미실행 |
 
 ### 읽을 코드 순서
 
@@ -498,3 +498,73 @@ Git 공유 범위는 팀 내비게이션/지도 거리 코드, 경로 직접 순
 실제 .env·로컬 DB·가상환경·사진은 Git에 포함하지 않습니다. 실행 확인 전 항목은 위 표와 README를 따릅니다.
 
 지도 브랜치 후속 e4ffbce6059404b700e4266d479a6644e20cfdc1도 공유 직전에 비교했습니다. 검색 좌표를 mapPoint로 바꾸는 변경은 현재 통합 코드에 이미 반영되어 있습니다.
+
+
+## 15. 가구 이미지 분석 인계와 발표 준비
+
+2026-10-21: 분석 담당자의 결과를 기다리며 **파일 목록·입출력·발표 흐름만 준비**했습니다. 실제 사진 선별·복사·웹 코드 수정·인식은 하지 않았습니다.
+
+### 원본과 이번 준비물
+
+원본은 사용자가 알려준 `폐기물가구이미지` 폴더 아래 `원천데이터/가구류`, `라벨링데이터/가구류`입니다.
+실제 로컬 경로는 프로젝트 밖에 두고, 인계 CSV에는 이 폴더 기준 상대 경로만 담습니다. 원본 파일명은 바꾸지 않습니다.
+향후 `.env` 설정명 `FURNITURE_SOURCE_DIR`로 경로를 받는 구상이며 **현재 앱/환경변수에 반영한 상태는 아닙니다.**
+
+| 준비 파일 | 분석 담당과 확인할 내용 |
+|---|---|
+| data/vision/sample_inventory.csv | 경로 짝, 라벨 품목·박스 수와 검수 상태. selection/review_status/정답/제외 사유를 채워 반환 |
+| data/vision/class_mapping.json | 모델 명칭 → 공식 품목 후보. 단어 포함으로 찾은 후보이므로 확정 아님 |
+| data/vision/model_result_template.json | 이후 Vision 어댑터가 반환할 항목 초안. 현재 API 응답이나 분석 결과가 아님 |
+| data/vision/integration_manifest.json | 실제 개수·짝 기준·미완료 작업·제안 저장 위치 |
+
+라벨 원본에는 GPS·촬영시각·기기 정보가 있으나 새 목록에는 옮기지 않았습니다. 파일 개수 차이를 모델 인식 실패로 해석하지 않습니다.
+파일명이 맞아도 사진 품질/정답이 확인된 것은 아닙니다. 불일치 행은 원본을 보존하고 분석 담당 판단 전까지 미선택으로 둡니다.
+
+### 분석 담당에게 받을 최소 항목
+
+1. CSV의 `selection`: pending/demo/evaluation/excluded. 지금은 전부 pending이며 자동 확정하지 않음.
+2. `review_status`: pending/confirmed/needs_review. 실제 확인한 품목·개수를 analyst_label/analyst_quantity에 기록.
+3. 제외·보류한 이유. 잘못된 라벨을 고친 경우 원본 라벨과 구분해 기록.
+4. 모델이 반환할 품목명과 공식 품목 ID 후보의 대응. 수납장처럼 애매한 항목은 단일 품목으로 강제하지 않음.
+5. 시연용과 평가용을 구분. 같은 물건의 여러 각도가 섞일 수 있어 source_group 단위 분리를 우선 검토하며, 독립성이 보장됐다고 단정하지 않음.
+
+예산이 작으면 소파·장롱·침대부터 시작할 수 있지만, 개수와 품목 범위는 분석 담당이 확정합니다. 11종 전체 목록은 보존합니다.
+
+### 결과를 받은 뒤 연결할 순서
+
+| 순서 | 구현/확인할 내용 | 현재 상태 |
+|---|---|---|
+| 1 | 분석 담당 확정 CSV와 품목 매핑 반영 | 준비 형식만 있음 |
+| 2 | 원본 루트 설정과 시연 샘플 읽기 | 미구현. 원본 전체 복사 불필요 |
+| 3 | 업로드 임시 저장·파일 ID·분석 후 삭제 | 미구현. 현재 업로드는 메모리 확인만 함 |
+| 4 | 확정된 외부 Vision API가 선택 사진 1장 읽기 | 제공처/모델/키 미정. 일괄 전송 안 함 |
+| 5 | 모델 후보/추정 개수 → 사용자가 품목/규격/수량 확정 | 수동 선택 화면은 있음. 모델 결과 연결은 남음 |
+| 6 | 공식 DB 수수료/안내 조회 → 검토된 문서 검색·LLM | DB 조회는 있음. 임베딩·LLM/RAG는 남음 |
+
+개발 샘플 보존과 시민 업로드 임시 보관은 구분합니다. 제안 위치는 `data/local/uploads/`, `data/local/vision_results/`이며 아직 이 폴더를 만들거나 저장 기능을 연결하지 않았습니다.
+결과 보관 범위·기간은 구현 전에 정합니다. 기본 사용자 흐름에서 검색어·위치 이력을 새로 수집하지 않습니다. API 키와 이미지 파일은 Git에 올리지 않습니다.
+
+### 발표 구성안 — 실제 결과가 생기면 채우기
+
+| 장면 | 보여줄 내용 | 준비할 근거 |
+|---|---|---|
+| 1. 문제와 범위 | 신월1동·아파트 제외, 주민 접근성과 수거 조건을 함께 검토 | 프로젝트 목적·대상·운영 승인 전 제안 표시 |
+| 2. 데이터와 분석 | 원본 → 정제 → 생활권 → 후보 비교 | 팀 2차 지도·엑셀 수치·출처/기준시점 |
+| 3. 지도 사용 | 건물 검색 → 담당 거점 → 자동/직접 수거 순서 | 실제 동작 확인 후 화면 캡처 |
+| 4. 사진과 배출 안내 | 확정 샘플 → Vision 후보 → 사용자 수정 → 공식 규격/금액 | 샘플 ID·실제 모델 응답·공식 DB 행. 연결 전이면 준비 단계로 표시 |
+| 5. 근거와 관리 | 법령/안내 출처·기준일, 관리자 수정 이력 | 실제 조회/저장 화면. RAG는 실제 연결 후 설명 |
+| 6. 결과와 한계 | 된 기능·남은 기능·현장/승인 필요 사항 | 실제 측정 지표와 실패 사례. 예상 효과를 실적으로 표시하지 않음 |
+
+모델 비교 지표는 API 연결 후, 검수한 평가 사진으로 품목 정답 일치/수량 일치/식별 보류/실패와 비용·응답시간을 측정한 뒤 작성합니다.
+아직 정확도·비용·처리시간·현장 효과를 측정하지 않았습니다. 이번 파일 목록/라벨 검사 결과는 AI 성능 지표가 아닙니다.
+
+
+## 2026-10-22 사용자·관리자 화면 최종 연결
+
+- `vision_service.py`: 팀원 코드의 공식 품목 목록·JSON 후보 응답 구조를 사용. Gemini만 호출하며 DINO/YOLO를 실행하지 않음. EXIF 제거·1,280픽셀 축소 후 전송. 허용 ID 재검사.
+- `service_routes.py`: 사진 8MB/1,200만 화소/정지 JPG·PNG·WebP 검증. 느린 호출은 `asyncio.to_thread`. 후보 없음과 오류를 구분하고 수동 검색 유지.
+- `static/disposal.js`: 후보 버튼을 사용자가 누르면 공식 품목 선택. 규격·수량은 수동 확인. 선택이 바뀌면 이전 금액을 비움.
+- `static/admin.js`: 로그인과 수정 이력. 변경 항목은 한국어 표, 시간은 한국 시간으로 표시. DB의 이전 값/새 값은 보존.
+- Opik: `OPIK_ENABLED=true`일 때 사진 없는 후보·보류·오류·처리시간·토큰 사용량 기록. SDK 기록 실패는 서비스 응답을 막지 않음. 환각 심사와 최종 사용자 수정률은 미구현.
+- 실화면 점검 후 소파 2인용 설명을 원복함. 금액은 바꾸지 않았으며 테스트/원복 두 이력은 로컬 DB에 남김.
+- 실행·키 설정·실제 캡처는 README에 통합. 코드/문서 변경은 로컬 상태이며 커밋·푸시하지 않음.

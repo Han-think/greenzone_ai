@@ -1,0 +1,161 @@
+{
+  "mapping_status": "analyst_review_pending",
+  "catalog_snapshot_checked_at": "2026-10-18",
+  "mappings": [
+    {
+      "model_label": "밥상",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-40b881b74f412cde",
+          "official_name": "밥상(교자상)"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "서랍장",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-6e02325e0db8e50f",
+          "official_name": "서랍장"
+        },
+        {
+          "item_id": "YC-I-dbf6f9b372436a2d",
+          "official_name": "서랍장 협탁(책상,침대)"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "소파",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-c5f25de619857c9d",
+          "official_name": "소파(안락의자)"
+        },
+        {
+          "item_id": "YC-I-cf600af3ed66feee",
+          "official_name": "소파스툴"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "수납장",
+      "suggested_catalog_candidates": [],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "싱크대",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-e75cea712e27ae93",
+          "official_name": "싱크대"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "의자",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-c5f25de619857c9d",
+          "official_name": "소파(안락의자)"
+        },
+        {
+          "item_id": "YC-I-c3eaf0087182e388",
+          "official_name": "의자"
+        },
+        {
+          "item_id": "YC-I-22bfba4e7223c3f3",
+          "official_name": "안마의자"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "장롱",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-12d343285b432716",
+          "official_name": "장롱"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "책상",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-dbf6f9b372436a2d",
+          "official_name": "서랍장 협탁(책상,침대)"
+        },
+        {
+          "item_id": "YC-I-7da36bf012bdcedc",
+          "official_name": "책상"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "침대",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-dbf6f9b372436a2d",
+          "official_name": "서랍장 협탁(책상,침대)"
+        },
+        {
+          "item_id": "YC-I-dfe376dd565d6fa5",
+          "official_name": "침대"
+        },
+        {
+          "item_id": "YC-I-06c198fba4ca2299",
+          "official_name": "침대(돌,옥,황토 등)"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "협탁",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-dbf6f9b372436a2d",
+          "official_name": "서랍장 협탁(책상,침대)"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    },
+    {
+      "model_label": "화장대",
+      "suggested_catalog_candidates": [
+        {
+          "item_id": "YC-I-099479f10b39c130",
+          "official_name": "화장대"
+        }
+      ],
+      "confirmed_item_ids": [],
+      "review_status": "pending",
+      "note": "단어 포함으로 만든 검토 후보일 뿐 확정 매핑이 아님. 규격·수량은 사용자 확인."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "평가일": "2026-10-22",
+  "모델ID": "gemini-3.5-flash-lite",
+  "API추가횟수": 30,
+  "YOLO추가추론": 45,
+  "팀코드출처": "https://github.com/Han-think/greenzone_ai/tree/dev1_google_ai_studio_bad",
+  "팀코드커밋": "5d3759bd9d8f8869a6cc391f81a60f1fc3f37556",
+  "팀코드수정": false,
+  "DINO모델": "IDEA-Research/grounding-dino-tiny",
+  "DINO박스기준": 0.3,
+  "DINO텍스트기준": 0.25,
+  "원본과크롭전달": "탐지시 원본과 1위 탐지 크롭; 미탐지시 원본만",
+  "판정": "후보 없음/오류/정답판정 보류를 구분; 검토초안 별칭 일치는 독립 정확도가 아님",
+  "합성대조": "3장; 자연사진 비대상 벤치마크로 일반화 금지",
+  "환각자동심사": "미실행; 환각률 산출 불가",
+  "실제토큰수": "기존 팀 함수가 반환/저장하지 않아 미측정",
+  "script_sha256": {
+    "greenzone_prepare_extended.py": "35f34ea5d4e85e17bfdef606e89b5c94904bcfe6c36485a84cafd00cfabd232b",
+    "greenzone_run_extended.py": "6075a6e7e4e2d5a7e7b49745eb2cc0fb183145453543ab5e7edf3c93bda48ebd",
+    "greenzone_yolo_extended.py": "335e1ad227e83d757afc54535f965b086b9ef1a67272587d0e6f1c0314edefb3",
+    "greenzone_finalize_extended.py": "dd2b1835ac932410b718f1e40ffc0d7f884a9488ce228bad3b5ca0acebe29e70"
+  }
+}

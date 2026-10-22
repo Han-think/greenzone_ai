@@ -1,0 +1,82 @@
+{
+  "서비스실호출로그": 2,
+  "사진기록": false,
+  "환각자동평가": "미실행",
+  "traces": [
+    {
+      "id": "01a1623b-a4e4-7e19-b84b-d8273eb1c796",
+      "output": {
+        "상태": "candidates",
+        "후보": [
+          {
+            "item_id": "YC-I-c5f25de619857c9d",
+            "name": "소파(안락의자)",
+            "reason": "흰색 소파가 사진 중앙에 있습니다."
+          }
+        ]
+      },
+      "metadata": {
+        "모델": "gemini-3.5-flash-lite",
+        "관측처리시간_초": 4.858,
+        "토큰사용량": {
+          "promptTokenCount": 4532,
+          "candidatesTokenCount": 76,
+          "totalTokenCount": 4608,
+          "cachedContentTokenCount": 2518,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 3432
+            },
+            {
+              "modality": "IMAGE",
+              "tokenCount": 1100
+            }
+          ],
+          "cacheTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 1907
+            },
+            {
+              "modality": "IMAGE",
+              "tokenCount": 611
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "환각자동심사": "미실행",
+        "사용자최종선택": "이 로그에서 수집하지 않음"
+      }
+    },
+    {
+      "id": "01a1623a-e19b-756e-b390-189d79bf3e31",
+      "output": {
+        "상태": "abstained",
+        "후보": []
+      },
+      "metadata": {
+        "모델": "gemini-3.5-flash-lite",
+        "관측처리시간_초": 3.592,
+        "토큰사용량": {
+          "promptTokenCount": 4496,
+          "candidatesTokenCount": 9,
+          "totalTokenCount": 4505,
+          "promptTokensDetails": [
+            {
+              "modality": "IMAGE",
+              "tokenCount": 1064
+            },
+            {
+              "modality": "TEXT",
+              "tokenCount": 3432
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "환각자동심사": "미실행",
+        "사용자최종선택": "이 로그에서 수집하지 않음"
+      }
+    }
+  ]
+}

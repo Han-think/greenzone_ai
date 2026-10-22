@@ -165,10 +165,37 @@ function changeAnalysisPlan() {
     drawAnalysis(); fitAnalysis();
 }
 
+function showReportView(mode) {
+    // hidden은 선택하지 않은 지도 영역을 숨긴다. 지도 객체와 체크 값은 지우지 않는다.
+    var foliumSelected = mode === 'folium';
+    document.getElementById('leafletView').hidden = foliumSelected;
+    document.getElementById('foliumView').hidden = !foliumSelected;
+    document.getElementById('leafletMode').setAttribute('aria-pressed', String(!foliumSelected));
+    document.getElementById('foliumMode').setAttribute('aria-pressed', String(foliumSelected));
+    if (foliumSelected) {
+        // 처음 Folium을 선택할 때만 HTML 지도를 불러와 첫 화면의 불필요한 지도 생성을 줄인다.
+        var frame = document.getElementById('foliumMap');
+        if (!frame.getAttribute('src')) frame.src = frame.dataset.src;
+    } else if (analysisMap) {
+        // 숨겼던 Leaflet 지도는 표시 영역 크기를 다시 알려야 빈 지도처럼 보이지 않는다.
+        analysisMap.invalidateSize();
+        if (!analysisMap.reportShown) {
+            fitAnalysis();
+            analysisMap.reportShown = true;
+        }
+    }
+}
+
 async function initializeReport() {
     // 기존 API에서 같은 자료를 읽고, 체크와 지도 표시를 연결한다. 새 API 키는 쓰지 않는다.
     // 작은 화면에서는 필터를 접어 지도를 먼저 보여준다. 제목을 누르면 다시 펼쳐진다.
-    if (window.innerWidth < 760) document.querySelector('.filter-panel').open = false;
+    document.getElementById('leafletMode').onclick = function() { showReportView('leaflet'); };
+    document.getElementById('foliumMode').onclick = function() { showReportView('folium'); };
+    showReportView(document.getElementById('foliumView').hidden ? 'leaflet' : 'folium');
+    if (window.innerWidth < 760) {
+        var panels = document.querySelectorAll('.filter-panel');
+        for (var p = 0; p < panels.length; p++) panels[p].open = false;
+    }
     if (!window.L) {
         document.getElementById('analysisStatus').textContent = 'Leaflet 표시 도구를 불러오지 못했습니다. 인터넷 연결 후 새로고침하세요.';
         return;
@@ -198,6 +225,7 @@ async function initializeReport() {
         for (var j = 0; j < checks.length; j++) checks[j].onchange = drawAnalysis;
         document.getElementById('analysisFit').onclick = fitAnalysis;
         changeAnalysisPlan();
+        analysisMap.reportShown = !document.getElementById('leafletView').hidden;
     } catch (error) { document.getElementById('analysisStatus').textContent = error.message; }
 }
 

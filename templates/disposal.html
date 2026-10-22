@@ -9,31 +9,33 @@
 <nav class="app-nav" aria-label="메인메뉴">
     <h2>GreenZone</h2>
     <a class="nav-btn" href="/">주소 검색</a><a class="nav-btn" href="/?view=route">수거 경로안</a>
-    <a class="nav-btn" href="/analysis">Leaflet 보기</a><a class="nav-btn" href="/analysis/folium">Folium 보기</a>
+    <a class="nav-btn" href="/analysis">분석 지도</a>
     <a class="nav-btn active" href="/disposal" aria-current="page">사진·배출 안내</a><a class="nav-btn" href="/admin">관리자</a>
 </nav>
 <main class="service-page">
     <h1>사진을 확인하고 배출 안내 찾기</h1>
-    <p class="notice">양천구 신월1동 기준 · 자동 인식 API 연결 전 · 사진 없이 직접 선택도 가능합니다.</p>
+    <p class="notice">양천구 신월1동 기준 · 사진 없이 직접 선택할 수 있습니다. 지도 거점안은 대형폐기물의 공식 배출장소가 아닙니다.</p>
+    <p class="flow-note">사진(선택) → AI 후보 확인 → 사용자 최종 선택 → 공식 자료의 규격·수수료 조회</p>
     <div class="service-grid">
     <section class="card">
-        <h2>1. 사진 업로드</h2>
+        <h2>1. Gemini로 품목 후보 찾기</h2>
         <p>JPG·PNG·WebP 정지 사진 1장 · 8MB / 1,200만 화소 이하</p>
         <label for="photoFile">배출할 물건 사진</label><input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp">
         <img id="photoPreview" alt="선택한 사진 미리보기" hidden>
-        <button id="uploadPhoto" type="button">사진 업로드 확인</button><button id="clearPhoto" type="button">사진 지우기</button>
-        <p id="photoStatus" role="status">사진은 서버에서 형식을 확인한 뒤 저장하지 않습니다.</p>
-        <small>사진만으로 크기·수수료를 확정하지 않습니다. 자동 품목 인식은 API 연결 후 추가됩니다.</small>
+        <button id="uploadPhoto" type="button">AI 품목 후보 확인</button><button id="clearPhoto" type="button">사진 지우기</button>
+        <p id="photoStatus" role="status">버튼을 누르면 사진의 촬영정보를 제거하고 Google Gemini에 전송합니다. 서버에는 사진을 저장하지 않습니다.</p>
+        <div id="visionCandidates" aria-live="polite"></div>
+        <small>AI 후보는 참고용입니다. 사진만으로 품목·규격·수량·수수료를 확정하지 않습니다.</small>
     </section>
     <section class="card">
-        <h2>2. 품목·규격·수량 확인</h2>
+        <h2>2. 사용자가 최종 품목·규격·수량 선택</h2>
         <label for="itemQuery">품목명·별칭 검색</label>
         <form id="itemSearch"><input id="itemQuery" maxlength="100" placeholder="예: 소파, 장롱, 침대"><button>품목 찾기</button></form>
         <label for="itemSelect">공식 품목</label><select id="itemSelect"></select>
         <label for="ruleSelect">직접 확인한 규격</label><select id="ruleSelect"></select>
         <label for="itemQuantity">수량</label><input id="itemQuantity" type="number" min="1" max="100" value="1">
         <p id="itemStatus" role="status"></p><button id="getGuide" type="button">선택한 규격으로 안내 보기</button>
-        <div id="guideResult" aria-live="polite"></div>
+        <h3>3. 선택한 내용으로 배출 안내 확인</h3><div id="guideResult" aria-live="polite"></div>
     </section>
     </div>
     <section class="card"><h2>배출 안내·법령 근거</h2>

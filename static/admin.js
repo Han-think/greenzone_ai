@@ -1,3 +1,11 @@
+function historyValue(value) {
+    // 내부 저장 코드를 사용자에게 익숙한 말로 바꾼다.
+    if (value === true) return '사용';
+    if (value === false) return '사용 안 함';
+    var names = {review_needed: '추가 확인 필요', seed_snapshot: '기존 스냅샷', verified_excerpt: '원문 대조 완료'};
+    return names[value] || (value === null || value === undefined ? '미입력' : String(value));
+}
+
 // 로그인 → 자료 조회 → 원문 대조 후 저장 → 이전/새 값 이력 확인.
 var records = [];
 var currentRecord = null;
@@ -99,11 +107,25 @@ async function loadHistory(id) {
         if (!data.history.length) { box.textContent = '아직 수정 이력이 없습니다.'; return; }
         for (var i = 0; i < data.history.length; i++) {
             var row = data.history[i]; var detail = document.createElement('details');
-            detail.append(textElement('summary', row.changed_at + ' · ' + row.actor + ' · ' + row.reason));
-            detail.append(textElement('h3', '이전 값'));
-            var before = textElement('pre', JSON.stringify(JSON.parse(row.before_json), null, 2)); before.className = 'history-value'; detail.append(before);
-            detail.append(textElement('h3', '새 값'));
-            var after = textElement('pre', JSON.stringify(JSON.parse(row.after_json), null, 2)); after.className = 'history-value'; detail.append(after); box.append(detail);
+            detail.append(textElement('summary', new Date(row.changed_at).toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'}) + ' · ' + row.actor + ' · ' + row.reason));
+            // DB 원본은 그대로 두고 변경된 항목만 한국어 표로 보여준다.
+            var before = JSON.parse(row.before_json); var after = JSON.parse(row.after_json);
+            var labels = {specification: '규격', fee_krw: '수수료(원)', source_note: '금액 기준 설명',
+                title: '제목', text: '발췌 본문', source_url: '공식 출처', checked_at: '원문 확인일',
+                effective_from: '시행 시작일', effective_until: '시행 종료일', verification_status: '검토 상태', active: '사용 여부'};
+            var table = document.createElement('table'); table.className = 'history-table';
+            var header = document.createElement('tr');
+            ['항목', '이전 값', '새 값'].forEach(function(value) { header.append(textElement('th', value)); });
+            table.append(header);
+            Object.keys(labels).forEach(function(key) {
+                var previous = key === 'active' ? Boolean(before[key]) : before[key];
+                var next = key === 'active' ? Boolean(after[key]) : after[key];
+                if (JSON.stringify(previous) === JSON.stringify(next)) return;
+                var line = document.createElement('tr');
+                line.append(textElement('td', labels[key]), textElement('td', historyValue(previous)), textElement('td', historyValue(next)));
+                table.append(line);
+            });
+            detail.append(table); box.append(detail);
         }
     } catch (error) { if (request === historyRequest) box.textContent = error.message; }
 }

@@ -1,30 +1,12 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>그린존 · Folium 분석 보기</title>
-    <link rel="stylesheet" href="/static/nav.css">
-    <link rel="stylesheet" href="/static/analysis.css?v=20261021">
-</head>
-<body>
-<nav class="app-nav" aria-label="메인메뉴">
-    <h2>GreenZone</h2>
-    <a class="nav-btn" href="/">주소 검색</a>
-        <a id="navRouteBtn" class="nav-btn" href="/?view=route">수거 경로안</a>
-    <a class="nav-btn" href="/analysis">Leaflet 보기</a>
-    <a class="nav-btn active" href="/analysis/folium" aria-current="page">Folium 보기</a>
-    <a class="nav-btn" href="/disposal">사진·배출 안내</a>
-        <a class="nav-btn" href="/admin">관리자</a>
-</nav>
-
+<!-- analysis.html 안에서 사용하는 Folium 필터와 지도 영역이다. -->
     <div class="analysis-layout">
         <aside>
-            <h1>그린존 · Folium 분석 보기</h1><p>Python으로 만든 지도입니다. 오른쪽 위 체크박스로 자료를 겹쳐 보세요.</p>
+            <h2>Python 보고 지도 · Folium</h2><p>Python으로 만든 지도입니다. 오른쪽 위 체크박스로 자료를 겹쳐 보세요.</p>
             <details class="filter-panel" open>
                 <summary>Folium 지도 조건</summary>
                 <!-- GET은 선택한 값을 주소의 ?plan=...&min_width=...로 서버에 보낸다. -->
-                <form class="filter-content" action="/analysis/folium" method="get">
+                <form class="filter-content" action="/analysis" method="get">
+                    <input type="hidden" name="view" value="folium">
                     <label for="foliumPlan">비교할 거점안</label>
                     <select id="foliumPlan" name="plan">
                         <option value="nine" {% if plan =='nine'%}selected{%endif%}>기존 6곳 + 새 대안 3곳 = 9곳</option>
@@ -51,7 +33,7 @@
                     <li><b>마커·도로를 클릭</b>하면 이름과 받은 값을 확인합니다. 숫자는 생활권 번호입니다.</li>
                     <li><b>6곳/9곳·도로폭</b>은 왼쪽에서 고르고 조건 적용을 누릅니다.</li>
                 </ol>
-                <p>Leaflet 보기는 화면에서 바로 필터를 바꿉니다. Folium 보기는 Python 코드로 같은 자료의 HTML 지도를 만듭니다.</p>
+                <p>Python 분석 코드에서 만든 결과를 보고서처럼 살펴볼 때 사용합니다. 이 지도도 확대·팝업·자료 체크가 가능합니다.</p>
                 {% if plan == 'six' %}<p>6곳 비교에서는 9생활권 색면을 숨깁니다. 필지의 원래 담당 배정은 변경하지 않습니다.</p>{% endif %}
             </details>
             <details class="source-panel">
@@ -64,11 +46,9 @@
         </aside>
         <main>
             <!-- iframe은 서버에서 Folium으로 만든 실제 지도 HTML을 이 영역에 보여준다. -->
-            <iframe id="foliumMap" title="Folium 신월1동 분석 지도" src="/analysis/folium-map?plan={{ plan }}&amp;min_width={{ min_width }}"></iframe>
+            <iframe id="foliumMap" title="Folium 신월1동 분석 지도" data-src="/analysis/folium-map?plan={{ plan }}&amp;min_width={{ min_width }}"></iframe>
             {% include 'analysis_legend.html' %}
             <p class="folium-status">준비한 자료 · 거점안 {{ hub_count }}곳 · 도로 {{ road_count }}구간 · 주거 필지 {{ parcel_count }}곳 (체크하면 표시)</p>
             <small class="folium-status">배경: OpenStreetMap · 거점은 운영 승인 전 분석 제안 · 지도 배경·도구 로딩에 인터넷 필요</small>
         </main>
     </div>
-</body>
-</html>

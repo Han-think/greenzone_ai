@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>그린존 · Leaflet 분석 보기</title>
+    <title>그린존 · 분석 지도</title>
     <!-- 팀이 받은 분석 HTML과 같은 Leaflet 버전. 지도 표시용이며 분석 알고리즘은 아니다. -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="/static/nav.css">
-    <link rel="stylesheet" href="/static/analysis.css?v=20261021">
+    <link rel="stylesheet" href="/static/analysis.css?v=20261021-unified">
     <link rel="stylesheet" href="/static/analysis_map.css?v=20261021">
 </head>
 <body>
@@ -15,22 +15,50 @@
         <h2>GreenZone</h2>
         <a class="nav-btn" href="/">주소 검색</a>
         <a id="navRouteBtn" class="nav-btn" href="/?view=route">수거 경로안</a>
-        <a class="nav-btn active" href="/analysis" aria-current="page">Leaflet 보기</a>
-        <a class="nav-btn" href="/analysis/folium">Folium 보기</a>
+        <a class="nav-btn active" href="/analysis" aria-current="page">분석 지도</a>
         <a class="nav-btn" href="/disposal">사진·배출 안내</a>
         <a class="nav-btn" href="/admin">관리자</a>
 </nav>
 
+    <section class="report-intro" aria-labelledby="reportTitle">
+        <h1 id="reportTitle">같은 신월1동 자료, 두 가지 보기</h1>
+        <p>필터로 비교할 때는 Leaflet, Python 분석 결과를 보고 지도로 살펴볼 때는 Folium을 선택하세요.</p>
+        <div class="report-modes" role="group" aria-label="분석 지도 보기 선택">
+            <button id="leafletMode" type="button" aria-controls="leafletView" aria-pressed="{{ 'true' if view == 'leaflet' else 'false' }}">
+                <strong>필터로 탐색 · Leaflet</strong>
+                <span>생활권·후보·도로를 체크 → 지도에 바로 반영</span>
+            </button>
+            <button id="foliumMode" type="button" aria-controls="foliumView" aria-pressed="{{ 'true' if view == 'folium' else 'false' }}">
+                <strong>Python 보고 지도 · Folium</strong>
+                <span>거점안·도로폭 선택 → 조건 적용 → 보고 지도 확인</span>
+            </button>
+        </div>
+        <p class="report-relationship"><b>왜 함께 쓰나요?</b> 웹에서 조건을 살펴보는 용도와 Python 분석 결과를 전달하는 용도를 함께 보여줍니다.
+            Folium도 Leaflet 위에서 작동하므로 같은 자료를 두 방식으로 표현합니다. 두 지도를 모두 써야 분석이 완성되는 것은 아닙니다.</p>
+        <details class="report-explanation">
+            <summary>이 페이지에서 가능한 일과 두 도구의 차이</summary>
+            <ul>
+                <li><b>Leaflet:</b> 생활권 하나를 고르고 여러 자료를 즉시 켜고 끄며 위치 관계를 탐색합니다.</li>
+                <li><b>Folium:</b> Python이 선택 조건을 넣은 HTML 지도를 만듭니다. 지도 안의 체크·확대·팝업도 사용할 수 있습니다.</li>
+                <li><b>공통:</b> 같은 팀 분석 자료와 색·범례를 씁니다. 현재 두 보기의 필터는 별도로 유지되며 자동 동기화하지 않습니다.</li>
+                <li>도로폭 필터는 도로선 표시 조건입니다. 후보 재선정이나 수거 경로 계산은 실행하지 않습니다.</li>
+            </ul>
+            <p>도구 설명: <a href="https://leafletjs.com/" target="_blank" rel="noopener">Leaflet 공식 안내</a> ·
+                <a href="https://python-visualization.github.io/folium/latest/" target="_blank" rel="noopener">Folium 공식 안내</a></p>
+        </details>
+        <noscript>보기 전환에는 JavaScript가 필요합니다. <a href="/analysis?view=leaflet">Leaflet 보기</a> · <a href="/analysis?view=folium">Folium 보기</a></noscript>
+    </section>
+    <section id="leafletView" aria-label="Leaflet 필터 탐색" {% if view == 'folium' %}hidden{% endif %}>
     <div class="analysis-layout">
         <aside>
-            <h1>그린존 · Leaflet 분석 보기</h1><p>분석 필터를 펼쳐 체크하고, 지도 마커·도로를 눌러보세요.</p>
+            <h2>필터로 탐색 · Leaflet</h2><p>분석 필터를 펼쳐 체크하고, 지도 마커·도로를 눌러보세요.</p>
             <details class="filter-panel" open>
                 <summary>분석 필터 · 체크하면 지도에 바로 반영</summary>
                 <div class="filter-content">
                     <label for="analysisPlan">비교할 거점안</label>
                     <select id="analysisPlan">
-                        <option value="nine">기존 6곳 + 새 대안 3곳 = 9곳</option>
-                        <option value="six">기존 후보 중 6곳만</option>
+                        <option value="nine" {% if plan == 'nine' %}selected{% endif %}>기존 6곳 + 새 대안 3곳 = 9곳</option>
+                        <option value="six" {% if plan == 'six' %}selected{% endif %}>기존 후보 중 6곳만</option>
                     </select>
                     <div class="metrics" aria-live="polite">
                         <div><span>평균 도로망 거리</span><strong id="analysisMean">—</strong></div>
@@ -51,8 +79,8 @@
                     </fieldset>
                     <label for="analysisWidth">표시할 도로의 등록폭</label>
                     <select id="analysisWidth">
-                        <option value="7">등록폭 7m 이상</option>
-                        <option value="0">전체 도로 · 좁은 도로 포함</option>
+                        <option value="7" {% if min_width == 7 %}selected{% endif %}>등록폭 7m 이상</option>
+                        <option value="0" {% if min_width == 0 %}selected{% endif %}>전체 도로 · 좁은 도로 포함</option>
                     </select>
                     <small id="analysisNote">도로폭은 도로선의 표시 조건입니다. 거점 위치를 다시 선정하지 않습니다.</small>
                     <button id="analysisFit" type="button">선택 범위 전체 보기</button>
@@ -66,7 +94,7 @@
                     <li><b>마커·도로를 클릭</b>하면 이름과 받은 분석 값을 확인합니다.</li>
                 </ol>
                 <p>숫자는 생활권 번호입니다. 6곳 비교에서는 기존 9생활권 색면을 숨깁니다.</p>
-                <p>Leaflet 보기는 화면에서 바로 필터를 바꿉니다. 위쪽 Folium 보기를 누르면 Python으로 만든 같은 자료의 HTML 지도를 볼 수 있습니다.</p>
+                <p>위쪽 보기 버튼으로 같은 페이지에서 Folium 보고 지도로 전환할 수 있습니다. 돌아오면 현재 체크와 지도 범위를 유지합니다.</p>
             </details>
             <details class="source-panel">
                 <summary>출처와 해석 범위</summary>
@@ -83,8 +111,12 @@
             <small id="backgroundStatus" role="status">배경: OpenStreetMap · 거점은 운영 승인 전 분석 제안</small>
         </main>
     </div>
+    </section>
+    <section id="foliumView" aria-label="Folium Python 보고 지도" {% if view != 'folium' %}hidden{% endif %}>
+        {% include 'analysis_folium.html' %}
+    </section>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script id="analysisColors" type="application/json">{{ zone_colors | tojson }}</script>
-    <script src="/static/analysis.js?v=20261021"></script>
+    <script src="/static/analysis.js?v=20261021-unified"></script>
 </body>
 </html>

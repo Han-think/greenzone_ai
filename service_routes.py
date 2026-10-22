@@ -1,4 +1,5 @@
 """사진 업로드·배출 안내·관리자 URL. main.py의 기존 지도 URL은 유지한다."""
+import asyncio
 import io
 import json
 import os
@@ -13,6 +14,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 import guide_service as guide
+import vision_service
 
 router = APIRouter()
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / 'templates')
@@ -81,7 +83,7 @@ def admin_page(request: Request):
 @router.post('/api/vision')
 async def upload_image(request: Request):
     # 파일은 raw 바이트로 받아 multipart 패키지 없이 실제 이미지를 확인한다.
-    # API 미확정 상태에서 인식 결과나 확률을 꾸며내지 않는다. 사진은 저장하지 않는다.
+    # 사진은 저장하지 않는다. API는 후보만 주며 공식 품목은 사람이 고른다.
     raw = await read_limited_body(request, 8 * 1024 * 1024)
     if not raw:
         raise HTTPException(422, '사진을 선택하세요.')
@@ -104,9 +106,27 @@ async def upload_image(request: Request):
                 image.load()
     except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError, Image.DecompressionBombWarning):
         raise HTTPException(422, '사진을 읽지 못했습니다. 다른 사진을 선택하세요.')
-    return {'status': 'manual_confirmation_required', 'width': width, 'height': height,
-            'candidates': [], 'stored': False, 'provider_called': False,
-            'message': '사진 업로드 확인 완료. 자동 인식 API 연결 전이므로 아래에서 품목·규격·수량을 직접 확인하세요.'}
+    result = {'status': 'manual_confirmation_required', 'width': width, 'height': height,
+              'candidates': [], 'stored': False, 'provider_called': False}
+    if vision_service.settings() is None:
+        result['state'] = 'not_configured'
+        result['message'] = 'Gemini 설정 전입니다. 아래에서 직접 품목을 선택하세요.'
+        return result
+    try:
+        # 별도 작업으로 호출해 사진을 분석하는 동안 지도·검색 요청을 막지 않는다.
+        analysis = await asyncio.to_thread(vision_service.suggest, raw, guide.list_items())
+        result.update(analysis)
+        result['provider_called'] = True
+    except (OSError, ValueError, TypeError, KeyError):
+        result['state'] = 'error'
+        result['provider_called'] = True
+        result['message'] = '사진 분석에 연결하지 못했습니다. 아래에서 직접 품목을 선택하세요.'
+        return result
+    if result['state'] == 'candidates':
+        result['message'] = 'Gemini가 제안한 후보입니다. 맞는 품목을 선택하고 규격·수량을 확인하세요.'
+    elif result['state'] == 'abstained':
+        result['message'] = '확실한 후보가 없어 보류했습니다. 다른 사진을 쓰거나 직접 품목을 선택하세요.'
+    return result
 
 
 @router.get('/api/disposal/items')

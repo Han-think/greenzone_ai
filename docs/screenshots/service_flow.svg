@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="300" viewBox="0 0 1000 300" role="img" aria-label="사진 후보와 사용자 확인, 관리자 자료 반영 흐름">
+<rect width="1000" height="300" rx="16" fill="#f4f8f5"/>
+<g font-family="Malgun Gothic, sans-serif" fill="#234737">
+<text x="30" y="38" font-size="22" font-weight="bold">그린존 · 사진은 후보만, 최종 선택은 사용자</text>
+<g font-size="18" text-anchor="middle">
+<rect x="30" y="65" width="200" height="84" rx="10" fill="#e0ece6" stroke="#87aa99"/><text x="130" y="98">① 사진 업로드</text><text x="130" y="126" font-size="14">촬영정보 제거 · 서버 비저장</text>
+<rect x="270" y="65" width="200" height="84" rx="10" fill="#d7e9ef" stroke="#83a8b5"/><text x="370" y="98">② Gemini 후보</text><text x="370" y="126" font-size="14">후보 또는 보류 · 자동 확정 안 함</text>
+<rect x="510" y="65" width="200" height="84" rx="10" fill="#f5ecd8" stroke="#c3ae78"/><text x="610" y="98">③ 사용자 최종 선택</text><text x="610" y="126" font-size="14">품목 · 규격 · 수량 직접 확인</text>
+<rect x="750" y="65" width="220" height="84" rx="10" fill="#e0ece6" stroke="#87aa99"/><text x="860" y="98">④ 공식 DB 조회</text><text x="860" y="126" font-size="14">참고 금액 · 출처 · 공식 신청 링크</text>
+<text x="250" y="112" font-size="27">→</text><text x="490" y="112" font-size="27">→</text><text x="730" y="112" font-size="27">→</text>
+</g>
+<rect x="30" y="175" width="940" height="90" rx="10" fill="white" stroke="#b8cfc1"/>
+<text x="50" y="205" font-size="17" font-weight="bold">관리자: 로그인 → 공식 원문 대조 → 수정 → 사유·이력 저장</text>
+<text x="50" y="234" font-size="15">다음 사용자 조회에 반영 · 원본 JSON 보존 · 이전/새 값과 사유 기록</text>
+<text x="50" y="254" font-size="13" fill="#5d7166">Opik: 사진 없이 후보·보류·시간 기록 · 신고와 최종 금액은 공식 사이트 확인</text>
+</g></svg>

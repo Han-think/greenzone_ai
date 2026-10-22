@@ -16,6 +16,8 @@ button:disabled { opacity: .5; cursor: wait; }
 a { color: #176d59; overflow-wrap: anywhere; }
 small { display: block; color: #617569; }
 #photoPreview { display: block; max-width: 100%; max-height: 280px; margin: 12px auto; object-fit: contain; }
+#visionCandidates { margin: 10px 0; }
+.candidate-button { background: #e6f2ec; color: #176047; border-color: #91c6a9; }
 #guideResult { border-top: 1px solid #d5e2d8; margin-top: 14px; padding-top: 8px; }
 details { margin: 10px 0; padding: 10px; border: 1px solid #d5e2d8; border-radius: 6px; }
 summary { cursor: pointer; font-weight: bold; }
@@ -24,3 +26,12 @@ summary { cursor: pointer; font-weight: bold; }
 .inline-check { display: flex; gap: 8px; align-items: center; }
 :focus-visible { outline: 3px solid #80aebd; outline-offset: 2px; }
 @media(max-width: 760px) { body { padding-left: 0; } .service-page { padding: 14px; } .service-grid { grid-template-columns: 1fr; } }
+
+/* 후보는 확정 결과와 구분한다. 사용자 선택 후에만 공식 금액을 조회한다. */
+.flow-note { padding: 12px 16px; border: 1px solid #b8d4c3; border-radius: 8px; background: #fff; font-weight: bold; }
+.candidate-card { margin: 10px 0; padding: 10px; border: 1px solid #c5d9cd; border-radius: 8px; background: #f6faf7; }
+#photoStatus[data-state="error"] { color: #9b3d27; }
+#photoStatus[data-state="abstained"] { color: #735621; }
+.history-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.history-table th,.history-table td { text-align: left; padding: 8px; border: 1px solid #d5e2d8; overflow-wrap: anywhere; white-space: pre-wrap; }
+.history-table th { background: #eaf2ec; }

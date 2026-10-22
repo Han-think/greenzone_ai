@@ -1,0 +1,20 @@
+{
+  "purpose": "future_adapter_contract_example_not_live_api_response",
+  "sample_id": null,
+  "status": "not_run",
+  "model_provider": null,
+  "model_id": null,
+  "items": [],
+  "item_fields_after_analysis": {
+    "model_label": "모델이 제시한 품목명",
+    "estimated_quantity": "추정 정수 또는 null",
+    "candidate_item_ids": "검토한 공식 품목 ID 목록",
+    "uncertainty": "식별이 어려운 이유 또는 수동 확인 필요 내용"
+  },
+  "user_confirmation": {
+    "item_id": null,
+    "rule_id": null,
+    "quantity": null
+  },
+  "note": "모델 점수를 검증된 정확도로 표시하지 않음. 공식 규격·금액은 DB 조회로 결정."
+}

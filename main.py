@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
@@ -132,11 +132,25 @@ def home(request: Request):
     )
 
 
-# /analysis로 접속하면 아래 함수를 실행한다. 받은 팀 자료를 체크해 보는 별도 화면이다.
+# @app.get은 분석 지도 페이지의 주소를 등록한다. 두 지도는 같은 페이지 안에서 전환한다.
 @app.get('/analysis')
-def analysis_view(request: Request):
-    # Leaflet 화면 틀만 보낸다. 데이터는 기존 /api/map-data를 함께 사용한다.
-    return templates.TemplateResponse(request=request, name='analysis.html', context={'zone_colors': ZONE_COLORS})
+def analysis_view(request: Request, view: str = 'leaflet', plan: str = 'nine', min_width: int = 7):
+    # 기존 팀 비교표를 읽는다. 표시 조건을 바꾸어도 분석 결과를 새로 계산하지 않는다.
+    check_report_options(plan, min_width)
+    if view not in ['leaflet', 'folium']:
+        raise HTTPException(status_code=422, detail='지도 보기 방식을 확인하세요.')
+    result = summary['comparisons'][1]
+    if plan == 'six':
+        result = summary['comparisons'][2]
+    road_count = 0
+    for feature in roads['features']:
+        if float(feature['properties']['도로폭_m']) >= min_width:
+            road_count += 1
+    return templates.TemplateResponse(request=request, name='analysis.html', context={
+        'view': view, 'plan': plan, 'min_width': min_width, 'zone_colors': ZONE_COLORS,
+        'mean': round(result['mean_m'], 1), 'coverage': round(result['coverage_300'] * 100, 1),
+        'hub_count': result['hub_count'], 'road_count': road_count, 'parcel_count': len(buildings)})
+
 
 
 def check_report_options(plan, min_width):
@@ -145,22 +159,11 @@ def check_report_options(plan, min_width):
         raise HTTPException(status_code=422, detail='거점안과 도로 등록폭 조건을 확인하세요.')
 
 
-# 이 @app.get은 Folium 보고서의 설명·조건 선택 화면을 여는 주소를 등록한다.
+# 예전 Folium 주소도 통합 페이지의 Folium 보기로 연결한다. 기존 공유 링크를 유지한다.
 @app.get('/analysis/folium')
-def folium_view(request: Request, plan: str = 'nine', min_width: int = 7):
-    # 비교 수치는 Leaflet과 같은 받은 엑셀 행을 쓴다. 필터로 다시 계산하지 않는다.
+def folium_view(plan: str = 'nine', min_width: int = 7):
     check_report_options(plan, min_width)
-    result = summary['comparisons'][1]
-    if plan == 'six':
-        result = summary['comparisons'][2]
-    road_count = 0
-    for feature in roads['features']:
-        if float(feature['properties']['도로폭_m']) >= min_width:
-            road_count += 1
-    return templates.TemplateResponse(request=request, name='analysis_folium.html', context={
-        'plan': plan, 'min_width': min_width, 'zone_colors': ZONE_COLORS, 'mean': round(result['mean_m'], 1),
-        'coverage': round(result['coverage_300'] * 100, 1),
-        'hub_count': result['hub_count'], 'road_count': road_count, 'parcel_count': len(buildings)})
+    return RedirectResponse(url='/analysis?view=folium&plan=' + plan + '&min_width=' + str(min_width), status_code=307)
 
 
 # 이 @app.get은 위 화면의 iframe 안에 넣을 Folium 지도 HTML을 돌려주는 주소다.
