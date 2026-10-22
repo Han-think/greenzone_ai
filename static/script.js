@@ -8,6 +8,7 @@ var wasteLoaded = false;
 
 // 팀의 탭을 전환한다. 검색 결과와 후보 선택 상태는 그대로 남긴다.
 function showPanel(panel) {
+    setSidebarCollapsed(false);
     var isSearch = panel === 'search';
     if (!isSearch) mapAddressRequest += 1;
     document.getElementById('tabContentSearch').hidden = !isSearch;
@@ -17,6 +18,25 @@ function showPanel(panel) {
     document.getElementById('tabSearchBtn').setAttribute('aria-pressed', String(isSearch));
     document.getElementById('tabDataBtn').setAttribute('aria-pressed', String(!isSearch));
     document.querySelector('.sidebar-content').scrollTop = 0;
+}
+
+function setSidebarCollapsed(collapsed) {
+    var sidebar = document.getElementById('sidebarPanel');
+    var button = document.getElementById('sidebarToggle');
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+    sidebar.inert = collapsed;
+    button.setAttribute('aria-expanded', String(!collapsed));
+    button.setAttribute('aria-label', collapsed
+        ? '주소 검색·후보지 창 펼치기'
+        : '주소 검색·후보지 창 접기');
+    button.textContent = collapsed ? '›' : '‹';
+    window.setTimeout(function() {
+        if (map) {
+            var center = map.getCenter();
+            map.relayout();
+            map.setCenter(center);
+        }
+    }, 240);
 }
 
 // 요소를 만들고 textContent로 글자를 넣는다. HTML 문자열로 사용자 입력을 해석하지 않는다.
@@ -206,6 +226,9 @@ async function loadWaste() {
     } catch (error) { box.textContent = error.message; }
 }
 document.addEventListener('DOMContentLoaded', async function() {
+    document.getElementById('sidebarToggle').onclick = function() {
+        setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+    };
     document.getElementById('tabSearchBtn').onclick = function() { showPanel('search'); };
     document.getElementById('tabDataBtn').onclick = function() { showPanel('data'); };
     document.getElementById('searchForm').onsubmit = searchBuildings;

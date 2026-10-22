@@ -5,7 +5,7 @@
 
 body {
     margin: 0;
-    padding-left: 190px;
+    padding-left: var(--app-nav-width);
     font: 14px/1.6 'Malgun Gothic', sans-serif;
     color: #293e34;
     background: #fafcfb;

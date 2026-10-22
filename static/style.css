@@ -14,12 +14,12 @@ body {
     display: flex;
     height: 100vh;
     overflow: hidden;
-    padding-left: 190px;
+    padding-left: var(--app-nav-width);
 }
 
 aside {
-    width:385px;
-    min-width:385px;
+    width:var(--sidebar-width, 385px);
+    min-width:var(--sidebar-width, 385px);
     flex-shrink:0;
     padding:18px;
     overflow:hidden;
@@ -27,6 +27,40 @@ aside {
     flex-direction:column;
     background:#fafcfb;
     border-right:1px solid #d8e2dc;
+    transition: width .22s ease, min-width .22s ease, padding .22s ease;
+}
+
+body.sidebar-collapsed aside {
+    width:0;
+    min-width:0;
+    padding-left:0;
+    padding-right:0;
+    border-right:0;
+}
+
+.sidebar-toggle {
+    position:fixed;
+    z-index:110;
+    top:50%;
+    left:calc(var(--app-nav-width) + var(--sidebar-width, 385px));
+    transform:translate(-50%, -50%);
+    width:26px;
+    height:56px;
+    padding:0;
+    border:1px solid #c4d2ca;
+    border-radius:0 8px 8px 0;
+    background:#fafcfb;
+    color:#245b40;
+    font-size:24px;
+    line-height:1;
+    box-shadow:1px 1px 5px #0002;
+    transition:left .22s ease;
+}
+body.sidebar-collapsed .sidebar-toggle {
+    left:var(--app-nav-width);
+}
+body.sidebar-collapsed aside > * {
+    visibility:hidden;
 }
 
 
@@ -229,12 +263,9 @@ a {
     aside {
         width:100%;
         min-width:0;
-        height:49%;
         flex-shrink:0;
         padding:12px 16px;
-    }
-    main {
-        min-height:200px;
+        transition: height .22s ease, max-height .22s ease, padding .22s ease;
     }
     header {
         margin-bottom:14px;
@@ -303,9 +334,67 @@ a {
 .route-panel summary { color: #88421e; font-weight: bold; }
 .route-steps { font-size: 12px; color: #88421e; }
 @media(max-width:760px) {
-    body { height: auto; min-height: 100vh; overflow: auto; }
-    aside { height: auto; max-height: 60vh; }
-    main { flex: none; height: 55vh; }
+    body {
+        height:100vh;
+        height:100dvh;
+        min-height:0;
+        overflow:hidden;
+    }
+    aside {
+        height:auto;
+        max-height:55vh;
+        max-height:55dvh;
+        min-height:0;
+        flex:0 1 auto;
+        overflow:hidden;
+    }
+    body.sidebar-collapsed aside {
+        height:0;
+        max-height:0;
+        flex-basis:0;
+        padding-top:0;
+        padding-bottom:0;
+        border:0;
+    }
+    body.sidebar-collapsed aside > * {
+        visibility:hidden;
+    }
+    .sidebar-toggle,
+    body.sidebar-collapsed .sidebar-toggle {
+        position:relative;
+        top:auto;
+        left:auto;
+        align-self:center;
+        flex:none;
+        width:52px;
+        height:28px;
+        margin:-14px 0;
+        transform:rotate(90deg);
+        border-radius:8px;
+        box-shadow:0 1px 5px #0002;
+    }
+    main {
+        flex:1 1 0;
+        height:auto;
+        min-height:0;
+    }
+    #map {
+        min-height:0;
+    }
+}
+@media(max-width:500px) {
+    .app-nav {
+        gap:3px;
+        padding:8px 6px;
+    }
+    .app-nav h2 {
+        font-size:16px;
+    }
+    .app-nav .nav-btn {
+        min-width:0;
+        padding:7px 3px;
+        font-size:10px;
+    }
 }
 
 /* 직접 순서 지정은 번호 선택만 사용해 드래그 없이 키보드로도 조정한다. */

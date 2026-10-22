@@ -1,7 +1,7 @@
 /* 새 배출/관리자 화면만 사용하는 스타일. 기존 지도 스타일과 섞지 않는다. */
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body { margin: 0; padding-left: 190px; color: #293e34; background: #f5f8f6; font: 15px/1.6 'Malgun Gothic', sans-serif; }
+body { margin: 0; padding-left: var(--app-nav-width); color: #293e34; background: #f5f8f6; font: 15px/1.6 'Malgun Gothic', sans-serif; }
 .service-page { max-width: 1180px; margin: auto; padding: 24px; }
 h1 { font-size: 25px; } h2 { font-size: 19px; margin-top: 0; }
 .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }

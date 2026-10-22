@@ -1,14 +1,17 @@
 /* 팀의 app-nav/nav-btn HTML을 세 화면이 함께 사용한다. */
+:root {
+    --app-nav-width: 148px;
+}
 .app-nav {
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
-    width: 190px;
-    padding: 22px 14px;
+    width: var(--app-nav-width);
+    padding: 18px 10px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     overflow-y: auto;
     background: #f1f6f2;
     border-right: 1px solid #d5e2d8;
@@ -16,17 +19,17 @@
 }
 .app-nav h2 {
     margin: 0 0 14px;
-    font-size: 21px;
+    font-size: 18px;
     color: #245b40;
 }
 .app-nav .nav-btn {
     display: block;
-    padding: 11px 12px;
+    padding: 9px 8px;
     border: 1px solid transparent;
     border-radius: 7px;
     color: #355341;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 12px;
 }
 .app-nav .nav-btn:hover { background: #e0ece3; }
 .app-nav .nav-btn.active { background: #267555; color: white; }
