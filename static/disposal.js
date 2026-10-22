@@ -87,7 +87,7 @@ async function uploadPhoto() {
     var version = photoRevision;
     var button = document.getElementById('uploadPhoto');
     button.disabled = true;
-    status.textContent = '사진 형식을 확인하고 설정된 경우 Gemini에 품목 후보를 요청하고 있습니다.';
+    status.textContent = '사진 확인 후 Grounding DINO 사전 탐지와 Gemini 품목 확인을 진행하고 있습니다.';
     try {
         var data = await readResponse(await fetch('/api/vision', {method: 'POST', body: file,
             headers: {'Content-Type': file.type || 'application/octet-stream'}}));

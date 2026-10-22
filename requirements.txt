@@ -8,5 +8,10 @@ jinja2
 # Python에서 분석 보고용 HTML 지도를 만드는 도구
 folium==0.20.0
 
-# 업로드 사진의 실제 형식·픽셀을 확인한다. 자동 인식 모델은 아님
+# 업로드 사진 검증과 Grounding DINO crop 처리
 Pillow>=12.3.0,<14
+
+# 사진 품목 후보를 찾는 Grounding DINO 사전 분류
+torch>=2.6,<3
+torchvision>=0.21,<1
+transformers>=4.51,<5

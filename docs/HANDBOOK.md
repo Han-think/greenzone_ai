@@ -423,17 +423,18 @@ LLM·임베딩 API가 없을 때도 수동 품목 선택과 구조화 DB 조회�
 | 항목 | 이번 반영 | 남은 확인 |
 |---|---|---|
 | 수거 경로안 | 지도 상단/공통 메뉴 전용 버튼 → 후보 탭과 경로 폼 펼침 | 경로 계산 방식과 원본은 유지. 실제 화면 확인 전 |
-| REQ-F-003 | `/disposal`에서 사진 실제 전송/형식 확인·미리보기 삭제, 공식 품목·규격·수량 수정, DB 금액·공식 신청 링크 | Vision 결과 후보와의 연결, 실사진 업로드 확인 |
+| REQ-F-003 | `/disposal`에서 사진 검증, Grounding DINO 탐지 영역 crop + 원본을 Gemini에 전달, 공식 품목·규격·수량 수동 확인 | 실사진 업로드와 탐지 품질·지연 확인 |
 | 품목 DB | 91품목/268규칙을 SQLite에 초기 적재. 별칭 검색, 선택 규격 금액×수량 | 공식표 최신 금액 전수 대조. 참고값 표시 유지 |
 | 법령 | 공식 조문 4건 + 현재 배출 절차 요약 1건, 확인일·시행일·법규 식별자·원문 해시 | 별표 상세 추출·금액 대조, 신월1동 상세 요일 |
 | 관리자 | 계정 로그인/로그아웃, 자료 조회·수정·사유·이전/새 값 이력, 수정 충돌 방지 | 실제 로그인/저장/사용자 반영 확인 |
-| REQ-AI-003 | `/api/vision`이 파일 검증 후 수동 확인 상태를 반환 | 외부 이미지 API/모델 선택·분류 연결. 인식 결과를 생성하지 않음 |
+| REQ-AI-003 | `/api/vision`이 Grounding DINO로 사전 탐지한 뒤 Gemini가 원본과 최고 점수 crop을 확인해 등록 품목 후보 반환 | 실제 사진 평가, 임계값 및 메모리/지연 측정 |
 | REQ-AI-004 | 확인한 문서의 DB 조회·출처 표시 | 임베딩·문서 검색·LLM/Opik은 미구현. 현재는 RAG라고 부르지 않음 |
 
 ### 읽을 코드 순서
 
 - `templates/index.html → static/route.js`: 경로 바로가기/거점 선택. 기존 `/api/route`와 `route_planner.py`는 유지.
 - `templates/disposal.html → static/disposal.js → service_routes.py`: 사진 요청과 품목/규격/수량 확정.
+- `model/dino.py`: `model/dino_classes.txt`의 클래스 목록으로 Grounding DINO를 지연 로드하고, NMS 후 점수 상위 탐지를 반환. `service_routes.py`는 상위 1개 crop과 원본을 Gemini에 전달하며, 탐지가 없으면 원본만 보냄.
 - `guide_service.py`: JSON 초기 자료 → SQLite 행 조회 → 선택 규격 수수료 계산. 원본은 보존.
 - `templates/admin.html → static/admin.js → service_routes.py → guide_service.py`: 로그인·수정/이력.
 - `main.py`는 `app.include_router`로 새 URL만 연결. 새 함수/데코레이터에 흐름 주석을 붙임.
@@ -480,7 +481,7 @@ LLM·임베딩 API가 없을 때도 수동 품목 선택과 구조화 DB 조회�
 3. 관리자 로그인 → 한 규칙의 사유 있는 수정 → 이력 이전/새 값 → 사용자 재조회로 반영 확인.
 4. 미로그인 관리자 요청·미지원/과대 사진·잘못된 수량 처리 확인.
 
-이번 작업은 코드/자료 반영까지이며 자동 테스트·서버 실행·브라우저 동작 확인은 수행하지 않았습니다. Vision API/LLM 호출도 없습니다.
+Grounding DINO와 Gemini는 사진 업로드 시 호출됩니다. 입력 사진은 서버 파일로 저장하지 않습니다. 모델 가중치는 첫 DINO 실행 때 Hugging Face에서 다운로드되므로 인터넷과 충분한 메모리가 필요합니다. 실제 사진별 정확도·지연은 별도 검증이 필요합니다.
 
 
 ### 수거 경로의 직접 방문 순서
