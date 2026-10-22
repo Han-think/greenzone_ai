@@ -1,0 +1,23 @@
+{
+"type": "FeatureCollection",
+"name": "greenzone1st_layer_protection_facilities",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "파랑새어린이집", "시설종류": "어린이집", "주소": "서울특별시 양천구 신월7동 965-1" }, "geometry": { "type": "Point", "coordinates": [ 126.835885, 37.522106 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "신월이화어린이집", "시설종류": "어린이집", "주소": "서울특별시 양천구 신월동 911-3" }, "geometry": { "type": "Point", "coordinates": [ 126.830175, 37.52243922 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "푸르미어린이집", "시설종류": "어린이집", "주소": "서울특별시 양천구 신월4동 419-7" }, "geometry": { "type": "Point", "coordinates": [ 126.837462, 37.523505 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "우리또래어린이집", "시설종류": "어린이집", "주소": "서울특별시 양천구 신월7동 932-7" }, "geometry": { "type": "Point", "coordinates": [ 126.832355, 37.521907 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "곰달래어린이집", "시설종류": "어린이집", "주소": "서울특별시 양천구 신월1동 217-1" }, "geometry": { "type": "Point", "coordinates": [ 126.834015, 37.527705 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "서울SOS어린이집", "시설종류": "어린이집", "주소": "서울특별시 양천구 신월3동 149-6" }, "geometry": { "type": "Point", "coordinates": [ 126.824872, 37.531678 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "파란들어린이집", "시설종류": "어린이집", "주소": "서울특별시 양천구 신월3동 48-12" }, "geometry": { "type": "Point", "coordinates": [ 126.825367, 37.535612 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "신강초교", "시설종류": "초등학교", "주소": "서울특별시 양천구 신월2동 448-5" }, "geometry": { "type": "Point", "coordinates": [ 126.841556, 37.525717 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "양원초교", "시설종류": "초등학교", "주소": "서울특별시 양천구 신월3동 40-1" }, "geometry": { "type": "Point", "coordinates": [ 126.823106, 37.538217 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "신원초교", "시설종류": "초등학교", "주소": "서울특별시 양천구 신월3동 204" }, "geometry": { "type": "Point", "coordinates": [ 126.829864, 37.529559 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "강서초교", "시설종류": "초등학교", "주소": "서울특별시 양천구 신월4동 441" }, "geometry": { "type": "Point", "coordinates": [ 126.840913, 37.522413 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "구립새하늘어린이집", "시설종류": "어린이집", "주소": "서울특별시 강서구 강서로17다길 15-14(화곡동)" }, "geometry": { "type": "Point", "coordinates": [ 126.841415500000011, 37.53330739 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "배다리어린이집", "시설종류": "어린이집", "주소": "서울특별시 강서구 곰달래로15길 25(화곡동)" }, "geometry": { "type": "Point", "coordinates": [ 126.8395428, 37.53127824 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "월정초등학교", "시설종류": "초등학교", "주소": "서울특별시 강서구 월정로 176 (화곡동)" }, "geometry": { "type": "Point", "coordinates": [ 126.8362936, 37.53499419 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "신월초등학교", "시설종류": "초등학교", "주소": "서울특별시 강서구 강서로31길 48 (화곡동)" }, "geometry": { "type": "Point", "coordinates": [ 126.8394555, 37.54036551 ] } },
+{ "type": "Feature", "properties": { "구분": "어린이보호구역", "시설명": "고리울초등학교", "시설종류": "초등학교", "주소": "경기도 부천시 오정구 고강동 325-4" }, "geometry": { "type": "Point", "coordinates": [ 126.8271237, 37.52727388 ] } }
+]
+}

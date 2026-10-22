@@ -1,0 +1,16 @@
+# 원본 공공데이터: 용량이 크고 제공기관 이용조건이 있어 저장소에 올리지 않음 (data/README.md 참고)
+data/raw/*
+!data/raw/.gitkeep
+
+# 중간 결과 (run_all.py 실행 시 다시 생성됨)
+build/
+
+# 파이썬·OS 부산물
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+~$*.xlsx
