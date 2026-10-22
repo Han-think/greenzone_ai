@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>그린존 · 신월1동</title>
     <link rel="stylesheet" href="/static/nav.css">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=20261022-toolbar-handle">
     {% if kakao_key %}
     <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&autoload=false&libraries=services"></script>
     {% endif %}
@@ -128,13 +128,15 @@
         </details>
     </div>
 </aside>
-<button id="sidebarToggle" class="sidebar-toggle" type="button" aria-controls="sidebarPanel"
-        aria-expanded="true" aria-label="주소 검색·후보지 창 접기">‹</button>
-<main>
-    <div class="map-toolbar">
-        <span>카카오 지도 · 보유 데이터 검색</span>
-        <button id="openRoute" type="button" disabled>수거 경로안 만들기</button>
-        <button id="showArea" type="button">신월1동 전체</button>
+    <main>
+        <div class="map-toolbar">
+            <span>카카오 지도 · 보유 데이터 검색</span>
+            <div class="map-toolbar-actions">
+                <button id="openRoute" type="button" disabled>수거 경로안 만들기</button>
+                <button id="showArea" type="button">신월1동 전체</button>
+            </div>
+            <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-controls="sidebarPanel"
+                    aria-expanded="true" aria-label="주소 검색·후보지 창 접기"><span aria-hidden="true"></span></button>
     </div>
     <div id="map" aria-label="신월1동 생활권과 거점 지도"></div>
     <p id="mapStatus" role="status">지도를 준비하고 있습니다.</p>

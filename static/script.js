@@ -29,7 +29,7 @@ function setSidebarCollapsed(collapsed) {
     button.setAttribute('aria-label', collapsed
         ? '주소 검색·후보지 창 펼치기'
         : '주소 검색·후보지 창 접기');
-    button.textContent = collapsed ? '›' : '‹';
+    button.dataset.collapsed = String(collapsed);
     window.setTimeout(function() {
         if (map) {
             var center = map.getCenter();
