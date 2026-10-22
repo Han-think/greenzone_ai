@@ -423,11 +423,11 @@ LLM·임베딩 API가 없을 때도 수동 품목 선택과 구조화 DB 조회�
 | 항목 | 이번 반영 | 남은 확인 |
 |---|---|---|
 | 수거 경로안 | 지도 상단/공통 메뉴 전용 버튼 → 후보 탭과 경로 폼 펼침 | 경로 계산 방식과 원본은 유지. 실제 화면 확인 전 |
-| REQ-F-003 | `/disposal`에서 사진 검증, Grounding DINO 탐지 영역 crop + 원본을 Gemini에 전달, 공식 품목·규격·수량 수동 확인 | 실사진 업로드와 탐지 품질·지연 확인 |
+| REQ-F-003 | `/disposal`에서 기존 Grounding DINO + Gemini 방식 또는 YOLO 시험 모드 선택, 공식 품목·규격·수량 수동 확인 | 실사진 업로드와 두 방식의 탐지 품질·지연 비교 |
 | 품목 DB | 91품목/268규칙을 SQLite에 초기 적재. 별칭 검색, 선택 규격 금액×수량 | 공식표 최신 금액 전수 대조. 참고값 표시 유지 |
 | 법령 | 공식 조문 4건 + 현재 배출 절차 요약 1건, 확인일·시행일·법규 식별자·원문 해시 | 별표 상세 추출·금액 대조, 신월1동 상세 요일 |
 | 관리자 | 계정 로그인/로그아웃, 자료 조회·수정·사유·이전/새 값 이력, 수정 충돌 방지 | 실제 로그인/저장/사용자 반영 확인 |
-| REQ-AI-003 | `/api/vision`이 Grounding DINO로 사전 탐지한 뒤 Gemini가 원본과 최고 점수 crop을 확인해 등록 품목 후보 반환 | 실제 사진 평가, 임계값 및 메모리/지연 측정 |
+| REQ-AI-003 | `/api/vision` 기본 모드는 Grounding DINO와 Gemini를 사용하고, `mode=yolo`는 `model/best.pt`를 단독 추론해 점수·영역과 등록 품목 후보를 반환 | 실제 사진 평가, 임계값 및 메모리/지연 측정 |
 | REQ-AI-004 | 확인한 문서의 DB 조회·출처 표시 | 임베딩·문서 검색·LLM/Opik은 미구현. 현재는 RAG라고 부르지 않음 |
 
 ### 읽을 코드 순서
@@ -435,6 +435,7 @@ LLM·임베딩 API가 없을 때도 수동 품목 선택과 구조화 DB 조회�
 - `templates/index.html → static/route.js`: 경로 바로가기/거점 선택. 기존 `/api/route`와 `route_planner.py`는 유지.
 - `templates/disposal.html → static/disposal.js → service_routes.py`: 사진 요청과 품목/규격/수량 확정.
 - `model/dino.py`: `model/dino_classes.txt`의 클래스 목록으로 Grounding DINO를 지연 로드하고, NMS 후 점수 상위 탐지를 반환. `service_routes.py`는 상위 1개 crop과 원본을 Gemini에 전달하며, 탐지가 없으면 원본만 보냄.
+- `model/yolo.py`: `model/best.pt`를 지연 로드해 밥상·서랍장·소파·수납장·싱크대·의자·장롱·책상·침대·협탁·화장대 11개 클래스의 점수와 박스를 반환. 사진 화면에서 YOLO 시험 모드를 선택하면 Gemini/DINO를 호출하지 않으며, 자동 연결되지 않은 품목은 직접 검색해야 함.
 - `guide_service.py`: JSON 초기 자료 → SQLite 행 조회 → 선택 규격 수수료 계산. 원본은 보존.
 - `templates/admin.html → static/admin.js → service_routes.py → guide_service.py`: 로그인·수정/이력.
 - `main.py`는 `app.include_router`로 새 URL만 연결. 새 함수/데코레이터에 흐름 주석을 붙임.
@@ -481,7 +482,7 @@ LLM·임베딩 API가 없을 때도 수동 품목 선택과 구조화 DB 조회�
 3. 관리자 로그인 → 한 규칙의 사유 있는 수정 → 이력 이전/새 값 → 사용자 재조회로 반영 확인.
 4. 미로그인 관리자 요청·미지원/과대 사진·잘못된 수량 처리 확인.
 
-Grounding DINO와 Gemini는 사진 업로드 시 호출됩니다. 입력 사진은 서버 파일로 저장하지 않습니다. 모델 가중치는 첫 DINO 실행 때 Hugging Face에서 다운로드되므로 인터넷과 충분한 메모리가 필요합니다. 실제 사진별 정확도·지연은 별도 검증이 필요합니다.
+기존 방식은 Grounding DINO와 Gemini를 사진 업로드 때 호출합니다. YOLO 시험 모드는 저장소의 `model/best.pt`만 로컬에서 추론하며 Gemini에 사진을 전송하지 않습니다. 입력 사진은 서버 파일로 저장하지 않습니다. 기존 DINO 가중치는 첫 DINO 실행 때 Hugging Face에서 다운로드됩니다. YOLO 체크포인트는 실제로 로드되고 추론됐지만, 실제 사진별 정확도·오탐·지연은 별도 검증이 필요합니다.
 
 
 ### 수거 경로의 직접 방문 순서

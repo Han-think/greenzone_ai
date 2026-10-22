@@ -6,6 +6,7 @@ import os
 import secrets
 import threading
 import time
+import unicodedata
 import urllib.error
 import urllib.request
 import warnings
@@ -18,6 +19,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 import guide_service as guide
 from model.dino import Detection, crop_detection, detect_objects
+from model.yolo import Detection as YoloDetection, detect_objects as detect_yolo_objects
 
 router = APIRouter()
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / 'templates')
@@ -84,9 +86,11 @@ def admin_page(request: Request):
 
 
 @router.post('/api/vision')
-async def upload_image(request: Request):
+async def upload_image(request: Request, mode: str = 'gemini'):
     # 파일은 raw 바이트로 받아 multipart 패키지 없이 실제 이미지를 확인한다.
     # Grounding DINO는 Gemini 사전 분류와 보조 crop만 제공하고 최종 품목은 사용자가 확인한다.
+    if mode not in {'gemini', 'yolo'}:
+        raise HTTPException(422, '사진 인식 모드를 확인하세요.')
     raw = await read_limited_body(request, 8 * 1024 * 1024)
     if not raw:
         raise HTTPException(422, '사진을 선택하세요.')
@@ -111,6 +115,43 @@ async def upload_image(request: Request):
                 rgb_image = image.convert('RGB')
     except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError, Image.DecompressionBombWarning):
         raise HTTPException(422, '사진을 읽지 못했습니다. 다른 사진을 선택하세요.')
+    if mode == 'yolo':
+        try:
+            detections = await run_in_threadpool(detect_yolo_objects, rgb_image)
+        except (ImportError, OSError, RuntimeError, ValueError) as error:
+            raise HTTPException(
+                503, 'YOLO 시험 모델을 실행할 수 없습니다. ultralytics 패키지와 model/best.pt를 확인하세요.'
+            ) from error
+        candidates = match_yolo_candidates(detections, guide.list_items())
+        if detections:
+            message = (
+                f'YOLO 시험 모델이 {len(detections)}개 영역을 찾았습니다. '
+                'Gemini를 사용하지 않은 결과이므로 품목·규격은 직접 확인하세요.'
+            )
+        else:
+            message = (
+                'YOLO 시험 모델에서 기준 점수 이상의 영역을 찾지 못했습니다. '
+                '아래에서 품목을 직접 검색하세요.'
+            )
+        return {
+            'status': 'manual_confirmation_required',
+            'mode': 'yolo',
+            'width': width,
+            'height': height,
+            'candidates': candidates,
+            'detections': [
+                {
+                    'label': row.label,
+                    'score': round(row.score, 4),
+                    'box': [round(value, 1) for value in row.box],
+                }
+                for row in detections
+            ],
+            'stored': False,
+            'provider_called': False,
+            'message': message,
+        }
+
     candidates = []
     detections = []
     crop_data = None
@@ -147,6 +188,45 @@ async def upload_image(request: Request):
                                   for row in detections],
             'crop_sent': crop_data is not None,
             'message': message}
+
+
+def match_yolo_candidates(detections: list[YoloDetection], items: list[dict]) -> list[dict]:
+    """Map recognized class names to the closest matching official catalog item."""
+    def normalize(value: str) -> str:
+        return ''.join(
+            character for character in unicodedata.normalize('NFKC', value).casefold()
+            if not character.isspace()
+        )
+
+    normalized_items = [
+        (item, normalize(item['name']))
+        for item in items
+        if isinstance(item.get('item_id'), str) and isinstance(item.get('name'), str)
+    ]
+    candidates = []
+    seen = set()
+    for detection in detections:
+        label = normalize(detection.label)
+        matches = [(item, name) for item, name in normalized_items if name == label]
+        if not matches:
+            matches = [(item, name) for item, name in normalized_items
+                       if name.startswith(label + '(')]
+        if not matches:
+            matches = [(item, name) for item, name in normalized_items if label in name]
+        if not matches:
+            continue
+        item, _ = min(matches, key=lambda match: len(match[1]))
+        if item['item_id'] in seen:
+            continue
+        seen.add(item['item_id'])
+        candidates.append({
+            'item_id': item['item_id'],
+            'name': item['name'],
+            'reason': f'YOLO 시험 모델 탐지: {detection.label} ({detection.score:.0%})',
+        })
+        if len(candidates) == 5:
+            break
+    return candidates
 
 
 

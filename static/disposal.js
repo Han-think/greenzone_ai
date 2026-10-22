@@ -51,11 +51,27 @@ async function selectVisionItem(itemId) {
     if (select.value) loadRules();
 }
 
-function showVisionCandidates(candidates) {
+function showVisionCandidates(candidates, detections, mode) {
     var box = document.getElementById('visionCandidates');
     box.replaceChildren();
+    if (mode === 'yolo' && detections.length) {
+        box.append(makeText('h3', 'YOLO 시험 탐지 결과'));
+        var detectionList = document.createElement('ul');
+        for (var i = 0; i < detections.length; i++) {
+            var coordinates = Array.isArray(detections[i].box)
+                ? ' · 영역 ' + detections[i].box.map(Math.round).join(', ') + 'px'
+                : '';
+            detectionList.append(makeText(
+                'li',
+                detections[i].label + ' · 신뢰도 ' + (detections[i].score * 100).toFixed(1) + '%' + coordinates
+            ));
+        }
+        box.append(detectionList);
+    }
     if (!candidates.length) {
-        box.append(makeText('p', '사진에서 선택 가능한 등록 품목 후보를 찾지 못했습니다. 품목명을 직접 검색해 주세요.'));
+        box.append(makeText('p', mode === 'yolo' && detections.length
+            ? '탐지 결과와 이름이 맞는 공식 등록 품목을 자동 연결하지 못했습니다. 품목명을 직접 검색해 주세요.'
+            : '사진에서 선택 가능한 등록 품목 후보를 찾지 못했습니다. 품목명을 직접 검색해 주세요.'));
         var searchButton = makeText('button', '품목 직접 검색');
         searchButton.type = 'button';
         searchButton.onclick = function() {
@@ -66,16 +82,22 @@ function showVisionCandidates(candidates) {
         box.append(searchButton);
         return;
     }
-    box.append(makeText('h3', '사진에서 추정한 품목 후보 · 직접 확인하세요'));
-    var candidate = candidates[0];
-    var button = makeText('button', candidate.name + ' 선택');
-    button.type = 'button';
-    button.onclick = function() {
-        selectVisionItem(candidate.item_id).catch(function(error) {
-            document.getElementById('itemStatus').textContent = error.message;
-        });
-    };
-    box.append(button);
+    box.append(makeText('h3', mode === 'yolo'
+        ? '이름이 연결된 공식 품목 후보 · 직접 확인하세요'
+        : '사진에서 추정한 품목 후보 · 직접 확인하세요'));
+    var candidateCount = mode === 'yolo' ? candidates.length : Math.min(candidates.length, 1);
+    for (var j = 0; j < candidateCount; j++) {
+        (function(candidate) {
+            var button = makeText('button', candidate.name + ' 선택');
+            button.type = 'button';
+            button.onclick = function() {
+                selectVisionItem(candidate.item_id).catch(function(error) {
+                    document.getElementById('itemStatus').textContent = error.message;
+                });
+            };
+            box.append(button);
+        })(candidates[j]);
+    }
     box.append(makeText('p', '다른 품목이라면 아래 검색창에서 직접 찾아 선택하세요.'));
 }
 
@@ -86,13 +108,16 @@ async function uploadPhoto() {
     if (file.size > 8 * 1024 * 1024) { status.textContent = '사진을 8MB 이하로 줄여주세요.'; return; }
     var version = photoRevision;
     var button = document.getElementById('uploadPhoto');
+    var mode = document.getElementById('visionMode').value;
     button.disabled = true;
-    status.textContent = '사진 확인 후 Grounding DINO 사전 탐지와 Gemini 품목 확인을 진행하고 있습니다.';
+    status.textContent = mode === 'yolo'
+        ? '파인튜닝 YOLO 시험 모델로 사진을 분석하고 있습니다. Gemini에는 전송하지 않습니다.'
+        : '사진 확인 후 Grounding DINO 사전 탐지와 Gemini 품목 확인을 진행하고 있습니다.';
     try {
-        var data = await readResponse(await fetch('/api/vision', {method: 'POST', body: file,
+        var data = await readResponse(await fetch('/api/vision?mode=' + encodeURIComponent(mode), {method: 'POST', body: file,
             headers: {'Content-Type': file.type || 'application/octet-stream'}}));
         if (version !== photoRevision) return;
-        showVisionCandidates(data.candidates || []);
+        showVisionCandidates(data.candidates || [], data.detections || [], mode);
         status.textContent = data.message + ' (' + data.width + ' × ' + data.height + ')';
     } catch (error) { if (version === photoRevision) status.textContent = error.message; }
     finally { button.disabled = false; }
@@ -190,6 +215,13 @@ document.addEventListener('DOMContentLoaded', function() {
             photoUrl = URL.createObjectURL(file); image.src = photoUrl; image.hidden = false;
         }
         document.getElementById('photoStatus').textContent = '사진을 바꿨습니다. 업로드 확인을 눌러주세요.';
+    };
+    document.getElementById('visionMode').onchange = function() {
+        photoRevision += 1;
+        document.getElementById('visionCandidates').replaceChildren();
+        document.getElementById('photoStatus').textContent = document.getElementById('photoFile').files.length
+            ? '인식 방식을 바꿨습니다. 사진 업로드 확인을 눌러주세요.'
+            : '사진은 서버에 저장하지 않습니다.';
     };
     document.getElementById('uploadPhoto').onclick = uploadPhoto;
     document.getElementById('clearPhoto').onclick = clearPhoto;

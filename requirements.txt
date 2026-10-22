@@ -15,3 +15,6 @@ Pillow>=12.3.0,<14
 torch>=2.6,<3
 torchvision>=0.21,<1
 transformers>=4.51,<5
+
+# model/best.pt 로컬 시험 추론용 YOLO 런타임
+ultralytics>=8.3,<9

@@ -147,14 +147,14 @@ flowchart LR
 | 수거 경로 `/?view=route` | 거점 선택, 자동/직접 방문 순서, 등록폭 조건, 복귀 선택, 경로·구간거리·방문 번호 |
 | Leaflet `/analysis` | 받은 분석 자료를 체크하며 보는 지도 |
 | Folium `/analysis/folium` | 선택 조건으로 Python이 보고용 HTML 지도를 생성 |
-| 사진·배출 안내 `/disposal` | Grounding DINO 사전 탐지 후 Gemini 후보 확인, 공식 품목·규격·수량 수동 선택, 참고 금액·공식 신청 링크 |
+| 사진·배출 안내 `/disposal` | 기존 Grounding DINO + Gemini 흐름 또는 `model/best.pt` 파인튜닝 YOLO 시험 모드 선택, 공식 품목·규격·수량 수동 확인 |
 | 관리자 `/admin` | 로그인·로그아웃, 기존 자료 수정·사용 중지, 출처·날짜·검토 상태, 수정 사유와 이전/새 값 이력 |
 
-사진은 JPG·PNG·WebP 정지 사진 1장, 8MB·1,200만 화소 이하를 받으며 서버에 저장하지 않습니다. Gemini 키가 있으면 Grounding DINO가 먼저 품목 영역을 탐지하고, 점수 상위 영역 crop과 원본 사진을 Gemini에 보냅니다. 탐지가 없으면 원본만 보냅니다. 탐지 점수와 라벨은 보조 힌트이며 Gemini가 이미지를 독립적으로 확인합니다. 최종 품목·규격·수량은 사용자가 확인하며 사진 없이 직접 선택할 수도 있습니다.
+사진은 JPG·PNG·WebP 정지 사진 1장, 8MB·1,200만 화소 이하를 받으며 서버에 저장하지 않습니다. 기존 방식은 Gemini 키가 있으면 Grounding DINO 탐지 영역과 원본 사진을 Gemini에 보내며, YOLO 시험 방식은 `model/best.pt`의 밥상·서랍장·소파·수납장·싱크대·의자·장롱·책상·침대·협탁·화장대 11개 클래스를 로컬에서 추론하고 Gemini에는 전송하지 않습니다. YOLO 결과의 신뢰도와 영역을 반환하며, 이름이 일치하는 등록 품목은 선택 후보로 연결합니다. 두 방식 모두 최종 품목·규격·수량은 사용자가 확인하며 사진 없이 직접 선택할 수도 있습니다.
 
 관리자 수정값은 `data/local/service.sqlite3`에 저장하고 다음 사용자 조회에 반영하도록 연결했습니다. 미검토 안내 문서는 확정 근거로 노출하지 않습니다. 원본 JSON은 보존합니다.
 
-> Grounding DINO와 Gemini 연결은 코드에 반영했습니다. 작은 crop·요청 payload 단위 테스트는 통과했지만, 실제 모델 가중치 다운로드·사진 추론·Gemini 실호출·브라우저 동작은 별도 확인이 필요합니다.
+> 기존 Grounding DINO와 Gemini 연결에 더해 `model/best.pt`의 YOLO 시험 모드를 추가했습니다. 모델을 실제로 로드하고 빈 이미지 추론을 확인했지만, 11개 품목별 실사진 정확도·오탐·지연은 별도 평가가 필요합니다.
 
 ## 7. 기술 구성과 폴더 구조
 
@@ -164,7 +164,7 @@ flowchart LR
 | 화면 | Jinja2, HTML, CSS, JavaScript |
 | 지도 | Kakao Maps JavaScript SDK, Leaflet, Folium |
 | 배출 자료 저장 | Python 내장 SQLite, JSON 초기 자료 |
-| 이미지 인식 | Grounding DINO tiny — 로컬 사전 탐지·crop, Gemini — 등록 품목 후보 확인 |
+| 이미지 인식 | 기존 방식: Grounding DINO tiny + Gemini. 시험 방식: Ultralytics YOLO `model/best.pt` 로컬 탐지 |
 | 분석 결과 | 팀 Louvain·도로망 분석 결과 및 보고서·GeoJSON 연결 |
 | 이후 연결 예정 | LLM·RAG·임베딩, Opik |
 
@@ -177,7 +177,9 @@ greenzone_ai/
 ├── service_routes.py       # 사진·배출 안내·관리자 API
 ├── model/
 │   ├── dino.py             # Grounding DINO 사전 탐지와 crop 생성
-│   └── dino_classes.txt    # 탐지 프롬프트 클래스 목록
+│   ├── dino_classes.txt    # 탐지 프롬프트 클래스 목록
+│   ├── yolo.py             # best.pt 파인튜닝 YOLO 시험 추론
+│   └── best.pt             # 파인튜닝된 YOLO 가중치
 ├── templates/              # 지도·분석·배출 안내·관리자 HTML
 ├── static/                 # 화면별 JavaScript·CSS
 ├── data/
@@ -221,10 +223,11 @@ ADMIN_PASSWORD=
 - **관리자**: 각자 `ADMIN_PASSWORD`를 16자 이상으로 지정합니다. 미설정·16자 미만이면 관리자 로그인을 허용하지 않습니다. 자동 생성된 공용 계정은 없습니다.
 - 지도 클릭의 좌표→주소 변환은 같은 카카오 키를 사용합니다. 보유 건물 검색에는 별도 API 키가 없습니다.
 - 현재 실행에 Docker·Ollama·VWorld·LLM 키는 필요하지 않습니다.
-- **사진 품목 후보**: [Google AI Studio API Keys](https://aistudio.google.com/apikey)에서 Gemini API 키를 발급해 `GEMINI_API_KEY`에 입력합니다. 키는 서버의 `.env`에만 둡니다. `requirements.txt`의 PyTorch·Transformers 패키지도 설치해야 합니다. Grounding DINO 가중치는 첫 사진 요청 때 Hugging Face에서 내려받으며, 인터넷 연결과 모델 캐시 저장 공간이 필요합니다. 키가 없으면 두 모델 호출 없이 기존 직접 품목 선택 방식이 동작합니다.
+- **사진 품목 후보**: [Google AI Studio API Keys](https://aistudio.google.com/apikey)에서 Gemini API 키를 발급해 `GEMINI_API_KEY`에 입력합니다. 키는 서버의 `.env`에만 둡니다. `requirements.txt`의 PyTorch·Transformers·Ultralytics 패키지도 설치해야 합니다. Grounding DINO 가중치는 첫 기존 방식 요청 때 Hugging Face에서 내려받으며, 인터넷 연결과 모델 캐시 저장 공간이 필요합니다. `/disposal`의 사진 인식 방식에서 YOLO 시험 모드를 선택하면 `model/best.pt`로 로컬 추론하고 Gemini를 호출하지 않습니다. Gemini 키가 없어도 YOLO 시험은 사용할 수 있습니다.
 - 모델에 일시적인 `503` 과부하가 반복되면 `GEMINI_MODEL=gemini-2.5-flash-lite` 또는 `GEMINI_MODEL=gemini-2.5-flash`로 바꿔 다른 멀티모달 모델을 시험하고 서버를 재시작합니다. 프로젝트·계정에 따라 무료 사용 가능 모델과 한도가 다르므로 AI Studio의 모델별 한도를 확인하세요.
 - 키를 설정한 상태에서 `/disposal`의 사진 업로드 버튼을 누르면 서버에서 Grounding DINO가 먼저 탐지합니다. 탐지 결과가 있으면 가장 높은 점수의 물체 crop과 원본을 Gemini에 보내고, 탐지가 없으면 원본만 보냅니다. 서버는 사진을 파일로 저장하지 않습니다. Gemini 요청의 구조화 출력 스키마에서 품목 ID·이름을 현재 등록 목록으로 제한하고, 서버도 목록에 없는 후보를 제외합니다. 규격·수량·수수료는 기존대로 사용자가 직접 확인합니다. Google AI Studio 사용량·요금·데이터 정책을 확인한 뒤 사용하세요.
 - Gemini SDK는 필요하지 않으며 서버에서 Google Gemini REST API를 호출합니다. Grounding DINO는 PyTorch·Torchvision·Transformers를 사용합니다. 기본 설치는 CPU에서도 가능하지만 첫 실행 속도와 메모리 사용량은 기기 성능에 따라 달라집니다.
+- YOLO 시험 모드는 11개 학습 클래스의 탐지 결과를 반환합니다. 공식 품목명과 이름이 맞지 않는 클래스는 자동 품목 후보로 연결하지 않을 수 있으므로, 아래 품목 검색에서 직접 확인하세요. 분류 성능을 보증하거나 배출 규격·수수료를 자동 확정하지 않습니다.
 
 ### ③ 서버 실행
 
@@ -263,7 +266,7 @@ ADMIN_PASSWORD=
 | 수거 경로 | 양방향 도로망 근사. 차고지·일방통행·회전·정차·부지 진입 미반영, 전역 최적 경로 보장 없음 |
 | 배출량 | 결합권역 공식값과 조건부 추정. 신월1동/거점별 실측량으로 해석하지 않음 |
 | 수수료·법령 | 수수료 스냅샷 최신 대조, 별표 상세 금액 비교, 신월1동 품목별 상세 요일 확인 필요 |
-| 이미지 인식 | DINO/Gemini 후보를 실제 사진으로 평가하고 임계값·속도·메모리 사용량을 검증할 필요 |
+| 이미지 인식 | DINO/Gemini와 YOLO 11개 클래스 후보를 실제 사진으로 비교하고 정확도·오탐·임계값·속도·메모리 사용량을 검증할 필요 |
 | LLM·RAG | 공식 자료 저장·DB 조회 기반 준비. 임베딩·문서 검색·LLM 답변·Opik 평가 미연결 |
 | 운영 확인 | 최신 화면·업로드·로그인·수정 반영 확인 및 여러 서버용 세션 구성 필요 |
 

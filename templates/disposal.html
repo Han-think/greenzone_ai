@@ -20,10 +20,15 @@
         <h2>1. 사진 업로드</h2>
         <p>JPG·PNG·WebP 정지 사진 1장 · 8MB / 1,200만 화소 이하</p>
         <label for="photoFile">배출할 물건 사진</label><input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp">
+        <label for="visionMode">사진 인식 방식</label>
+        <select id="visionMode">
+            <option value="gemini">기존 방식 · DINO 사전 탐지 + Gemini 확인</option>
+            <option value="yolo">시험용 · 파인튜닝 YOLO 단독 추론</option>
+        </select>
         <img id="photoPreview" alt="선택한 사진 미리보기" hidden>
         <button id="uploadPhoto" type="button">사진 업로드 확인</button><button id="clearPhoto" type="button">사진 지우기</button>
         <p id="photoStatus" role="status">사진은 서버에 저장하지 않습니다.</p>
-        <small>GEMINI_API_KEY를 설정하면 업로드 버튼을 누를 때 사진이 Google Gemini API로 전송되어 품목 후보를 추정합니다. 사진만으로 규격·수수료를 확정하지 않습니다.</small>
+        <small>기존 방식은 GEMINI_API_KEY를 설정하면 사진을 Google Gemini API로 전송합니다. YOLO 시험 방식은 model/best.pt로 서버에서만 추론하며 Gemini에는 전송하지 않습니다. 두 방식 모두 사진을 서버에 저장하지 않으며, 사진만으로 규격·수수료를 확정하지 않습니다.</small>
         <div id="visionCandidates" aria-live="polite"></div>
     </section>
     <section class="card">
@@ -42,5 +47,5 @@
         <div id="legalDocuments"></div><p id="legalStatus" role="status"></p>
     </section>
 </main>
-<script src="/static/disposal.js"></script>
+<script src="/static/disposal.js?v=20261022-yolo-test-v3"></script>
 </body></html>
