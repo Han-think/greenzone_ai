@@ -1,0 +1,754 @@
+{
+  "논리테이블": [
+    {
+      "name": "district_scopes",
+      "label": "관할범위",
+      "cols": [
+        {
+          "name": "scope_code",
+          "type": "VARCHAR(10)",
+          "pk": true,
+          "label": "관할코드"
+        },
+        {
+          "name": "scope_name",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "관할명"
+        }
+      ]
+    },
+    {
+      "name": "sources",
+      "label": "자료출처",
+      "cols": [
+        {
+          "name": "source_id",
+          "type": "VARCHAR(100)",
+          "pk": true,
+          "label": "출처ID"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(255)",
+          "pk": false,
+          "label": "제목"
+        },
+        {
+          "name": "url",
+          "type": "TEXT",
+          "pk": false,
+          "label": "원문URL"
+        },
+        {
+          "name": "reference_date",
+          "type": "DATE",
+          "pk": false,
+          "label": "자료기준일"
+        },
+        {
+          "name": "checked_at",
+          "type": "DATE",
+          "pk": false,
+          "label": "원문확인일"
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "pk": false,
+          "label": "비고"
+        }
+      ]
+    },
+    {
+      "name": "communities",
+      "label": "생활권",
+      "cols": [
+        {
+          "name": "community_id",
+          "type": "INTEGER",
+          "pk": true,
+          "label": "생활권ID"
+        },
+        {
+          "name": "scope_code",
+          "type": "VARCHAR(10)",
+          "pk": false,
+          "label": "관할코드"
+        },
+        {
+          "name": "registered_units",
+          "type": "INTEGER",
+          "pk": false,
+          "label": "등록주거단위"
+        },
+        {
+          "name": "parcel_count",
+          "type": "INTEGER",
+          "pk": false,
+          "label": "필지수"
+        },
+        {
+          "name": "geometry_json",
+          "type": "LONGTEXT",
+          "pk": false,
+          "label": "경계도형"
+        }
+      ]
+    },
+    {
+      "name": "proposed_hubs",
+      "label": "제안거점",
+      "cols": [
+        {
+          "name": "hub_id",
+          "type": "VARCHAR(40)",
+          "pk": true,
+          "label": "거점ID"
+        },
+        {
+          "name": "community_id",
+          "type": "INTEGER",
+          "pk": false,
+          "label": "생활권ID"
+        },
+        {
+          "name": "hub_name",
+          "type": "VARCHAR(255)",
+          "pk": false,
+          "label": "제안거점명"
+        },
+        {
+          "name": "hub_type",
+          "type": "VARCHAR(80)",
+          "pk": false,
+          "label": "제안유형"
+        },
+        {
+          "name": "longitude",
+          "type": "DECIMAL(12, 8)",
+          "pk": false,
+          "label": "경도"
+        },
+        {
+          "name": "latitude",
+          "type": "DECIMAL(12, 8)",
+          "pk": false,
+          "label": "위도"
+        },
+        {
+          "name": "road_name",
+          "type": "VARCHAR(160)",
+          "pk": false,
+          "label": "접한도로명"
+        },
+        {
+          "name": "road_width_m",
+          "type": "DECIMAL(8, 2)",
+          "pk": false,
+          "label": "도로폭m"
+        },
+        {
+          "name": "road_width_basis",
+          "type": "VARCHAR(160)",
+          "pk": false,
+          "label": "도로폭근거"
+        },
+        {
+          "name": "protection_distance_m",
+          "type": "DECIMAL(10, 2)",
+          "pk": false,
+          "label": "보호시설거리m"
+        }
+      ]
+    },
+    {
+      "name": "residential_parcels",
+      "label": "주거필지",
+      "cols": [
+        {
+          "name": "pnu",
+          "type": "CHAR(19)",
+          "pk": true,
+          "label": "필지고유번호"
+        },
+        {
+          "name": "team_key",
+          "type": "CHAR(19)",
+          "pk": false,
+          "label": "팀필지키"
+        },
+        {
+          "name": "building_name",
+          "type": "VARCHAR(500)",
+          "pk": false,
+          "label": "건물명"
+        },
+        {
+          "name": "address",
+          "type": "VARCHAR(500)",
+          "pk": false,
+          "label": "도로명주소"
+        },
+        {
+          "name": "jibun_address",
+          "type": "VARCHAR(255)",
+          "pk": false,
+          "label": "지번주소"
+        },
+        {
+          "name": "longitude",
+          "type": "DECIMAL(12, 8)",
+          "pk": false,
+          "label": "경도"
+        },
+        {
+          "name": "latitude",
+          "type": "DECIMAL(12, 8)",
+          "pk": false,
+          "label": "위도"
+        },
+        {
+          "name": "registered_units",
+          "type": "INTEGER",
+          "pk": false,
+          "label": "등록주거단위"
+        },
+        {
+          "name": "housing_type",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "주택유형"
+        },
+        {
+          "name": "community_id",
+          "type": "INTEGER",
+          "pk": false,
+          "label": "생활권ID"
+        },
+        {
+          "name": "hub_id",
+          "type": "VARCHAR(40)",
+          "pk": false,
+          "label": "거점ID"
+        }
+      ]
+    },
+    {
+      "name": "waste_items",
+      "label": "폐기물품목",
+      "cols": [
+        {
+          "name": "item_id",
+          "type": "VARCHAR(100)",
+          "pk": true,
+          "label": "품목ID"
+        },
+        {
+          "name": "official_name",
+          "type": "VARCHAR(255)",
+          "pk": false,
+          "label": "공식품목명"
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR(80)",
+          "pk": false,
+          "label": "품목구분"
+        },
+        {
+          "name": "official_category",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "공식분류"
+        },
+        {
+          "name": "source_id",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "출처ID"
+        },
+        {
+          "name": "active",
+          "type": "BOOLEAN",
+          "pk": false,
+          "label": "사용여부"
+        }
+      ]
+    },
+    {
+      "name": "item_aliases",
+      "label": "품목별칭",
+      "cols": [
+        {
+          "name": "alias_id",
+          "type": "VARCHAR(100)",
+          "pk": true,
+          "label": "별칭ID"
+        },
+        {
+          "name": "item_id",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "품목ID"
+        },
+        {
+          "name": "alias",
+          "type": "VARCHAR(255)",
+          "pk": false,
+          "label": "검색별칭"
+        },
+        {
+          "name": "origin",
+          "type": "VARCHAR(80)",
+          "pk": false,
+          "label": "별칭출처"
+        }
+      ]
+    },
+    {
+      "name": "item_rules",
+      "label": "품목규격_수수료",
+      "cols": [
+        {
+          "name": "rule_id",
+          "type": "VARCHAR(100)",
+          "pk": true,
+          "label": "규칙ID"
+        },
+        {
+          "name": "item_id",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "품목ID"
+        },
+        {
+          "name": "scope_code",
+          "type": "VARCHAR(10)",
+          "pk": false,
+          "label": "관할코드"
+        },
+        {
+          "name": "specification",
+          "type": "VARCHAR(500)",
+          "pk": false,
+          "label": "규격"
+        },
+        {
+          "name": "fee_krw",
+          "type": "INTEGER",
+          "pk": false,
+          "label": "참고수수료원"
+        },
+        {
+          "name": "fee_status",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "금액상태"
+        },
+        {
+          "name": "collection_status",
+          "type": "VARCHAR(160)",
+          "pk": false,
+          "label": "수거상태"
+        },
+        {
+          "name": "housing_type",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "주택유형"
+        },
+        {
+          "name": "conditions",
+          "type": "TEXT",
+          "pk": false,
+          "label": "적용조건"
+        },
+        {
+          "name": "source_id",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "출처ID"
+        },
+        {
+          "name": "guide_source_id",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "절차출처ID"
+        },
+        {
+          "name": "checked_at",
+          "type": "DATE",
+          "pk": false,
+          "label": "원문확인일"
+        },
+        {
+          "name": "reference_date",
+          "type": "DATE",
+          "pk": false,
+          "label": "자료기준일"
+        },
+        {
+          "name": "effective_from",
+          "type": "DATE",
+          "pk": false,
+          "label": "시행시작일"
+        },
+        {
+          "name": "effective_until",
+          "type": "DATE",
+          "pk": false,
+          "label": "시행종료일"
+        },
+        {
+          "name": "verification_status",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "검토상태"
+        },
+        {
+          "name": "active",
+          "type": "BOOLEAN",
+          "pk": false,
+          "label": "사용여부"
+        },
+        {
+          "name": "snapshot_id",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "스냅샷ID"
+        }
+      ]
+    },
+    {
+      "name": "guide_documents",
+      "label": "배출근거문서",
+      "cols": [
+        {
+          "name": "document_id",
+          "type": "VARCHAR(100)",
+          "pk": true,
+          "label": "문서ID"
+        },
+        {
+          "name": "scope_code",
+          "type": "VARCHAR(10)",
+          "pk": false,
+          "label": "관할코드"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(500)",
+          "pk": false,
+          "label": "제목"
+        },
+        {
+          "name": "content_text",
+          "type": "LONGTEXT",
+          "pk": false,
+          "label": "근거본문"
+        },
+        {
+          "name": "source_url",
+          "type": "TEXT",
+          "pk": false,
+          "label": "원문URL"
+        },
+        {
+          "name": "source_type",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "근거종류"
+        },
+        {
+          "name": "checked_at",
+          "type": "DATE",
+          "pk": false,
+          "label": "원문확인일"
+        },
+        {
+          "name": "reference_date",
+          "type": "DATE",
+          "pk": false,
+          "label": "자료기준일"
+        },
+        {
+          "name": "effective_from",
+          "type": "DATE",
+          "pk": false,
+          "label": "시행시작일"
+        },
+        {
+          "name": "effective_until",
+          "type": "DATE",
+          "pk": false,
+          "label": "시행종료일"
+        },
+        {
+          "name": "verification_status",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "검토상태"
+        },
+        {
+          "name": "active",
+          "type": "BOOLEAN",
+          "pk": false,
+          "label": "사용여부"
+        },
+        {
+          "name": "source_id",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "출처ID(원문URL의 논리 연결)"
+        }
+      ]
+    },
+    {
+      "name": "rule_history",
+      "label": "규칙수정이력 (history의 kind별 논리 표현)",
+      "cols": [
+        {
+          "name": "history_id",
+          "type": "INTEGER",
+          "pk": true,
+          "label": "이력ID"
+        },
+        {
+          "name": "rule_id",
+          "type": "VARCHAR(191)",
+          "pk": false,
+          "label": "규칙ID"
+        },
+        {
+          "name": "actor",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "수정계정"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "pk": false,
+          "label": "수정사유"
+        },
+        {
+          "name": "before_json",
+          "type": "LONGTEXT",
+          "pk": false,
+          "label": "이전값"
+        },
+        {
+          "name": "after_json",
+          "type": "LONGTEXT",
+          "pk": false,
+          "label": "새값"
+        },
+        {
+          "name": "changed_at",
+          "type": "VARCHAR(40)",
+          "pk": false,
+          "label": "수정시각"
+        }
+      ]
+    },
+    {
+      "name": "document_history",
+      "label": "문서수정이력 (history의 kind별 논리 표현)",
+      "cols": [
+        {
+          "name": "history_id",
+          "type": "INTEGER",
+          "pk": true,
+          "label": "이력ID"
+        },
+        {
+          "name": "document_id",
+          "type": "VARCHAR(191)",
+          "pk": false,
+          "label": "문서ID"
+        },
+        {
+          "name": "actor",
+          "type": "VARCHAR(100)",
+          "pk": false,
+          "label": "수정계정"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "pk": false,
+          "label": "수정사유"
+        },
+        {
+          "name": "before_json",
+          "type": "LONGTEXT",
+          "pk": false,
+          "label": "이전값"
+        },
+        {
+          "name": "after_json",
+          "type": "LONGTEXT",
+          "pk": false,
+          "label": "새값"
+        },
+        {
+          "name": "changed_at",
+          "type": "VARCHAR(40)",
+          "pk": false,
+          "label": "수정시각"
+        }
+      ]
+    }
+  ],
+  "관계": [
+    {
+      "child": "communities",
+      "child_keys": [
+        "scope_code"
+      ],
+      "parent": "district_scopes",
+      "parent_keys": [
+        "scope_code"
+      ]
+    },
+    {
+      "child": "proposed_hubs",
+      "child_keys": [
+        "community_id"
+      ],
+      "parent": "communities",
+      "parent_keys": [
+        "community_id"
+      ]
+    },
+    {
+      "child": "residential_parcels",
+      "child_keys": [
+        "community_id"
+      ],
+      "parent": "communities",
+      "parent_keys": [
+        "community_id"
+      ]
+    },
+    {
+      "child": "residential_parcels",
+      "child_keys": [
+        "hub_id",
+        "community_id"
+      ],
+      "parent": "proposed_hubs",
+      "parent_keys": [
+        "hub_id",
+        "community_id"
+      ]
+    },
+    {
+      "child": "waste_items",
+      "child_keys": [
+        "source_id"
+      ],
+      "parent": "sources",
+      "parent_keys": [
+        "source_id"
+      ]
+    },
+    {
+      "child": "item_aliases",
+      "child_keys": [
+        "item_id"
+      ],
+      "parent": "waste_items",
+      "parent_keys": [
+        "item_id"
+      ]
+    },
+    {
+      "child": "item_rules",
+      "child_keys": [
+        "item_id"
+      ],
+      "parent": "waste_items",
+      "parent_keys": [
+        "item_id"
+      ]
+    },
+    {
+      "child": "item_rules",
+      "child_keys": [
+        "scope_code"
+      ],
+      "parent": "district_scopes",
+      "parent_keys": [
+        "scope_code"
+      ]
+    },
+    {
+      "child": "item_rules",
+      "child_keys": [
+        "source_id"
+      ],
+      "parent": "sources",
+      "parent_keys": [
+        "source_id"
+      ]
+    },
+    {
+      "child": "item_rules",
+      "child_keys": [
+        "guide_source_id"
+      ],
+      "parent": "sources",
+      "parent_keys": [
+        "source_id"
+      ]
+    },
+    {
+      "child": "guide_documents",
+      "child_keys": [
+        "scope_code"
+      ],
+      "parent": "district_scopes",
+      "parent_keys": [
+        "scope_code"
+      ]
+    },
+    {
+      "child": "guide_documents",
+      "child_keys": [
+        "source_id"
+      ],
+      "parent": "sources",
+      "parent_keys": [
+        "source_id"
+      ]
+    },
+    {
+      "child": "rule_history",
+      "child_keys": [
+        "rule_id"
+      ],
+      "parent": "item_rules",
+      "parent_keys": [
+        "rule_id"
+      ]
+    },
+    {
+      "child": "document_history",
+      "child_keys": [
+        "document_id"
+      ],
+      "parent": "guide_documents",
+      "parent_keys": [
+        "document_id"
+      ]
+    }
+  ],
+  "실제테이블": [
+    "history",
+    "records",
+    "seeds"
+  ],
+  "설명": "논리 FK와 실제 DB를 구분. 새 DB나 업로드 저장 테이블을 구현하지 않음."
+}

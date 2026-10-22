@@ -1,0 +1,8 @@
+{
+  "logical_tables": 11,
+  "logical_relationships": 14,
+  "actual_tables": 3,
+  "sqlite_schema_validation": true,
+  "ERDCloud_live_import_verified": false,
+  "runtime_DB_modified": false
+}
