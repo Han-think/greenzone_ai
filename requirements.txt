@@ -13,3 +13,6 @@ Pillow>=12.3.0,<14
 
 # 사진 없이 후보·보류·처리시간을 기록하는 선택 기능
 opik==2.2.113
+
+# 검수 문서의 문단 분할. 임베딩·JSON 생성은 기존 Gemini 키를 사용
+langchain-text-splitters==1.1.3

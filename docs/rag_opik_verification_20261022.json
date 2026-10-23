@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-22",
+  "found_trace_count": 4,
+  "input_keys": [
+    "질문원문기록"
+  ],
+  "output_keys": [
+    "근거ID",
+    "상태"
+  ],
+  "completed_trace_count": 4,
+  "raw_question_or_image_fields": false
+}

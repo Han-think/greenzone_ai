@@ -4,6 +4,7 @@ var photoRevision = 0;
 var itemRequest = 0;
 var ruleRequest = 0;
 var guideRequest = 0;
+var questionRequest = 0;
 
 function makeText(tag, value) {
     // 사용자 입력·서버 본문은 HTML로 해석하지 않고 글자로 넣는다.
@@ -21,6 +22,7 @@ async function readResponse(response) {
 function clearGuide() {
     // 품목/규격/수량이 달라지면 이전 금액을 계속 보여주지 않는다.
     guideRequest += 1;
+    clearQuestionAnswer();
     document.getElementById('guideResult').replaceChildren();
 }
 
@@ -36,34 +38,46 @@ function clearPhoto() {
     document.getElementById('visionCandidates').replaceChildren();
 }
 
+// 사진의 추정 결과는 자동 확정하지 않는다. 맞다고 누른 품목만 연결한다.
+async function confirmItem() {
+    var version = photoRevision;
+    var id = this.dataset.itemId;
+    document.getElementById('itemQuery').value = this.dataset.name;
+    await loadItems();
+    if (version !== photoRevision) return;
+    var select = document.getElementById('itemSelect');
+    select.value = id;
+    if (select.value) await loadRules();
+    document.getElementById('itemStatus').textContent = '품목을 확인했습니다. 실제 규격과 수량을 선택하세요.';
+    document.getElementById('ruleSelect').focus();
+}
+
 function showCandidates(candidates) {
-    // 공식 ID와 이름은 서버에서 검사했다. 버튼을 누른 사용자가 최종 품목을 고른다.
     var box = document.getElementById('visionCandidates');
     box.replaceChildren();
-    if (!candidates.length) return;
-    box.append(makeText('p', 'AI 품목 후보 · 실제 물건과 맞는지 확인한 뒤 선택하세요.'));
+    if (!candidates.length) {
+        box.append(makeText('p', '사진만으로 품목을 확인하기 어려워요. 아래에서 직접 찾아주세요.'));
+        return;
+    }
     for (var i = 0; i < candidates.length; i++) {
         var candidate = candidates[i];
         var card = document.createElement('div'); card.className = 'candidate-card';
-        var button = makeText('button', candidate.name + ' 선택');
-        button.type = 'button'; button.className = 'candidate-button';
-        button.dataset.itemId = candidate.item_id; button.dataset.name = candidate.name;
-        button.onclick = async function() {
-            var id = this.dataset.itemId;
-            var selectedPhoto = photoRevision;
-            document.getElementById('itemQuery').value = this.dataset.name;
-            await loadItems();
-            if (selectedPhoto !== photoRevision) return;
-            var select = document.getElementById('itemSelect');
-            select.value = id;
-            if (select.value) await loadRules();
-            select.focus();
-        };
+        card.append(makeText('strong', i === 0 ? candidate.name + '으로 보입니다. 이 품목이 맞나요?' : '다른 후보: ' + candidate.name));
+        var button = makeText('button', i === 0 ? '네, 이 품목이 맞아요' : candidate.name + '으로 변경');
+        button.type = 'button'; button.dataset.itemId = candidate.item_id; button.dataset.name = candidate.name;
+        button.onclick = confirmItem;
         card.append(button);
-        if (candidate.reason) card.append(makeText('small', 'AI의 참고 설명: ' + candidate.reason));
+        if (candidate.reason) card.append(makeText('small', candidate.reason));
         box.append(card);
     }
-    box.append(makeText('small', '맞는 후보가 없으면 품목 검색에서 직접 찾아보세요. AI 설명도 틀릴 수 있습니다.'));
+    var edit = makeText('button', '아니요, 직접 수정할게요');
+    edit.type = 'button'; edit.className = 'secondary-button';
+    edit.onclick = function() {
+        document.getElementById('itemStatus').textContent = '실제 품목 이름을 검색하고 다시 선택하세요.';
+        document.getElementById('itemQuery').focus();
+        document.getElementById('itemEditor').scrollIntoView({block: 'center', behavior: 'smooth'});
+    };
+    box.append(edit);
 }
 
 async function uploadPhoto() {
@@ -168,7 +182,87 @@ async function loadDocuments() {
     } catch (error) { document.getElementById('legalStatus').textContent = error.message; }
 }
 
+function clearQuestionAnswer() {
+    // 선택이 바뀌면 이전 품목의 답변을 그대로 보여주지 않는다.
+    questionRequest += 1;
+    var messages = document.getElementById('questionResult');
+    messages.replaceChildren(makeText('p', '안녕하세요! 버릴 품목이나 신청 방법을 질문해 주세요. 답변에는 확인한 공식 출처를 함께 보여드려요.'));
+    var items = document.getElementById('itemSelect');
+    var rules = document.getElementById('ruleSelect');
+    var context = items && items.value ? items.options[items.selectedIndex].text : '품목 미선택';
+    if (rules && rules.value) context += ' · ' + rules.options[rules.selectedIndex].text;
+    document.getElementById('questionContext').textContent = '현재 확인할 품목: ' + context;
+    document.getElementById('questionStatus').textContent = '';
+}
+
+async function askQuestion(event) {
+    event.preventDefault();
+    var request = ++questionRequest;
+    var question = document.getElementById('questionText').value.trim();
+    var messages = document.getElementById('questionResult');
+    var box = document.createElement('div'); box.className = 'assistant-message';
+    var status = document.getElementById('questionStatus');
+    var button = document.getElementById('askQuestion');
+    if (!question) { status.textContent = '질문을 입력하세요.'; return; }
+    var userMessage = makeText('p', question); userMessage.className = 'user-message';
+    messages.append(userMessage, box);
+    // 화면의 최근 대화만 보관한다. 질문 전체 이력을 서버로 보내지는 않는다.
+    while (messages.children.length > 9) messages.firstElementChild.remove();
+    box.textContent = '공식 안내를 확인하고 있어요…';
+    messages.scrollTop = messages.scrollHeight;
+    button.disabled = true;
+    status.textContent = '공식 근거를 찾고 있습니다. 처음 검색할 때는 조금 더 걸릴 수 있습니다.';
+    try {
+        var data = await readResponse(await fetch('/api/disposal/question', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({question: question,
+                item_id: document.getElementById('itemSelect').value || null,
+                rule_id: document.getElementById('ruleSelect').value || null,
+                quantity: Number(document.getElementById('itemQuantity').value), district: '신월1동'})
+        }));
+        if (request !== questionRequest) return;
+        var labels = {answered: '근거 기반 안내', needs_confirmation: '추가 확인이 필요합니다', error: '지금은 답변을 확인하지 못했습니다'};
+        status.textContent = labels[data.status] || '처리 결과';
+        status.dataset.state = data.status;
+        box.replaceChildren();
+        var answer = makeText('p', data.answer); answer.className = 'document-text'; box.append(answer);
+        var fieldNames = {item_id: '품목', rule_id: '규격', quantity: '수량'};
+        if (data.needed_fields && data.needed_fields.length) {
+            box.append(makeText('small', '확인할 내용: ' + data.needed_fields.map(function(field) {
+                return fieldNames[field] || field;
+            }).join(', ')));
+        }
+        for (var i = 0; i < (data.sources || []).length; i++) {
+            var row = data.sources[i];
+            var detail = document.createElement('div'); detail.className = 'answer-source';
+            detail.append(makeText('strong', row.title));
+            appendSource(detail, {source_url: row.url, checked_at: row.checked_at, effective_from: row.effective_from});
+            if (row.verification_status === 'seed_snapshot') {
+                detail.append(makeText('small', '수수료 스냅샷 · 현행 금액은 공식 신청 화면에서 확인하세요.'));
+            }
+            box.append(detail);
+        }
+        box.append(makeText('small', data.notice));
+        messages.scrollTop = messages.scrollHeight;
+        document.getElementById('questionText').value = '';
+    } catch (error) {
+        if (request === questionRequest) { status.textContent = error.message; box.textContent = '답변을 가져오지 못했어요. 잠시 후 다시 질문해 주세요.'; }
+    } finally { button.disabled = false; }
+}
+
+// 작은 화면에서는 두 화면을 번갈아 보고, 큰 화면에서는 나란히 본다.
+function showPanel(view) {
+    document.querySelector('.disposal-workspace').dataset.view = view;
+    document.getElementById('showItems').setAttribute('aria-pressed', view === 'items');
+    document.getElementById('showQuestions').setAttribute('aria-pressed', view === 'questions');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('showItems').onclick = function() { showPanel('items'); };
+    document.getElementById('showQuestions').onclick = function() { showPanel('questions'); };
+    document.getElementById('questionAboutItem').onclick = function() {
+        showPanel('questions'); document.getElementById('questionText').focus();
+    };
     document.getElementById('photoFile').onchange = function() {
         photoRevision += 1;
         document.getElementById('visionCandidates').replaceChildren();
@@ -187,5 +281,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('ruleSelect').onchange = clearGuide;
     document.getElementById('itemQuantity').oninput = clearGuide;
     document.getElementById('getGuide').onclick = getGuide;
+    document.getElementById('questionForm').onsubmit = askQuestion;
+    document.getElementById('clearQuestion').onclick = function() {
+        document.getElementById('questionText').value = ''; clearQuestionAnswer();
+    };
     loadItems(); loadDocuments();
 });

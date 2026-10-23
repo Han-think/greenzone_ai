@@ -113,7 +113,7 @@ def suggest(raw, items):
                 break
         result['state'] = 'candidates' if result['candidates'] else 'abstained'
     except urllib.error.HTTPError as error:
-        result['message'] = ('Gemini 사용 한도에 도달했습니다. 직접 품목을 선택하세요.' if error.code == 429
+        result['message'] = ('사진 확인의 이용 한도에 도달했습니다. 직접 품목을 선택해 주세요.' if error.code == 429
                              else '사진 분석 요청에 실패했습니다. 직접 품목을 선택하세요.')
     except (OSError, ValueError, KeyError, IndexError, TypeError):
         result['message'] = '사진 분석 결과를 확인하지 못했습니다. 직접 품목을 선택하세요.'

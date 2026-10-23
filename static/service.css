@@ -35,3 +35,37 @@ summary { cursor: pointer; font-weight: bold; }
 .history-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .history-table th,.history-table td { text-align: left; padding: 8px; border: 1px solid #d5e2d8; overflow-wrap: anywhere; white-space: pre-wrap; }
 .history-table th { background: #eaf2ec; }
+
+/* RAG 결과도 본문과 출처를 나누어 읽기 쉽게 보여준다. */
+.answer-source { margin: 12px 0; padding: 10px; border-left: 3px solid #80ad95; background: #f5faf7; }
+#questionStatus[data-state="error"] { color: #9b3d27; }
+#questionStatus[data-state="needs_confirmation"] { color: #735621; }
+
+/* 배출 도우미: 컴퓨터에서는 품목과 질문을 나란히, 모바일에서는 탭으로 전환한다. */
+.disposal-workspace { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 20px; align-items: start; }
+.chat-panel { position: sticky; top: 20px; }
+.chat-messages { min-height: 260px; max-height: 480px; overflow-y: auto; padding: 12px; background: #f6f8f7; border-radius: 10px; overflow-wrap: anywhere; }
+.assistant-message { margin: 12px 0; background: white; border: 1px solid #d5e2d8; border-radius: 10px; padding: 12px; }
+.user-message { margin: 12px 0 12px 24px; padding: 10px 14px; background: #deeee5; border-radius: 12px 12px 2px 12px; white-space: pre-wrap; }
+.context-note { padding: 8px 12px; border-radius: 6px; background: #edf4ef; font-size: 13px; }
+.disposal-page textarea { min-height: 76px; max-height: 180px; }
+.disposal-page input,.disposal-page select,.disposal-page textarea { font-size: 16px; }
+.secondary-button { background: white; color: #176047; }
+.mobile-switch { display: none; }
+.disposal-page button { min-height: 44px; }
+@media(max-width: 1050px) {
+    .disposal-workspace { grid-template-columns: minmax(0,1fr); }
+    .chat-panel { position: static; }
+    .mobile-switch { display: flex; gap: 8px; }
+    .mobile-switch button { flex: 1; background: white; color: #176047; }
+    .mobile-switch button[aria-pressed="true"] { background: #267555; color: white; }
+    .disposal-workspace[data-view="items"] #chatPanel { display: none; }
+    .disposal-workspace[data-view="questions"] #itemPanel { display: none; }
+    .chat-messages { min-height: 220px; max-height: 45dvh; }
+}
+@media(max-width: 480px) {
+    .disposal-page .card { padding: 14px; }
+    .disposal-page h1 { font-size: 23px; }
+    .disposal-page .flow-note { font-size: 13px; }
+    .disposal-page .service-page { padding: 12px; }
+}

@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 import guide_service as guide
 import vision_service
+from server import rag_service
 
 router = APIRouter()
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / 'templates')
@@ -110,7 +111,7 @@ async def upload_image(request: Request):
               'candidates': [], 'stored': False, 'provider_called': False}
     if vision_service.settings() is None:
         result['state'] = 'not_configured'
-        result['message'] = 'Gemini 설정 전입니다. 아래에서 직접 품목을 선택하세요.'
+        result['message'] = '현재 사진 확인을 사용할 수 없습니다. 직접 품목을 선택해 주세요.'
         return result
     try:
         # 별도 작업으로 호출해 사진을 분석하는 동안 지도·검색 요청을 막지 않는다.
@@ -123,7 +124,7 @@ async def upload_image(request: Request):
         result['message'] = '사진 분석에 연결하지 못했습니다. 아래에서 직접 품목을 선택하세요.'
         return result
     if result['state'] == 'candidates':
-        result['message'] = 'Gemini가 제안한 후보입니다. 맞는 품목을 선택하고 규격·수량을 확인하세요.'
+        result['message'] = '사진에서 찾은 품목입니다. 실제 물건과 맞는지 확인해 주세요.'
     elif result['state'] == 'abstained':
         result['message'] = '확실한 후보가 없어 보류했습니다. 다른 사진을 쓰거나 직접 품목을 선택하세요.'
     return result
@@ -156,6 +157,36 @@ async def disposal_guide(request: Request):
         return guide.make_guide(str(data.get('rule_id', ''))[:100], quantity)
     except ValueError as error:
         raise HTTPException(422, str(error))
+
+
+# @router.post는 질문 JSON을 받는 URL을 기존 FastAPI 앱에 등록한다.
+@router.post('/api/disposal/question')
+async def disposal_question(request: Request):
+    # 사용자 질문은 저장하지 않는다. 실제 선택 ID와 수량을 먼저 검사한다.
+    data = await read_form_json(request)
+    question = data.get('question')
+    if not isinstance(question, str) or not 1 <= len(question.strip()) <= 1000:
+        raise HTTPException(422, '질문은 1~1,000자로 입력하세요.')
+    if data.get('district', '신월1동') != '신월1동':
+        raise HTTPException(422, '이번 안내는 양천구 신월1동 기준입니다.')
+    # 연락처·이메일은 질문에 넣지 않도록 요청하고 외부 전송 전에 차단한다.
+    import re
+    if re.search(r'(?<!\d)0\d{1,2}[- .]?\d{3,4}[- .]?\d{4}(?!\d)|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}', question):
+        raise HTTPException(422, '연락처·이메일을 지운 뒤 질문하세요.')
+    item_id = data.get('item_id') or None
+    rule_id = data.get('rule_id') or None
+    if any(v is not None and (not isinstance(v, str) or len(v) > 100) for v in [item_id, rule_id]):
+        raise HTTPException(422, '품목·규격 선택값을 확인하세요.')
+    quantity = data.get('quantity', 1)
+    if type(quantity) is not int or not 1 <= quantity <= 100:
+        raise HTTPException(422, '수량은 1~100 사이 정수로 입력하세요.')
+    try:
+        rag_service.item_context('', item_id, rule_id, quantity)
+    except ValueError as error:
+        raise HTTPException(422, str(error))
+    # 외부 검색·생성이 느려도 지도와 다른 요청을 막지 않게 별도 스레드에서 실행한다.
+    return await asyncio.to_thread(rag_service.answer_question,
+        question.strip(), item_id, rule_id, quantity)
 
 
 @router.post('/api/admin/login')
