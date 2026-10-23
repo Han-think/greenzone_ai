@@ -20,14 +20,15 @@ function setMapSidebarCollapsed(collapsed) {
 
     if (!sidebarCenterToRestore) return;
     clearTimeout(sidebarCenterRestoreTimer);
-    relayoutMapKeepingCenter(sidebarCenterToRestore);
-    sidebarCenterRestoreTimer = setTimeout(restoreSidebarMapCenter, 280);
+    mapSidebarTransitionActive = true;
+    sidebarCenterRestoreTimer = setTimeout(restoreSidebarMapCenter, 240);
 }
 
 function restoreSidebarMapCenter() {
     if (map && sidebarCenterToRestore) {
         relayoutMapKeepingCenter(sidebarCenterToRestore);
     }
+    mapSidebarTransitionActive = false;
     sidebarCenterToRestore = null;
     sidebarCenterRestoreTimer = null;
 }

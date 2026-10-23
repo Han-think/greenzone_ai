@@ -16,6 +16,7 @@ var lastStableMapSize;
 var mapResizeTimer;
 var mapCenterAnimationFrame;
 var mapCenterAnimationTarget;
+var mapSidebarTransitionActive = false;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
 // 팀 지도 브랜치의 거리/점선 함수. 원래 배정은 유지하고 두 대표점의 관계만 표시한다.
@@ -515,11 +516,11 @@ function initializeMap() {
             var mapResizeObserver = new ResizeObserver(function() {
                 var size = currentMapSize();
                 if (size.width === lastStableMapSize.width && size.height === lastStableMapSize.height) return;
-                var center = mapCenterAnimationTarget || lastStableMapCenter || map.getCenter();
-                map.relayout();
-                map.setCenter(center);
-                lastStableMapSize = currentMapSize();
-                lastStableMapCenter = center;
+                if (mapSidebarTransitionActive) return;
+                clearTimeout(mapResizeTimer);
+                mapResizeTimer = setTimeout(function() {
+                    relayoutMapKeepingCenter(mapCenterAnimationTarget || lastStableMapCenter);
+                }, 100);
             });
             mapResizeObserver.observe(document.getElementById('map'));
         }
