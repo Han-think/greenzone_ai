@@ -13,22 +13,75 @@ html,body {
 body {
     display: flex;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     padding-left: 190px;
 }
 
 aside {
+    position: relative;
+    z-index: 105;
     width:385px;
     min-width:385px;
     flex-shrink:0;
     padding:18px;
-    overflow:hidden;
+    overflow:visible;
     display:flex;
     flex-direction:column;
     background:#fafcfb;
     border-right:1px solid #d8e2dc;
+    transition: width 220ms ease, min-width 220ms ease, height 220ms ease, max-height 220ms ease, padding 220ms ease;
 }
 
+.sidebar-toggle {
+    position: absolute;
+    z-index: 110;
+    top: 50%;
+    right: -17px;
+    width: 34px;
+    height: 48px;
+    padding: 0;
+    transform: translateY(-50%);
+    border: 1px solid #b9cec1;
+    border-radius: 0 8px 8px 0;
+    background: #fafcfb;
+    box-shadow: 2px 1px 5px #0002;
+}
+.sidebar-toggle::before {
+    display: block;
+    width: 9px;
+    height: 9px;
+    margin: auto;
+    border-top: 2px solid #245b40;
+    border-right: 2px solid #245b40;
+    content: "";
+    transform: rotate(-135deg);
+    transition: transform 180ms ease;
+}
+.map-sidebar-collapsed #searchPanel {
+    width: 34px;
+    min-width: 34px;
+    padding: 0;
+    border-right: 0;
+}
+.map-sidebar-collapsed #searchPanel > :not(.sidebar-toggle) {
+    display: none;
+}
+.map-sidebar-collapsed .sidebar-toggle::before {
+    transform: rotate(45deg);
+}
+@media (orientation: landscape) {
+    .map-sidebar-collapsed #searchPanel {
+        background: transparent;
+        pointer-events: none;
+    }
+    .map-sidebar-collapsed .sidebar-toggle {
+        pointer-events: auto;
+        left: 0;
+        right: auto;
+        transform: translateY(-50%);
+    }
+}
 
 main {
     flex:1;
@@ -230,10 +283,12 @@ a {
         width:100%;
         min-width:0;
         height:49%;
+        max-height:60vh;
         flex-shrink:0;
         padding:12px 16px;
     }
     main {
+        flex:1;
         min-height:200px;
     }
     header {
@@ -247,6 +302,29 @@ a {
     }
     #mapStatus {
         font-size:11px;
+    }
+    .sidebar-toggle {
+        top:auto;
+        right:16px;
+        bottom:-17px;
+        transform:none;
+        border-radius:0 0 8px 8px;
+    }
+    .sidebar-toggle::before {
+        transform: rotate(135deg);
+    }
+    .map-sidebar-collapsed #searchPanel {
+        height:0;
+        max-height:0;
+        padding:0;
+        border-bottom:0;
+    }
+    .map-sidebar-collapsed .sidebar-toggle::before {
+        transform: rotate(-45deg);
+    }
+    .map-sidebar-collapsed #searchPanel {
+        width:34px;
+        min-width:34px;
     }
 }
 .map-dot {
@@ -268,6 +346,36 @@ a {
     min-width: 180px;
     max-width: 280px;
     white-space: normal;
+}
+.map-popup-subtle {
+    position: relative;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px #0004;
+    background-color: rgba(255, 255, 255, 0.78);
+}
+.map-popup-subtle p {
+    margin: 0;
+}
+.map-popup-close {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+    color: #293e34;
+    font-size: 18px;
+    line-height: 1;
+}
+.search-location-marker {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: #2469c6;
+    box-shadow: 0 1px 5px #0008;
+    cursor: pointer;
 }
 
 /* 경로 선택은 작은 체크 목록으로 둔다. 기존 검색/후보 탭 구조는 그대로 쓴다. */
@@ -303,9 +411,180 @@ a {
 .route-panel summary { color: #88421e; font-weight: bold; }
 .route-steps { font-size: 12px; color: #88421e; }
 @media(max-width:760px) {
-    body { height: auto; min-height: 100vh; overflow: auto; }
-    aside { height: auto; max-height: 60vh; }
-    main { flex: none; height: 55vh; }
+    body { height: 100vh; height: 100dvh; min-height:0; overflow:hidden; }
+}
+@media (orientation: portrait) {
+    body.map-page {
+        display:flex;
+        grid-template-columns:none;
+        grid-template-rows:none;
+        padding-left:0;
+        flex-direction:column;
+        transition:none;
+    }
+    body.map-page .app-nav {
+        position:static;
+        top:auto;
+        bottom:auto;
+        left:auto;
+        width:100%;
+        max-height:none;
+        padding:10px 12px;
+        flex-direction:row;
+        flex-wrap:wrap;
+        flex-shrink:0;
+        overflow:visible;
+        border-right:0;
+        border-bottom:1px solid #d5e2d8;
+    }
+    body.map-page .nav-brand { width:auto; flex:1; }
+    body.map-page .nav-links { width:100%; }
+    body.map-page aside {
+        width:100%;
+        min-width:0;
+        height:49%;
+        max-height:60vh;
+        flex-shrink:0;
+        padding:12px 16px;
+    }
+    body.map-page main {
+        flex:1;
+        min-height:200px;
+    }
+    body.map-page .sidebar-toggle {
+        top:auto;
+        right:16px;
+        bottom:-17px;
+        transform:none;
+        border-radius:0 0 8px 8px;
+    }
+    body.map-page .sidebar-toggle::before {
+        transform:rotate(-45deg);
+    }
+    body.map-page.map-sidebar-collapsed .sidebar-toggle {
+        top:0;
+        right:16px;
+        bottom:auto;
+        width:34px;
+        height:30px;
+        padding:0;
+        transform:translateY(-50%);
+        border-radius:6px;
+        background:rgba(250, 252, 251, 0.88);
+    }
+    body.map-page.map-sidebar-collapsed #searchPanel {
+        width:100%;
+        min-width:0;
+        flex:0 0 0;
+        height:0;
+        max-height:0;
+        padding:0;
+        border-bottom:0;
+    }
+    body.map-page.map-sidebar-collapsed .sidebar-toggle::before {
+        transform:rotate(135deg);
+    }
+    body.map-page.map-sidebar-collapsed .map-toolbar {
+        padding-right:58px;
+    }
+}
+@media (orientation: portrait) and (min-width:761px) {
+    body.map-page .nav-brand { flex:0 0 auto; }
+    body.map-page .nav-links {
+        display:flex;
+        width:auto;
+        flex:1;
+        flex-direction:row;
+        align-items:center;
+    }
+    body.map-page .nav-section { display:none; }
+    body.map-page .nav-btn { flex:1; text-align:center; }
+}
+@media (orientation: landscape) {
+    body.map-page {
+        display:grid;
+        grid-template-columns:190px minmax(220px, 30vw) minmax(0, 1fr);
+        grid-template-rows:minmax(0, 1fr);
+        padding-left:0;
+        transition:grid-template-columns 220ms ease;
+    }
+    body.map-page .app-nav {
+        grid-column:1;
+        grid-row:1;
+        position:static;
+        width:190px;
+        max-height:none;
+        flex-direction:column;
+        flex-wrap:nowrap;
+        overflow-y:auto;
+        border-right:1px solid #d5e2d8;
+        border-bottom:0;
+    }
+    body.map-page .nav-brand { width:100%; flex:none; }
+    body.map-page .nav-links { display:flex; width:100%; flex:1; flex-direction:column; }
+    body.map-page .nav-section { display:block; }
+    body.map-page .app-nav #menuToggle { display:none; }
+    body.map-page aside {
+        grid-column:2;
+        grid-row:1;
+        width:auto;
+        min-width:0;
+        height:auto;
+        max-height:none;
+        min-height:0;
+        padding:10px;
+    }
+    body.map-page main {
+        grid-column:3;
+        grid-row:1;
+        min-height:0;
+    }
+    body.map-page.map-sidebar-collapsed {
+        grid-template-columns:190px 34px minmax(0, 1fr);
+    }
+    body.map-page.map-sidebar-collapsed #searchPanel {
+        width:auto;
+        min-width:0;
+        height:auto;
+        max-height:none;
+    }
+    body.map-page .sidebar-toggle {
+        top:50%;
+        right:-16px;
+        bottom:auto;
+        width:32px;
+        height:40px;
+        transform:translateY(-50%);
+        border-radius:0 8px 8px 0;
+    }
+    body.map-page.map-sidebar-collapsed .sidebar-toggle {
+        left:0;
+        right:auto;
+    }
+    body.map-page .sidebar-toggle::before {
+        transform:rotate(-135deg);
+    }
+    body.map-page.map-sidebar-collapsed .sidebar-toggle::before {
+        transform:rotate(45deg);
+    }
+    body.map-page.map-sidebar-collapsed .map-toolbar {
+        padding-left:46px;
+    }
+}
+@media print {
+    .sidebar-toggle { display:none; }
+    body.map-sidebar-collapsed #searchPanel {
+        width:100%;
+        min-width:0;
+        height:auto;
+        max-height:none;
+        padding:10px;
+        border:0;
+    }
+    body.map-sidebar-collapsed #searchPanel > :not(.sidebar-toggle) {
+        display:block;
+        visibility:visible;
+    }
 }
 
 /* 직접 순서 지정은 번호 선택만 사용해 드래그 없이 키보드로도 조정한다. */

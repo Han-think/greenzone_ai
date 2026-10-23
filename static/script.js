@@ -5,6 +5,32 @@ var searchQuery = '';
 var searchPage = 0;
 var searchBusy = false;
 var wasteLoaded = false;
+var sidebarCenterRestoreTimer;
+var sidebarCenterToRestore;
+
+function setMapSidebarCollapsed(collapsed) {
+    var isCollapsed = document.body.classList.contains('map-sidebar-collapsed');
+    if (isCollapsed === collapsed) return;
+    sidebarCenterToRestore = map ? map.getCenter() : null;
+    document.body.classList.toggle('map-sidebar-collapsed', collapsed);
+
+    var toggle = document.getElementById('sidebarToggle');
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    toggle.setAttribute('aria-label', collapsed ? '검색 메뉴 펼치기' : '검색 메뉴 접기');
+
+    if (!sidebarCenterToRestore) return;
+    clearTimeout(sidebarCenterRestoreTimer);
+    relayoutMapKeepingCenter(sidebarCenterToRestore);
+    sidebarCenterRestoreTimer = setTimeout(restoreSidebarMapCenter, 280);
+}
+
+function restoreSidebarMapCenter() {
+    if (map && sidebarCenterToRestore) {
+        relayoutMapKeepingCenter(sidebarCenterToRestore);
+    }
+    sidebarCenterToRestore = null;
+    sidebarCenterRestoreTimer = null;
+}
 
 // 팀의 탭을 전환한다. 검색 결과와 후보 선택 상태는 그대로 남긴다.
 function showPanel(panel) {
@@ -218,6 +244,12 @@ async function loadWaste() {
     } catch (error) { box.textContent = error.message; }
 }
 document.addEventListener('DOMContentLoaded', async function() {
+    var sidebarToggle = document.getElementById('sidebarToggle');
+    sidebarToggle.addEventListener('click', function() {
+        var expanded = this.getAttribute('aria-expanded') === 'true';
+        setMapSidebarCollapsed(expanded);
+    });
+
     document.getElementById('tabSearchBtn').onclick = function() { showPanel('search'); };
     document.getElementById('tabDataBtn').onclick = function() { showPanel('data'); };
     document.getElementById('searchForm').onsubmit = searchBuildings;
@@ -268,6 +300,7 @@ var navSearchBtn = document.getElementById('navSearchBtn');
 if (navSearchBtn && new URLSearchParams(location.search).get('view') !== 'route') {
     navSearchBtn.onclick = function(event) {
         event.preventDefault();
+        setMapSidebarCollapsed(false);
         showPanel('search');
     };
 }
