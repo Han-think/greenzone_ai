@@ -332,3 +332,56 @@ async def admin_save(kind: str, record_id: str, request: Request):
     except ValueError as error:
         raise HTTPException(409, str(error))
     return {'saved': True, 'message': '저장했습니다. 다음 사용자 조회부터 반영됩니다.'}
+
+
+@router.get('/about')
+def about_page(request: Request):
+    return templates.TemplateResponse(request=request, name='about.html', context={})
+
+
+# POST는 새 자료 등록이다. 기존 PUT 수정과 분리해 원래 ID를 바꾸지 않는다.
+@router.post('/api/admin/records/{kind}')
+async def admin_create(kind: str, request: Request):
+    actor = require_admin(request)
+    check_admin_origin(request)
+    check_kind(kind)
+    data = await read_form_json(request)
+    changes = validate_changes(kind, data)
+    reason = data.get('reason', '')
+    name = data.get('official_name', '').strip() if isinstance(data.get('official_name', ''), str) else ''
+    source_type = data.get('source_type', 'official_web_summary')
+    if not isinstance(reason, str) or not 3 <= len(reason.strip()) <= 500:
+        raise HTTPException(422, '수정 사유를 3~500자로 입력하세요.')
+    if kind == 'rules' and not 1 <= len(name) <= 100:
+        raise HTTPException(422, '공식 품목명을 1~100자로 입력하세요.')
+    if source_type not in ['official_web_summary', 'law']:
+        raise HTTPException(422, '문서 종류를 확인하세요.')
+    if kind == 'documents' and source_type == 'law' and changes['verification_status'] == 'verified_excerpt' and not changes.get('effective_from'):
+        raise HTTPException(422, '법령 검토 완료 시 시행일이 필요합니다.')
+    record_id = guide.create_record(kind, changes, name, source_type, reason.strip(), actor)
+    return {'saved': True, 'record_id': record_id, 'message': '새 자료를 등록했습니다.'}
+
+
+# 복원도 검증된 수정으로 처리한다. 이력을 삭제하거나 버전 번호를 되돌리지 않는다.
+@router.post('/api/admin/restore/{kind}/{record_id}')
+async def admin_restore(kind: str, record_id: str, request: Request):
+    actor = require_admin(request)
+    check_admin_origin(request)
+    check_kind(kind)
+    data = await read_form_json(request)
+    reason = data.get('reason', '')
+    revision = data.get('revision')
+    if not isinstance(reason, str) or not 3 <= len(reason.strip()) <= 500 or type(revision) is not int:
+        raise HTTPException(422, '복원 사유와 현재 자료 버전을 확인하세요.')
+    history = next((h for h in guide.read_history(kind, record_id) if h['id'] == data.get('history_id')), None)
+    if history is None or not json.loads(history['before_json']):
+        raise HTTPException(422, '복원할 이전 값이 없습니다.')
+    before = json.loads(history['before_json'])
+    changes = validate_changes(kind, {'changes': before})
+    if kind == 'documents' and before.get('source_type') == 'law' and changes['verification_status'] == 'verified_excerpt' and not changes.get('effective_from'):
+        raise HTTPException(422, '법령 검토 완료 시 시행일이 필요합니다.')
+    try:
+        guide.save_record(kind, record_id, changes, revision, '이전 값 복원: ' + reason.strip(), actor)
+    except ValueError as error:
+        raise HTTPException(409, str(error))
+    return {'saved': True, 'message': '이전 값으로 복원했습니다. 복원 내역도 이력에 남겼습니다.'}

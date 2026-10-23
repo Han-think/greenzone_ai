@@ -47,3 +47,35 @@
     .app-nav .nav-btn { flex: 1; padding: 8px; text-align: center; white-space: nowrap; font-size: 12px; }
 }
 @media print { .app-nav { display: none !important; } }
+
+/* 기존 왼쪽 메뉴 폭을 유지하고 모바일에서만 접는다. */
+.nav-brand { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.nav-brand > a { font-size: 21px; font-weight: bold; color: #245b40; text-decoration: none; }
+.nav-links { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+.nav-section { display: block; margin: 14px 10px 4px; font-size: 12px; color: #63796a; }
+.app-nav #menuToggle { display: none; }
+.app-nav #navLogout { margin: 10px; background: white; color: #355341; padding: 9px; border: 1px solid #b9cec1; border-radius: 6px; cursor: pointer; }
+.nav-admin-entry { margin-top: 16px; font-size: 12px !important; }
+@media(max-width: 760px) {
+ .app-nav #menuToggle { display: block; padding: 8px 14px; border: 1px solid #b9cec1; border-radius: 6px; background: white; color: #245b40; }
+ .nav-links { display: none; }
+ .nav-links.menu-open { display: flex; }
+ .app-nav .nav-btn { flex: none; text-align: left; font-size: 14px; }
+ .nav-admin-entry { margin-top: 4px; }
+}
+
+/* 운영 메뉴는 주민 메뉴 아래에 두고 '관리자 화면'을 누르면 펼친다. */
+.app-nav .nav-links { flex: 1; }
+.app-nav .admin-nav-group { margin: auto 0 0; padding: 20px 0 0; border: 0; border-radius: 0; background: none; }
+.app-nav .admin-menu-title { cursor: pointer; font-weight: bold; list-style: none; }
+.app-nav .admin-menu-title::-webkit-details-marker { display: none; }
+.app-nav .admin-menu-title::after { content: '▸'; float: right; }
+.app-nav .admin-nav-group[open] > .admin-menu-title::after { content: '▾'; }
+.app-nav .admin-submenu { margin: 6px 0 0 10px; padding-left: 6px; border-left: 2px solid #c6dace; }
+.app-nav .admin-submenu .nav-btn { font-size: 13px; padding: 9px 8px; }
+.app-nav .nav-admin-entry { margin-top: auto; padding-top: 16px; }
+@media(max-width: 760px) {
+ .app-nav .nav-links { flex: none; }
+ .app-nav .admin-nav-group { margin-top: 10px; padding-top: 6px; }
+ .app-nav .nav-admin-entry { margin-top: 4px; }
+}

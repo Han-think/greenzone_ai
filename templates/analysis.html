@@ -6,19 +6,12 @@
     <title>그린존 · 분석 지도</title>
     <!-- 팀이 받은 분석 HTML과 같은 Leaflet 버전. 지도 표시용이며 분석 알고리즘은 아니다. -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-    <link rel="stylesheet" href="/static/nav.css">
+    <link rel="stylesheet" href="/static/nav.css?v=20261023-fold2">
     <link rel="stylesheet" href="/static/analysis.css?v=20261021-unified">
     <link rel="stylesheet" href="/static/analysis_map.css?v=20261021">
 </head>
 <body>
-    <nav class="app-nav" aria-label="메인메뉴">
-        <h2>GreenZone</h2>
-        <a class="nav-btn" href="/">주소 검색</a>
-        <a id="navRouteBtn" class="nav-btn" href="/?view=route">수거 경로안</a>
-        <a class="nav-btn active" href="/analysis" aria-current="page">분석 지도</a>
-        <a class="nav-btn" href="/disposal">배출 도우미</a>
-        <a class="nav-btn" href="/admin">관리자</a>
-</nav>
+    {% include 'nav.html' %}
 
     <section class="report-intro" aria-labelledby="reportTitle">
         <h1 id="reportTitle">같은 신월1동 자료, 두 가지 보기</h1>

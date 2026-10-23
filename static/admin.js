@@ -12,6 +12,8 @@ var currentRecord = null;
 var currentKind = '';
 var listRequest = 0;
 var historyRequest = 0;
+var creating = false;
+var pendingSave = null;
 
 function textElement(tag, value) {
     var node = document.createElement(tag); node.textContent = value; return node;
@@ -30,6 +32,13 @@ async function adminFetch(url, method, data) {
 
 function showLogin(loggedIn) {
     document.getElementById('loginPanel').hidden = loggedIn;
+    document.getElementById('adminNav').hidden = !loggedIn;
+    document.getElementById('adminLoginEntry').hidden = loggedIn;
+    if (!loggedIn) {
+        rememberMenu('greenzone-admin-menu-open', false);
+        document.getElementById('adminNav').open = false;
+    }
+    document.getElementById('adminEntry').textContent = loggedIn ? '관리자 화면' : '관리자 로그인';
     document.getElementById('adminPanel').hidden = !loggedIn;
     if (!loggedIn) {
         listRequest += 1; historyRequest += 1;
@@ -61,7 +70,15 @@ async function loadRecords(event, keepId) {
     try {
         var data = await adminFetch('/api/admin/records/' + kind + '?q=' + encodeURIComponent(document.getElementById('recordQuery').value));
         if (request !== listRequest) return;
-        records = data.records; currentKind = kind;
+        records = data.records.filter(function(row) {
+            var filter = document.getElementById('reviewFilter').value;
+            var today = new Date().toLocaleDateString('sv-SE', {timeZone: 'Asia/Seoul'});
+            if (filter === 'review') return row.verification_status !== 'verified_excerpt';
+            if (filter === 'expired') return row.effective_until && row.effective_until < today;
+            if (filter === 'inactive') return row.active === false;
+            if (filter === 'future') return row.effective_from && row.effective_from > today;
+            return true;
+        }); currentKind = kind;
         for (var i = 0; i < records.length; i++) {
             var row = records[i];
             var label = kind === 'rules' ? row.official_name + ' / ' + row.specification : row.title;
@@ -78,6 +95,7 @@ function selectRecord() {
     // 목록에서 선택한 한 행의 수정 버전을 보관한다. 저장할 때 버전을 함께 보낸다.
     currentRecord = records[Number(document.getElementById('recordSelect').value)];
     if (!currentRecord) return;
+    creating = false; document.getElementById('createFields').hidden = true;
     var row = currentRecord;
     var isRule = currentKind === 'rules';
     document.getElementById('ruleFields').hidden = !isRule;
@@ -109,7 +127,7 @@ async function loadHistory(id) {
             var row = data.history[i]; var detail = document.createElement('details');
             detail.append(textElement('summary', new Date(row.changed_at).toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'}) + ' · ' + row.actor + ' · ' + row.reason));
             // DB 원본은 그대로 두고 변경된 항목만 한국어 표로 보여준다.
-            var before = JSON.parse(row.before_json); var after = JSON.parse(row.after_json);
+            var previousValue = JSON.parse(row.before_json); var before = previousValue || {}; var after = JSON.parse(row.after_json);
             var labels = {specification: '규격', fee_krw: '수수료(원)', source_note: '금액 기준 설명',
                 title: '제목', text: '발췌 본문', source_url: '공식 출처', checked_at: '원문 확인일',
                 effective_from: '시행 시작일', effective_until: '시행 종료일', verification_status: '검토 상태', active: '사용 여부'};
@@ -125,15 +143,22 @@ async function loadHistory(id) {
                 line.append(textElement('td', labels[key]), textElement('td', historyValue(previous)), textElement('td', historyValue(next)));
                 table.append(line);
             });
-            detail.append(table); box.append(detail);
+            detail.append(table);
+            if (previousValue) {
+                var restore = textElement('button', '이 변경 전으로 복원');
+                restore.type = 'button'; restore.dataset.historyId = row.id;
+                restore.onclick = function() { prepareRestore(Number(this.dataset.historyId), data.history); };
+                detail.append(restore);
+            }
+            box.append(detail);
         }
     } catch (error) { if (request === historyRequest) box.textContent = error.message; }
 }
 
 async function saveRecord(event) {
     event.preventDefault();
-    if (!currentRecord) return;
-    var id = currentRecord.rule_id || currentRecord.document_id;
+    if (!currentRecord && !creating) return;
+    var id = creating ? '' : currentRecord.rule_id || currentRecord.document_id;
     var changes = {source_url: document.getElementById('sourceUrl').value,
         checked_at: document.getElementById('checkedAt').value || null,
         effective_from: document.getElementById('effectiveFrom').value || null,
@@ -145,20 +170,87 @@ async function saveRecord(event) {
         changes.fee_krw = Number(document.getElementById('fee').value);
         changes.source_note = document.getElementById('sourceNote').value;
     } else { changes.title = document.getElementById('documentTitle').value; changes.text = document.getElementById('documentText').value; }
-    var button = document.getElementById('saveRecord'); button.disabled = true;
-    // 저장 중에는 다른 행을 골라 내용을 혼동하지 않도록 선택을 잠시 막는다.
-    document.getElementById('recordSelect').disabled = true;
-    document.getElementById('recordKind').disabled = true;
-    try {
-        var result = await adminFetch('/api/admin/records/' + currentKind + '/' + encodeURIComponent(id), 'PUT',
-            {changes: changes, revision: currentRecord.revision, reason: document.getElementById('changeReason').value});
-        document.getElementById('adminStatus').textContent = result.message;
-        await loadRecords(null, id);
-    } catch (error) { document.getElementById('adminStatus').textContent = error.message; }
-    finally { button.disabled = false; document.getElementById('recordSelect').disabled = false; document.getElementById('recordKind').disabled = false; }
+    var reason = document.getElementById('changeReason').value;
+    if (reason.trim().length < 3) { document.getElementById('adminStatus').textContent = '사유를 3자 이상 입력하세요.'; return; }
+    var body = {changes: changes, reason: reason};
+    if (creating) {
+        body.official_name = document.getElementById('officialName').value.trim();
+        body.source_type = document.getElementById('sourceType').value;
+        if (currentKind === 'rules' && !body.official_name) { document.getElementById('adminStatus').textContent = '공식 품목명을 입력하세요.'; return; }
+    } else body.revision = currentRecord.revision;
+    pendingSave = {url: '/api/admin/records/' + currentKind + (creating ? '' : '/' + encodeURIComponent(id)),
+        method: creating ? 'POST' : 'PUT', body: body, id: id};
+    previewChanges(currentRecord || {}, changes);
 }
 
+function previewChanges(before, after) {
+    // HTML 문자열로 본문을 삽입하지 않고 실제 바뀐 칸을 비교한다.
+    var box = document.getElementById('previewChanges'); box.replaceChildren();
+    var labels = {specification:'규격', fee_krw:'수수료', source_note:'금액 설명', title:'제목', text:'본문',
+        source_url:'공식 출처', checked_at:'확인일', effective_from:'시행 시작', effective_until:'시행 종료', verification_status:'검토 상태', active:'사용 여부'};
+    if (pendingSave.body.official_name) box.append(textElement('p', '공식 품목명: ' + pendingSave.body.official_name));
+    Object.keys(after).forEach(function(key) {
+        if (!labels[key] || JSON.stringify(before[key] ?? null) === JSON.stringify(after[key] ?? null)) return;
+        box.append(textElement('strong', labels[key] || key), textElement('p', historyValue(before[key]) + ' → ' + historyValue(after[key])));
+    });
+    box.append(textElement('p', '사유: ' + pendingSave.body.reason));
+    document.getElementById('savePreview').showModal();
+}
+
+function prepareRestore(historyId, history) {
+    if (!currentRecord) return;
+    var row = history.find(function(value) { return value.id === historyId; });
+    if (!row || !JSON.parse(row.before_json)) return;
+    var reason = prompt('복원 사유를 3자 이상 입력하세요.');
+    if (!reason || reason.trim().length < 3 || reason.length > 500) return;
+    var id = currentRecord.rule_id || currentRecord.document_id;
+    pendingSave = {url:'/api/admin/restore/' + currentKind + '/' + encodeURIComponent(id), method:'POST', id:id,
+        body:{history_id:historyId, revision:currentRecord.revision, reason:reason}};
+    previewChanges(currentRecord, JSON.parse(row.before_json));
+}
+
+async function confirmSave() {
+    // 대화상자에서 확정한 데이터만 저장한다. DB는 버전을 다시 검사한다.
+    if (!pendingSave) return;
+    var request = pendingSave;
+    var button = document.getElementById('confirmSave'); button.disabled = true;
+    try {
+        var result = await adminFetch(request.url, request.method, request.body);
+        document.getElementById('savePreview').close(); pendingSave = null;
+        document.getElementById('adminStatus').textContent = result.message;
+        document.getElementById('reviewFilter').value = 'all';
+        document.getElementById('recordQuery').value = '';
+        await loadRecords(null, result.record_id || request.id);
+    } catch (error) { document.getElementById('savePreview').close(); document.getElementById('adminStatus').textContent = error.message; }
+    finally { button.disabled = false; }
+}
+
+function newRecord() {
+    creating = true; currentRecord = null; historyRequest += 1;
+    currentKind = document.getElementById('recordKind').value;
+    document.getElementById('editForm').reset();
+    document.getElementById('editForm').hidden = false;
+    document.getElementById('createFields').hidden = false;
+    document.getElementById('officialName').hidden = currentKind !== 'rules';
+    document.querySelector('label[for="officialName"]').hidden = currentKind !== 'rules';
+    document.getElementById('sourceType').hidden = currentKind !== 'documents';
+    document.querySelector('label[for="sourceType"]').hidden = currentKind !== 'documents';
+    document.getElementById('ruleFields').hidden = currentKind !== 'rules';
+    document.getElementById('documentFields').hidden = currentKind !== 'documents';
+    document.getElementById('verification').value = 'review_needed';
+    document.getElementById('recordActive').checked = false;
+    document.getElementById('sourceUrl').value = 'https://smartclean.yangcheon.go.kr/online/bulky/guide';
+    document.getElementById('historyList').replaceChildren();
+    document.getElementById('adminStatus').textContent = '새 자료는 사용 중지·추가 확인 필요 상태로 시작합니다. 확인 후 공개 여부를 선택하세요.';
+}
+
+
 document.addEventListener('DOMContentLoaded', async function() {
+    document.getElementById('newRecord').onclick = newRecord;
+    document.getElementById('confirmSave').onclick = confirmSave;
+    document.getElementById('cancelSave').onclick = function() { document.getElementById('savePreview').close(); pendingSave = null; };
+    document.getElementById('reviewFilter').onchange = loadRecords;
+    if (new URLSearchParams(location.search).get('filter') === 'review') document.getElementById('reviewFilter').value = 'review';
     document.getElementById('loginForm').onsubmit = login;
     document.getElementById('recordSearch').onsubmit = loadRecords;
     document.getElementById('recordKind').onchange = loadRecords;

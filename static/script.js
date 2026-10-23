@@ -63,6 +63,17 @@ function renderHubList() {
 }
 // 클릭한 거점의 받은 분석 수치와 확인할 점을 후보 탭에 표시한다.
 function showHubDetail(feature) {
+    // 주민에게는 거점 설명만, 운영자에게는 분석 필터와 상세 근거를 보여준다.
+    if (!document.getElementById('navRouteBtn')) {
+        showPanel('search');
+        var hub = feature.properties;
+        var resident = document.getElementById('residentHubDetail');
+        resident.replaceChildren(textNode('h3', '생활권 ' + hub['생활권'] + ' · 제안 거점'), textNode('p', hub['이름']));
+        resident.append(textNode('p', '생활권 담당 거점의 보행거리 참고: 평균 ' + fmt(hub['평균보행_m']) + 'm'));
+        resident.append(textNode('small', '운영 승인 전 분석 제안입니다. 대형폐기물의 공식 배출장소가 아닙니다.'));
+        resident.scrollIntoView({block:'nearest'});
+        return;
+    }
     showPanel('data');
     var row = feature.properties;
     var box = document.getElementById('hubDetail');
@@ -85,6 +96,7 @@ function selectBuilding(row) {
         refreshPlan();
     }
     showPanel('search');
+    document.getElementById('residentHubDetail').replaceChildren();
     var box = document.getElementById('selectedBuilding');
     box.replaceChildren(textNode('h3', row.name || row.address), textNode('p', row.address + ' / ' + row.jibun_address));
     box.append(textNode('p', '팀 대장 기준 ' + fmt(row.units) + ' 주거단위 · ' + row.housing_type));
@@ -253,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // 주소 검색 메뉴는 현재 페이지를 새로 열지 않고 기존 검색 탭으로 돌아간다.
 var navSearchBtn = document.getElementById('navSearchBtn');
-if (navSearchBtn) {
+if (navSearchBtn && new URLSearchParams(location.search).get('view') !== 'route') {
     navSearchBtn.onclick = function(event) {
         event.preventDefault();
         showPanel('search');

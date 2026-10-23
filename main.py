@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 from route_planner import load_route_data, plan_route
 from folium_report import build_folium_report, ZONE_COLORS
-from service_routes import router as service_router
+from service_routes import router as service_router, require_admin
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / '.env')
@@ -29,8 +29,18 @@ app.include_router(service_router)
 @app.middleware('http')
 async def protect_service_cache(request: Request, call_next):
     # 관리자 정보와 수정된 수수료가 브라우저 캐시에 남지 않게 한다.
+    path = request.url.path
+    protected = path.startswith('/analysis') or path == '/api/route' or (path == '/' and request.query_params.get('view') == 'route')
+    if protected:
+        try:
+            require_admin(request)
+        except HTTPException:
+            if path.startswith('/api/'):
+                from fastapi.responses import JSONResponse
+                return JSONResponse({'detail': '관리자 로그인이 필요합니다.'}, status_code=401)
+            return RedirectResponse('/admin', status_code=303, headers={'Cache-Control': 'no-store'})
     response = await call_next(request)
-    if request.url.path.startswith(('/admin', '/disposal', '/api/admin', '/api/disposal', '/api/vision')):
+    if request.url.path.startswith(('/admin', '/analysis', '/api/route', '/disposal', '/api/admin', '/api/disposal', '/api/vision')):
         response.headers['Cache-Control'] = 'no-store'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'DENY'
@@ -128,7 +138,7 @@ def home(request: Request):
     return templates.TemplateResponse(
         request=request,
         name='index.html',
-        context={'kakao_key': os.getenv('KAKAO_JAVASCRIPT_KEY', '')}
+        context={'kakao_key': os.getenv('KAKAO_JAVASCRIPT_KEY', ''), 'route_mode': request.query_params.get('view') == 'route'}
     )
 
 

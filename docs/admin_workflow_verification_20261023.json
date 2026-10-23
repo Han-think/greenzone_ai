@@ -1,0 +1,89 @@
+{
+  "scope": "isolated temporary SQLite; no live data edits",
+  "checks": [
+    {
+      "check": "anonymous analysis redirects",
+      "passed": true
+    },
+    {
+      "check": "anonymous route API denied",
+      "passed": true
+    },
+    {
+      "check": "public home remains public",
+      "passed": true
+    },
+    {
+      "check": "public about renders",
+      "passed": true
+    },
+    {
+      "check": "configured administrator login",
+      "passed": true
+    },
+    {
+      "check": "authenticated analysis renders",
+      "passed": true
+    },
+    {
+      "check": "create new record",
+      "passed": true
+    },
+    {
+      "check": "inactive creation excluded from public items",
+      "passed": true
+    },
+    {
+      "check": "update record",
+      "passed": true
+    },
+    {
+      "check": "stale revision rejected",
+      "passed": true
+    },
+    {
+      "check": "creation and update histories kept",
+      "passed": true
+    },
+    {
+      "check": "restore previous record",
+      "passed": true
+    },
+    {
+      "check": "restore keeps incrementing revision and restores inactive fee",
+      "passed": true
+    },
+    {
+      "check": "restore adds history",
+      "passed": true
+    },
+    {
+      "check": "cannot restore before creation",
+      "passed": true
+    },
+    {
+      "check": "unofficial source blocked",
+      "passed": true
+    },
+    {
+      "check": "logout revokes protected access",
+      "passed": true
+    },
+    {
+      "check": "create new document",
+      "passed": true
+    },
+    {
+      "check": "unreviewed document not public",
+      "passed": true
+    },
+    {
+      "check": "verified document becomes public",
+      "passed": true
+    },
+    {
+      "check": "law creation requires effective date",
+      "passed": true
+    }
+  ]
+}

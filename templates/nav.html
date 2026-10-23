@@ -1,0 +1,23 @@
+{% set admin_area = request.url.path.startswith('/admin') or request.url.path.startswith('/analysis') or request.query_params.get('view') == 'route' %}
+<nav class="app-nav" aria-label="{{ '관리자 메뉴' if admin_area else '주 메뉴' }}">
+  <div class="nav-brand"><a href="/">GreenZone</a><button id="menuToggle" type="button" aria-expanded="false" aria-controls="navLinks">메뉴</button></div>
+  <div id="navLinks" class="nav-links">
+    <small class="nav-section">주민 서비스</small>
+    <a id="navSearchBtn" class="nav-btn {{ 'active' if request.url.path == '/' and not admin_area else '' }}" href="/">우리 집 거점 찾기</a>
+    <a class="nav-btn {{ 'active' if request.url.path == '/disposal' else '' }}" href="/disposal">폐기물 배출 안내</a>
+    <a class="nav-btn {{ 'active' if request.url.path == '/about' else '' }}" href="/about">서비스 소개</a>
+    {% if admin_area %}<details id="adminNav" class="admin-nav-group" {{ 'hidden' if request.url.path == '/admin' else '' }}>
+      <summary id="adminEntry" class="nav-btn admin-menu-title">관리자 화면</summary>
+      <div class="admin-submenu">
+      <a class="nav-btn {{ 'active' if request.url.path == '/admin' and request.query_params.get('filter') != 'review' else '' }}" href="/admin">안내 자료 관리</a>
+      <a class="nav-btn {{ 'active' if request.query_params.get('filter') == 'review' else '' }}" href="/admin?filter=review">검토할 자료</a>
+      <a class="nav-btn {{ 'active' if request.url.path.startswith('/analysis') else '' }}" href="/analysis">거점 분석 지도</a>
+      <a id="navRouteBtn" class="nav-btn {{ 'active' if request.query_params.get('view') == 'route' else '' }}" href="/?view=route">수거 경로안</a>
+      <button id="navLogout" type="button">로그아웃</button>
+      </div>
+    </details>
+    <a id="adminLoginEntry" class="nav-btn nav-admin-entry" href="/admin">관리자 로그인</a>
+    {% else %}<a id="adminEntry" class="nav-btn nav-admin-entry" href="/admin">관리자 로그인</a>{% endif %}
+  </div>
+</nav>
+<script src="/static/nav.js?v=20261023-persist"></script>

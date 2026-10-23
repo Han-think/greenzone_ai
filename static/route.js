@@ -227,6 +227,7 @@ function initializeAnalysis() {
     refreshPlan();
     document.getElementById('openRoute').disabled = false;
     document.getElementById('openRoute').onclick = openRoutePanel;
-    document.getElementById('navRouteBtn').onclick = openRoutePanel;
+    var routeMenu = document.getElementById('navRouteBtn');
+    if (routeMenu) routeMenu.onclick = openRoutePanel;
     if (new URLSearchParams(window.location.search).get('view') === 'route') openRoutePanel();
 }

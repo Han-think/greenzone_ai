@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>그린존 · 폐기물 배출 도우미</title>
-    <link rel="stylesheet" href="/static/nav.css"><link rel="stylesheet" href="/static/service.css?v=20261023-ux1">
+    <link rel="stylesheet" href="/static/nav.css?v=20261023-fold2"><link rel="stylesheet" href="/static/service.css?v=20261023-ux1">
 </head>
 <body class="disposal-page">
-<nav class="app-nav" aria-label="메인메뉴">
-    <h2>GreenZone</h2>
-    <a class="nav-btn" href="/">주소 검색</a><a class="nav-btn" href="/?view=route">수거 경로안</a>
-    <a class="nav-btn" href="/analysis">분석 지도</a>
-    <a class="nav-btn active" href="/disposal" aria-current="page">배출 도우미</a><a class="nav-btn" href="/admin">관리자</a>
-</nav>
+{% include 'nav.html' %}
 <main class="service-page">
     <h1>무엇을 버리시나요?</h1>
     <p class="notice">양천구 신월1동 기준 · 사진 없이 직접 선택할 수 있습니다. 지도 거점안은 대형폐기물의 공식 배출장소가 아닙니다.</p>

@@ -5,6 +5,7 @@ LLM·임베딩은 아직 호출하지 않는다. 수수료는 선택한 DB 행�
 """
 import json
 import sqlite3
+import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -70,6 +71,10 @@ def connect_database():
             for row in read_json(KNOWLEDGE / 'legal_documents.json')['documents']:
                 insert_record(connection, 'documents', row['document_id'], row)
             connection.execute("INSERT INTO seeds(name) VALUES ('legal-20261021-v1')")
+        if not connection.execute("SELECT name FROM seeds WHERE name='guide-supplement-20261023'").fetchone():
+            for row in read_json(KNOWLEDGE / 'guide_supplement_20261023.json')['documents']:
+                insert_record(connection, 'documents', row['document_id'], row)
+            connection.execute("INSERT INTO seeds(name) VALUES ('guide-supplement-20261023')")
         connection.commit()
     except Exception:
         connection.rollback()
@@ -192,5 +197,34 @@ def read_history(kind, record_id):
         for row in rows:
             result.append(dict(row))
         return result
+    finally:
+        connection.close()
+
+
+def create_record(kind, changes, name, source_type, reason, actor):
+    # 공식 식별자를 사용자가 임의로 바꾸지 않도록 서버가 새 ID를 만든다.
+    connection = connect_database()
+    try:
+        connection.execute('BEGIN IMMEDIATE')
+        record_id = 'ADMIN-' + uuid.uuid4().hex[:12]
+        row = dict(changes)
+        row.update(district_code='11470', updated_at=now_text())
+        if kind == 'rules':
+            existing = connection.execute("SELECT payload FROM records WHERE kind='rules'").fetchall()
+            matched = next((json.loads(r['payload']) for r in existing
+                if json.loads(r['payload']).get('official_name') == name), None)
+            row.update(rule_id=record_id, item_id=matched['item_id'] if matched else 'ITEM-' + uuid.uuid4().hex[:12],
+                official_name=name, aliases=matched.get('aliases', []) if matched else [])
+        else:
+            row.update(document_id=record_id, source_type=source_type)
+        encoded = json.dumps(row, ensure_ascii=False)
+        connection.execute('INSERT INTO records(kind,record_id,payload) VALUES (?,?,?)', (kind,record_id,encoded))
+        connection.execute('INSERT INTO history(kind,record_id,before_json,after_json,reason,actor,changed_at) VALUES (?,?,?,?,?,?,?)',
+            (kind,record_id,'null',encoded,reason,actor,now_text()))
+        connection.commit()
+        return record_id
+    except Exception:
+        connection.rollback()
+        raise
     finally:
         connection.close()

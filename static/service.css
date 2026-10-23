@@ -69,3 +69,8 @@ summary { cursor: pointer; font-weight: bold; }
     .disposal-page .flow-note { font-size: 13px; }
     .disposal-page .service-page { padding: 12px; }
 }
+
+/* 저장 전 확인창은 작은 화면에서도 스크롤하여 확인한다. */
+dialog { width: min(650px,92vw); max-height: 85dvh; overflow-y: auto; border: 1px solid #b9cec1; border-radius: 12px; color: #293e34; }
+dialog::backdrop { background: #10251d88; }
+#previewChanges p { white-space: pre-wrap; overflow-wrap: anywhere; border-bottom: 1px solid #e1ebe4; padding-bottom: 8px; }

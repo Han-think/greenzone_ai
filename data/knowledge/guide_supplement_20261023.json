@@ -1,0 +1,47 @@
+{
+  "prepared_on": "2026-10-23",
+  "documents": [
+    {
+      "document_id": "YC-GUIDE-REFUND-20261023",
+      "title": "양천구 대형폐기물 취소·환불 안내",
+      "text": "신청 취소는 신고일로부터 10일 이내에 가능하며 이미 수거된 품목은 취소와 환불이 불가합니다. 환불은 영업일 기준 통상 3~5일 정도 걸릴 수 있습니다. 실제 신청의 취소 가능 여부와 처리 상태는 공식 신청 내역에서 확인해야 합니다.",
+      "district_code": "11470",
+      "source_url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+      "checked_at": "2026-10-23",
+      "effective_from": null,
+      "effective_until": null,
+      "source_type": "official_web_summary",
+      "verification_status": "verified_excerpt",
+      "active": true,
+      "content_kind": "official_web_summary_with_scope_notes"
+    },
+    {
+      "document_id": "YC-GUIDE-CERAMIC-20261023",
+      "title": "양천구 깨진 유리·도자기 배출 안내",
+      "text": "깨진 유리와 도자기 조각 등 불에 타지 않는 폐기물은 불연성종량제봉투에 담아 배출하도록 안내합니다. 이는 깨진 조각에 관한 안내이며 멀쩡한 가구나 대형 물품 전체에 적용하는 기준이 아닙니다.",
+      "district_code": "11470",
+      "source_url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+      "checked_at": "2026-10-23",
+      "effective_from": null,
+      "effective_until": null,
+      "source_type": "official_web_summary",
+      "verification_status": "verified_excerpt",
+      "active": true,
+      "content_kind": "official_web_summary_with_scope_notes"
+    },
+    {
+      "document_id": "YC-GUIDE-PENALTY-20261023",
+      "title": "양천구 신고 없는 대형폐기물 배출 유의사항",
+      "text": "양천구 공식 이용 안내는 대형폐기물을 신고 없이 배출하면 무단투기로 간주되어 100만원 이하의 과태료가 부과된다고 설명합니다. 이는 공식 웹의 상한 안내이며 개별 사안에서 무조건 100만원이 부과된다는 뜻이 아닙니다. 개별 부과 여부와 금액은 담당 기관에 확인해야 합니다.",
+      "district_code": "11470",
+      "source_url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+      "checked_at": "2026-10-23",
+      "effective_from": null,
+      "effective_until": null,
+      "source_type": "official_web_summary",
+      "verification_status": "verified_excerpt",
+      "active": true,
+      "content_kind": "official_web_summary_with_scope_notes"
+    }
+  ]
+}
