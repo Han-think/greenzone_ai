@@ -588,3 +588,49 @@ a {
 .manual-route-list li { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
 .manual-route-list select { width: 70px; flex: none; }
 .manual-route-list span { font-size: 12px; }
+
+/* 검색 패널 토글: 펼쳤을 때는 패널 안에, 접었을 때는 지도 왼쪽 위에 이름을 표시한다. */
+body.map-page .sidebar-toggle {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+    flex-shrink: 0;
+    gap: 8px;
+    width: auto;
+    min-width: 112px;
+    height: 36px;
+    margin: 0 0 10px auto;
+    padding: 6px 12px;
+    transform: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #245b40;
+    background: #fafcfb;
+    white-space: nowrap;
+}
+body.map-page .sidebar-toggle::before { display: none; }
+body.map-page .sidebar-toggle::after { content: '‹'; font-size: 20px; }
+body.map-page.map-sidebar-collapsed .sidebar-toggle {
+    position: absolute;
+    top: 64px;
+    left: 46px;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    height: 38px;
+    transform: none;
+    background: #fafcfb;
+    pointer-events: auto;
+}
+body.map-page.map-sidebar-collapsed .sidebar-toggle::after { content: '›'; }
+@media (orientation: portrait) {
+    body.map-page.map-sidebar-collapsed .sidebar-toggle { left: 12px; }
+}
+@media print { body.map-page .sidebar-toggle { display: none; } }

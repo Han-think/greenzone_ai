@@ -24,7 +24,13 @@ function setMapSidebarCollapsed(collapsed) {
 
     var toggle = document.getElementById('sidebarToggle');
     toggle.setAttribute('aria-expanded', String(!collapsed));
-    toggle.setAttribute('aria-label', collapsed ? '검색 메뉴 펼치기' : '검색 메뉴 접기');
+    // 화살표만 두지 않고 버튼이 여는 기능을 글자로 알려준다.
+    toggle.textContent = collapsed ? '주소 검색' : '검색창 접기';
+    toggle.setAttribute('aria-label', collapsed ? '주소 검색' : '검색창 접기');
+    if (!collapsed) {
+        showPanel('search');
+        document.getElementById('keyword').focus({preventScroll: true});
+    }
 
     if (!sidebarCenterToRestore) return;
     sidebarTransitionHandler = function(event) {
