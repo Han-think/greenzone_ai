@@ -17,6 +17,8 @@ var mapResizeTimer;
 var mapCenterAnimationFrame;
 var mapCenterAnimationTarget;
 var mapSidebarTransitionActive = false;
+var mapSidebarTransitionCenter;
+var mapSidebarResizeFrame;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
 // 팀 지도 브랜치의 거리/점선 함수. 원래 배정은 유지하고 두 대표점의 관계만 표시한다.
@@ -80,6 +82,29 @@ function relayoutMapKeepingCenter(center) {
     map.relayout();
     lastStableMapSize = currentMapSize();
     animateMapCenter(targetCenter, 170);
+}
+
+function beginMapSidebarTransition(center) {
+    clearTimeout(mapResizeTimer);
+    mapSidebarTransitionCenter = center || map.getCenter();
+    mapSidebarTransitionActive = true;
+    if (mapCenterAnimationFrame !== undefined) {
+        cancelAnimationFrame(mapCenterAnimationFrame);
+        mapCenterAnimationFrame = undefined;
+    }
+    mapCenterAnimationTarget = null;
+}
+
+function finishMapSidebarTransition(center) {
+    if (!map) return;
+    clearTimeout(mapResizeTimer);
+    var targetCenter = center || mapSidebarTransitionCenter || lastStableMapCenter || map.getCenter();
+    map.relayout();
+    map.setCenter(targetCenter);
+    lastStableMapSize = currentMapSize();
+    lastStableMapCenter = targetCenter;
+    mapSidebarTransitionActive = false;
+    mapSidebarTransitionCenter = null;
 }
 
 function animateMapCenter(targetCenter, duration) {
@@ -516,7 +541,19 @@ function initializeMap() {
             var mapResizeObserver = new ResizeObserver(function() {
                 var size = currentMapSize();
                 if (size.width === lastStableMapSize.width && size.height === lastStableMapSize.height) return;
-                if (mapSidebarTransitionActive) return;
+                if (mapSidebarTransitionActive) {
+                    if (mapSidebarResizeFrame !== undefined) return;
+                    mapSidebarResizeFrame = requestAnimationFrame(function() {
+                        mapSidebarResizeFrame = undefined;
+                        if (!mapSidebarTransitionActive) return;
+                        var center = mapSidebarTransitionCenter || lastStableMapCenter || map.getCenter();
+                        map.relayout();
+                        map.setCenter(center);
+                        lastStableMapSize = currentMapSize();
+                        lastStableMapCenter = center;
+                    });
+                    return;
+                }
                 clearTimeout(mapResizeTimer);
                 mapResizeTimer = setTimeout(function() {
                     relayoutMapKeepingCenter(mapCenterAnimationTarget || lastStableMapCenter);
@@ -536,6 +573,7 @@ window.addEventListener('resize', function() {
     if (!map) return;
     clearTimeout(mapResizeTimer);
     mapResizeTimer = setTimeout(function() {
+        if (mapSidebarTransitionActive) return;
         relayoutMapKeepingCenter(mapCenterAnimationTarget || lastStableMapCenter);
     }, 180);
 });

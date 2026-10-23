@@ -7,11 +7,19 @@ var searchBusy = false;
 var wasteLoaded = false;
 var sidebarCenterRestoreTimer;
 var sidebarCenterToRestore;
+var sidebarTransitionHandler;
 
 function setMapSidebarCollapsed(collapsed) {
     var isCollapsed = document.body.classList.contains('map-sidebar-collapsed');
     if (isCollapsed === collapsed) return;
-    sidebarCenterToRestore = map ? map.getCenter() : null;
+    sidebarCenterToRestore = map ? (mapCenterAnimationTarget || map.getCenter()) : null;
+    clearTimeout(sidebarCenterRestoreTimer);
+    var panel = document.getElementById('searchPanel');
+    if (sidebarTransitionHandler) {
+        panel.removeEventListener('transitionend', sidebarTransitionHandler);
+        sidebarTransitionHandler = null;
+    }
+    if (sidebarCenterToRestore) beginMapSidebarTransition(sidebarCenterToRestore);
     document.body.classList.toggle('map-sidebar-collapsed', collapsed);
 
     var toggle = document.getElementById('sidebarToggle');
@@ -19,16 +27,22 @@ function setMapSidebarCollapsed(collapsed) {
     toggle.setAttribute('aria-label', collapsed ? '검색 메뉴 펼치기' : '검색 메뉴 접기');
 
     if (!sidebarCenterToRestore) return;
-    clearTimeout(sidebarCenterRestoreTimer);
-    mapSidebarTransitionActive = true;
-    sidebarCenterRestoreTimer = setTimeout(restoreSidebarMapCenter, 240);
+    sidebarTransitionHandler = function(event) {
+        if (event.target !== panel || !['width', 'height', 'flex-basis'].includes(event.propertyName)) return;
+        restoreSidebarMapCenter();
+    };
+    panel.addEventListener('transitionend', sidebarTransitionHandler);
+    sidebarCenterRestoreTimer = setTimeout(restoreSidebarMapCenter, 300);
 }
 
 function restoreSidebarMapCenter() {
-    if (map && sidebarCenterToRestore) {
-        relayoutMapKeepingCenter(sidebarCenterToRestore);
+    var panel = document.getElementById('searchPanel');
+    if (sidebarTransitionHandler) {
+        panel.removeEventListener('transitionend', sidebarTransitionHandler);
+        sidebarTransitionHandler = null;
     }
-    mapSidebarTransitionActive = false;
+    clearTimeout(sidebarCenterRestoreTimer);
+    if (map && sidebarCenterToRestore) finishMapSidebarTransition(sidebarCenterToRestore);
     sidebarCenterToRestore = null;
     sidebarCenterRestoreTimer = null;
 }
