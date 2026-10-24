@@ -39,7 +39,9 @@ def record_result(result, seconds, usage):
         client = opik.Opik()
         trace = client.trace(name='사용자 사진 품목 후보',
             input={'기능': 'Gemini 품목 후보 제안', '사진기록': False},
-            output={'상태': result['state'], '후보': result['candidates']},
+            # 모델의 자유 설명에는 사진 속 문구가 섞일 수 있어 기록하지 않는다.
+            output={'상태': result['state'], '후보': [
+                {'item_id': row['item_id'], 'name': row['name']} for row in result['candidates']]},
             metadata={'모델': os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
                       '관측처리시간_초': round(seconds, 3), '토큰사용량': usage,
                       '환각자동심사': '미실행', '사용자최종선택': '이 로그에서 수집하지 않음'},

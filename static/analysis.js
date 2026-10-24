@@ -206,7 +206,7 @@ async function initializeReport() {
         analysisData = await response.json();
         analysisMap = L.map('analysisMap', {preferCanvas:true});
         var background = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+            referrerPolicy:'strict-origin-when-cross-origin', maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
         background.on('tileerror', function() {
             document.getElementById('backgroundStatus').textContent = '배경지도 일부를 못 불러왔습니다. 팀 도로·거점 자료는 계속 표시합니다.';
         });

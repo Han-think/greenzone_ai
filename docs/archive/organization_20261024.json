@@ -1,0 +1,253 @@
+{
+  "date": "2026-10-24",
+  "scope": "local file organization; no commit/push; application code/data inputs unchanged",
+  "backup": "data/local/cleanup_backup_20261024/before_organization.zip",
+  "application_code_files_unchanged": 51,
+  "actions": [
+    {
+      "action": "move",
+      "from": "docs/PROJECT_STATUS.md",
+      "to": "docs/status/README.md",
+      "sha256": "a4571a31139801b639e3d66abc58cb841c2dd390ceeb835f5b05f6a1c4aae05f"
+    },
+    {
+      "action": "move",
+      "from": "docs/PROJECT_STATUS.csv",
+      "to": "docs/status/requirements_status.csv",
+      "sha256": "127950214a316debcb60c877420620c24e2b86c8ce4da6dcacd3479d8546f5a1"
+    },
+    {
+      "action": "move",
+      "from": "docs/PUBLICATION_REVIEW.md",
+      "to": "docs/review/publication_review.md",
+      "sha256": "94dfb7b9d843452b8b77860b7dca6a596a6d9de5e558c29145722368e8a3f5c4"
+    },
+    {
+      "action": "move",
+      "from": "docs/PUBLIC_COPY_MANIFEST.json",
+      "to": "docs/review/public_copy_manifest.json",
+      "sha256": "5fb73144269059a2363dbac22ef74cde2ef4100695f46f693f868a35b32aa347"
+    },
+    {
+      "action": "move",
+      "from": "docs/RAG_QUALITY_EVALUATION.md",
+      "to": "docs/evaluation/rag_quality.md",
+      "sha256": "bf5f15e3d4e7029e44b9920530c64bce10f5b3053dc521582f2f1e70d5f1bda0"
+    },
+    {
+      "action": "move",
+      "from": "docs/EVALUATION_CONFLICT_CHECK.md",
+      "to": "docs/evaluation/conflict_check.md",
+      "sha256": "756202e15f88bb010720466d7f7a5f672acab040d9647f3d19cf8e12c7d1c58d"
+    },
+    {
+      "action": "move",
+      "from": "docs/YANGCHEON_EVAL_V1_REVIEW.md",
+      "to": "docs/evaluation/yangcheon_eval_v1_review.md",
+      "sha256": "f639987c6588358e7ca9da3f914aec572de0a0e9bf430539e27bcefcb23fde3a"
+    },
+    {
+      "action": "move",
+      "from": "docs/admin_workflow_verification_20261023.json",
+      "to": "docs/evaluation/admin_workflow_20261023.json",
+      "sha256": "82c3e2409cd4a5f2e4d008aeab46cf4b82aa44dba85677e335a9e0aa918d7a89"
+    },
+    {
+      "action": "move",
+      "from": "docs/rag_opik_verification_20261022.json",
+      "to": "docs/evaluation/rag_opik_verification_20261022.json",
+      "sha256": "715c99628e08f32a1ade85db29a394ed984f528e2d091c9c2592264f7692fd5d"
+    },
+    {
+      "action": "move",
+      "from": "docs/rag_quality_evaluation_20261023.json",
+      "to": "docs/evaluation/rag_quality_evaluation_20261023.json",
+      "sha256": "920b8bb7bb53e917d18344e30d3443f42f5892980c97d8778b39bdcd1a860d93"
+    },
+    {
+      "action": "move",
+      "from": "docs/rag_quality_recheck_20261023.json",
+      "to": "docs/evaluation/rag_quality_recheck_20261023.json",
+      "sha256": "e9630709a7e4786408c1b5610adf2978067a03624fd62044145dde9ad3576f3e"
+    },
+    {
+      "action": "move",
+      "from": "docs/rag_verification_20261022.json",
+      "to": "docs/evaluation/rag_verification_20261022.json",
+      "sha256": "35027af1ee00e71c1200d8b06c23cb9ccfa2b8ca55035708a0a04c1dc1b8891e"
+    },
+    {
+      "action": "move",
+      "from": "docs/rag_quality_evaluation_20261023.csv",
+      "to": "docs/evaluation/rag_quality_evaluation_20261023.csv",
+      "sha256": "7a02cde42dfe0e2a2c43f723f423eea0424a14f953d9fe57054fa0f971031572"
+    },
+    {
+      "action": "move",
+      "from": "docs/rag_quality_recheck_20261023.csv",
+      "to": "docs/evaluation/rag_quality_recheck_20261023.csv",
+      "sha256": "fbca85516dee38d7e507453498f172136bd2498c08b4a7535f38620ec4005bf1"
+    },
+    {
+      "action": "archive_then_remove_loose_file",
+      "from": "docs/HANDBOOK.md",
+      "to": "docs/archive/history_20261024.zip!/HANDBOOK.md",
+      "sha256": "b203bddac8973e7f30fd34c2738904a33df1207967a5fda33674751f4b33d3b1"
+    },
+    {
+      "action": "archive_then_remove_loose_file",
+      "from": "docs/REMAINING_TASKS.md",
+      "to": "docs/archive/history_20261024.zip!/REMAINING_TASKS.md",
+      "sha256": "32e6bf941cee14dd4980f3a380f0a1c9176aee1c5093cdc0cb51b0ebb5c0819a"
+    },
+    {
+      "action": "archive_then_remove_loose_file",
+      "from": "docs/GREENZONE_ARGUMENT_EVIDENCE_20261022.md",
+      "to": "docs/archive/history_20261024.zip!/GREENZONE_ARGUMENT_EVIDENCE_20261022.md",
+      "sha256": "3ca673ff3a93e0422742d28ae1f61f581218a182f1175266558bbb010421bdfa"
+    },
+    {
+      "action": "archive_then_remove_loose_file",
+      "from": "docs/GreenZone_Requirements_Status_20261022.xlsx",
+      "to": "docs/archive/history_20261024.zip!/GreenZone_Requirements_Status_20261022.xlsx",
+      "sha256": "77d371e896b52ed2dedc98c091cef1dccb1cc5eabbafeeb64a6a39ecd0e895ed"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "app/__pycache__/analysis_api.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "app/__pycache__/main.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "app/__pycache__/map_tiles.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "app/__pycache__/repository.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "app/__pycache__/__init__.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "scripts/__pycache__/test_rag.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "server/__pycache__/rag_service.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "server/__pycache__/__init__.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/address_service.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/analysis.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/analysis_service.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/data_catalog.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/folium_report.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/guide_service.cpython-312.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/guide_service.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/main.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/route_planner.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/service_routes.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "remove_generated_cache",
+      "from": "__pycache__/vision_service.cpython-314.pyc",
+      "backup": "data/local/cleanup_backup_20261024/before_organization.zip"
+    },
+    {
+      "action": "copy_latest_presentation",
+      "to": "docs/presentation/greenzone_presentation_20261024.pptx",
+      "sha256": "f6e3bce4117367e3db8e1292b3b494a45272ab5c2682d3fd9c374fa253da82eb"
+    },
+    {
+      "action": "copy_svg",
+      "to": "docs/presentation/assets/P11_data_spec_original_style.svg",
+      "sha256": "109436f77d22fbb50dca8acec15575a7eb8ca35a8c505aaf131604131f77a2e1"
+    },
+    {
+      "action": "copy_svg",
+      "to": "docs/presentation/assets/P13_accessibility_chart.svg",
+      "sha256": "34ac03a937e233be7a160108113c2e53ea515bff09b346dfdcc0e0df096161ec"
+    },
+    {
+      "action": "copy_svg",
+      "to": "docs/presentation/assets/P14_requirements_original_style.svg",
+      "sha256": "9fd657338685ff9351c50b3c5d640e687482f2c25175545070de336ed09d97c9"
+    },
+    {
+      "action": "copy_svg",
+      "to": "docs/presentation/assets/P15_logical_erd.svg",
+      "sha256": "94b66502a7f0101d0c53176b37ec4603e42840c76a0387368279bbfdc8df03c4"
+    },
+    {
+      "action": "copy_svg",
+      "to": "docs/presentation/assets/reference/P11_full_spec_with_sources.svg",
+      "sha256": "e1fcbf99d58d70312f629510e89ea28a7bbfd5824da5961f56bbbe258e321aed"
+    },
+    {
+      "action": "copy_svg",
+      "to": "docs/presentation/assets/reference/P14_detailed_status.svg",
+      "sha256": "42858a63d28ee3744b75dd52758de071d914f1fbb10fd9a7a4b71b08353467a4"
+    }
+  ],
+  "validation": {
+    "markdown_file_links_missing": 0,
+    "history_zip_entries_verified": 4,
+    "latest_presentation_source_sha256_matched": true,
+    "application_code_sha256_unchanged": 51,
+    "runtime_api_probe": "not verified: localhost:8000 connection unavailable; server not started or restarted by cleanup"
+  }
+}

@@ -50,8 +50,8 @@
 
 - `scripts/evaluate_rag_quality.py --run-live`: 외부 API 호출을 명시적으로 허용하고 로컬 원자료를 만든다. 실행마다 모델 응답이 달라질 수 있다.
 - `data/local/evaluation/rag_quality_20261023.json`: 평가 질문·답변·공식 문단 스냅샷·사용량. Git 제외. 재실행 시 기존 파일이 바뀌므로 별도 날짜 사본을 먼저 보존한다.
-- `docs/rag_quality_evaluation_20261023.csv`: 엑셀에서 볼 수 있는 질문·실제 답변·판정 표.
-- `docs/rag_quality_evaluation_20261023.json`: 검색 문단·출처·토큰·시간을 포함한 공유 가능한 고정 개발 질문 결과.
+- `docs/evaluation/rag_quality_evaluation_20261023.csv`: 엑셀에서 볼 수 있는 질문·실제 답변·판정 표.
+- `docs/evaluation/rag_quality_evaluation_20261023.json`: 검색 문단·출처·토큰·시간을 포함한 공유 가능한 고정 개발 질문 결과.
 - Opik의 기존 서비스 trace는 상태·근거ID·시간·사용량만 기록한다. 이 문서의 답변 내용 평가 점수는 Opik에 등록하지 않았다.
 - 팀원은 본인의 `.env`에 Gemini/Opik 설정을 넣는다. Opik 미설정 또는 기록 실패가 답변 내용 검증을 대신하거나 서비스 정답을 결정하지 않는다.
 

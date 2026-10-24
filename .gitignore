@@ -16,3 +16,9 @@ data/local/
 # 개인정보가 포함된 비공개 평가 원본은 Git에 넣지 않는다
 yangcheon_eval_v1.zip
 yangcheon_eval_v1/
+
+# 환경별 개인 설정과 인증 파일도 제외한다. 예제만 공유한다.
+.env.*
+!.env.example
+*.pem
+*.key
