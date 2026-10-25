@@ -134,6 +134,34 @@ function addRouteLine(coordinates, dashed) {
     line.setMap(map); routeLayers.push(line);
 }
 
+// 방문 거점 카드: 구간 거리는 도로망 계산값이며 거점 진입 거리는 제외한다.
+function routeStopClick(stop, number, result) {
+    return function(event) {
+        preventMapClick(event);
+        var hub = findHub(stop.id);
+        var name = hub ? hub.properties['이름'] : stop.id;
+        var details = '방문 순서 ' + number + ' · ' + stop.id + '\n' + name;
+        if (hub) details += '\n생활권 ' + hub.properties['생활권'];
+        for (var i = 0; i < result.legs.length; i++) {
+            var leg = result.legs[i];
+            if (leg.from === stop.id) {
+                details += '\n다음 거점 ' + leg.to + '까지 ' + fmt(leg.distance_m) + 'm';
+                break;
+            }
+        }
+        details += '\n도로 접속거리 ' + fmt(stop.snap_m) + 'm (운행거리 제외)';
+        details += '\n운영 승인 전 경로 제안';
+        showPointPopup(stop.road_coordinates, details, 'map-popup-subtle');
+        // 줄바꿈을 살리고 지도를 가운데로 옮겨 카드가 화면 위로 잘리지 않게 한다.
+        var card = selectedPopup.getContent();
+        card.style.width = '330px';
+        card.style.background = '#ffffff';
+        card.style.opacity = '1';
+        card.querySelector('p').style.whiteSpace = 'pre-line';
+        map.panTo(mapPoint(stop.road_coordinates));
+    };
+}
+
 function drawRoute(result) {
     // 실선=계산된 도로 경로, 점선=부지 진입을 확인해야 하는 거점↔도로 관계선이다.
     if (!map) return;
@@ -147,10 +175,14 @@ function drawRoute(result) {
         addRouteLine([stop.hub_coordinates, stop.road_coordinates], true);
         bounds.extend(mapPoint(stop.hub_coordinates));
         var number = result.order.indexOf(stop.id) + 1;
-        var label = textNode('span', number);
+        var label = textNode('button', number);
+        label.type = 'button';
         label.className = number === 1 ? 'route-marker route-start' : 'route-marker';
         label.setAttribute('aria-label', '방문 순서 ' + number + ' · ' + stop.id);
-        var marker = new kakao.maps.CustomOverlay({content: label, position: mapPoint(stop.road_coordinates), xAnchor: 0.5, yAnchor: 0.5, zIndex: 50});
+        // 경로 번호를 누르면 주소 검색 대신 해당 방문 거점의 상세 카드를 연다.
+        // 함수 인자로 현재 stop을 전달해 반복문이 끝나도 각 마커의 정보가 유지된다.
+        label.onclick = routeStopClick(stop, number, result);
+        var marker = new kakao.maps.CustomOverlay({content: label, position: mapPoint(stop.road_coordinates), xAnchor: 0.5, yAnchor: 0.5, clickable: true, zIndex: 50});
         marker.setMap(map); routeLayers.push(marker);
     }
     map.setBounds(bounds, 40, 40, 40, 40);

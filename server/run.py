@@ -21,7 +21,8 @@ def start_server(port=8000):
     # 로그인 세션이 메모리에 있으므로 이번 시연은 서버 프로세스 1개로 실행한다.
     print(f"그린존 실행 주소: http://localhost:{port}")
     print("종료하려면 이 터미널에서 Ctrl+C를 누르세요.")
-    uvicorn.run("main:app", host="localhost", port=port, workers=1)
+    # 주소 검색 쿼리가 터미널 접근 로그에 남지 않도록 기본 로그를 끈다.
+    uvicorn.run("main:app", host="localhost", port=port, workers=1, access_log=False)
 
 
 # 이 파일을 직접 실행했을 때만 서버를 켠다. import할 때는 실행하지 않는다.

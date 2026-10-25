@@ -4,9 +4,21 @@ var map;
 var studyBounds;
 var resultLayers = [];
 var searchMarker;
+var searchMarkerElement;
+var searchPopupPoint;
+var searchPopupText;
+var searchPopupOverlay;
 var selectedPopup;
 var addressGeocoder;
 var mapAddressRequest = 0;
+var lastStableMapCenter;
+var lastStableMapSize;
+var mapResizeTimer;
+var mapCenterAnimationFrame;
+var mapCenterAnimationTarget;
+var mapSidebarTransitionActive = false;
+var mapSidebarTransitionCenter;
+var mapSidebarResizeFrame;
 var zoneColors = ['#c4d8eb', '#e8d1bd', '#c4dfcf', '#dbceeb', '#e9cbd2', '#d8dfbd', '#bfe0e4', '#e7d9bc', '#cdd2e7'];
 
 // 팀 지도 브랜치의 거리/점선 함수. 원래 배정은 유지하고 두 대표점의 관계만 표시한다.
@@ -48,6 +60,83 @@ function mapPoint(coordinates) {
     return new kakao.maps.LatLng(coordinates[1], coordinates[0]);
 }
 
+function currentMapSize() {
+    var element = document.getElementById('map');
+    return {width: element.clientWidth, height: element.clientHeight};
+}
+
+function rememberMapCenterWhenSizeIsStable() {
+    if (!map || !lastStableMapSize || mapCenterAnimationFrame !== undefined) return;
+    var size = currentMapSize();
+    if (size.width !== lastStableMapSize.width || size.height !== lastStableMapSize.height) return;
+    lastStableMapCenter = map.getCenter();
+}
+
+function relayoutMapKeepingCenter(center) {
+    if (!map) return;
+    var targetCenter = center || mapCenterAnimationTarget || lastStableMapCenter || map.getCenter();
+    if (mapCenterAnimationFrame !== undefined) {
+        cancelAnimationFrame(mapCenterAnimationFrame);
+        mapCenterAnimationFrame = undefined;
+    }
+    map.relayout();
+    lastStableMapSize = currentMapSize();
+    animateMapCenter(targetCenter, 170);
+}
+
+function beginMapSidebarTransition(center) {
+    clearTimeout(mapResizeTimer);
+    mapSidebarTransitionCenter = center || map.getCenter();
+    mapSidebarTransitionActive = true;
+    if (mapCenterAnimationFrame !== undefined) {
+        cancelAnimationFrame(mapCenterAnimationFrame);
+        mapCenterAnimationFrame = undefined;
+    }
+    mapCenterAnimationTarget = null;
+}
+
+function finishMapSidebarTransition(center) {
+    if (!map) return;
+    clearTimeout(mapResizeTimer);
+    var targetCenter = center || mapSidebarTransitionCenter || lastStableMapCenter || map.getCenter();
+    map.relayout();
+    map.setCenter(targetCenter);
+    lastStableMapSize = currentMapSize();
+    lastStableMapCenter = targetCenter;
+    mapSidebarTransitionActive = false;
+    mapSidebarTransitionCenter = null;
+}
+
+function animateMapCenter(targetCenter, duration) {
+    var startCenter = map.getCenter();
+    var startLat = startCenter.getLat();
+    var startLng = startCenter.getLng();
+    var targetLat = targetCenter.getLat();
+    var targetLng = targetCenter.getLng();
+    var startedAt;
+    mapCenterAnimationTarget = targetCenter;
+
+    function step(timestamp) {
+        if (startedAt === undefined) startedAt = timestamp;
+        var progress = Math.min((timestamp - startedAt) / duration, 1);
+        var easedProgress = 1 - Math.pow(1 - progress, 2);
+        map.setCenter(new kakao.maps.LatLng(
+            startLat + (targetLat - startLat) * easedProgress,
+            startLng + (targetLng - startLng) * easedProgress
+        ));
+        if (progress < 1) {
+            mapCenterAnimationFrame = requestAnimationFrame(step);
+            return;
+        }
+        mapCenterAnimationFrame = undefined;
+        mapCenterAnimationTarget = null;
+        lastStableMapSize = currentMapSize();
+        lastStableMapCenter = map.getCenter();
+    }
+
+    mapCenterAnimationFrame = requestAnimationFrame(step);
+}
+
 // 생활권 보기 선택과 해당 자료의 생활권이 같은지 확인한다.
 function matchesZone(zone) {
     var selected = document.getElementById('zoneFilter').value;
@@ -60,7 +149,7 @@ function clearResults() {
         resultLayers[i].setMap(null);
     }
     resultLayers = [];
-    if (selectedPopup) selectedPopup.close();
+    closeSelectedPopup();
 }
 
 // 받은 다각형 좌표를 Kakao Polygon으로 표시한다.
@@ -94,6 +183,24 @@ function showStudyArea() {
     if (map) map.setBounds(studyBounds, 20, 20, 20, 20);
 }
 
+function closeSelectedPopup() {
+    if (!selectedPopup) return;
+    if (selectedPopup.close) selectedPopup.close();
+    else selectedPopup.setMap(null);
+    selectedPopup = null;
+}
+
+function showSearchPopup() {
+    if (!searchPopupPoint || searchPopupText === null) return;
+    showPointPopup(searchPopupPoint, searchPopupText, 'map-popup-subtle');
+    searchPopupOverlay = selectedPopup;
+}
+
+function preventMapClick(event) {
+    kakao.maps.event.preventMap();
+    if (event) event.stopPropagation();
+}
+
 // 다각형의 모든 점을 담는 Kakao 지도 범위를 만든다.
 function geometryBounds(geometry) {
     // 제공 SDK 연결: 다각형을 모두 담는 지도 범위를 구한다.
@@ -125,8 +232,37 @@ function showSelectedZone() {
 }
 
 // 좌표에 작은 설명 창을 표시한다.
-function showPointPopup(point, text) {
-    if (selectedPopup) selectedPopup.close();
+function showPointPopup(point, text, className) {
+    closeSelectedPopup();
+    if (className === 'map-popup-subtle') {
+        var content = document.createElement('div');
+        content.className = 'map-popup map-popup-subtle';
+        content.addEventListener('click', preventMapClick);
+        content.appendChild(textNode('p', text));
+        var closeButton = textNode('button', '×');
+        closeButton.type = 'button';
+        closeButton.className = 'map-popup-close';
+        closeButton.setAttribute('aria-label', '팝업 닫기');
+        var popup = new kakao.maps.CustomOverlay({
+            position: mapPoint(point),
+            content: content,
+            xAnchor: 0.5,
+            yAnchor: 1.15,
+            clickable: true,
+            zIndex: 50
+        });
+        kakao.maps.event.addListener(popup, 'click', preventMapClick);
+        closeButton.onclick = function(event) {
+            preventMapClick(event);
+            popup.setMap(null);
+            if (selectedPopup === popup) selectedPopup = null;
+            if (searchPopupOverlay === popup) searchPopupOverlay = null;
+        };
+        content.appendChild(closeButton);
+        selectedPopup = popup;
+        popup.setMap(map);
+        return;
+    }
     var content = textNode('p', text);
     content.className = 'map-popup';
     selectedPopup = new kakao.maps.InfoWindow({position: mapPoint(point), content: content, removable: true});
@@ -144,7 +280,7 @@ function openHub(id) {
     if (!map) return;
     map.setLevel(3);
     map.panTo(mapPoint(feature.geometry.coordinates));
-    showPointPopup(feature.geometry.coordinates, feature.properties['이름'] + ' / 분석 제안, 운영 승인 전');
+    showPointPopup(feature.geometry.coordinates, feature.properties['이름'] + ' / 분석 제안, 운영 승인 전', 'map-popup-subtle');
 }
 
 // 주거 필지 대표점을 작은 원으로 그린다.
@@ -152,7 +288,7 @@ function drawBuilding(row) {
     // 제공 SDK 연결: 필지 한 개를 그린다. 클릭하면 그 필지의 정보를 표시한다.
     var dot = new kakao.maps.Circle({center: mapPoint(row.coordinates), radius: 3, strokeWeight: 0, fillColor: '#397d66', fillOpacity: 0.7});
     kakao.maps.event.addListener(dot, 'click', function() {
-        kakao.maps.event.preventMap();
+        preventMapClick();
         selectBuilding(row);
     });
     dot.setMap(map);
@@ -167,11 +303,11 @@ function drawReference(feature, label, color, description) {
     button.className = 'map-dot reference-dot';
     button.style.background = color;
     button.setAttribute('aria-label', description);
-    button.onclick = function() {
-        kakao.maps.event.preventMap();
+    button.onclick = function(event) {
+        preventMapClick(event);
         showPointPopup(feature.geometry.coordinates, description);
     };
-    var marker = new kakao.maps.CustomOverlay({content: button, position: mapPoint(feature.geometry.coordinates), xAnchor: 0.5, yAnchor: 0.5, zIndex: 20});
+    var marker = new kakao.maps.CustomOverlay({content: button, position: mapPoint(feature.geometry.coordinates), xAnchor: 0.5, yAnchor: 0.5, clickable: true, zIndex: 20});
     marker.setMap(map);
     resultLayers.push(marker);
 }
@@ -184,11 +320,11 @@ function drawHub(feature) {
     button.className = 'map-dot';
     button.setAttribute('aria-label', '생활권 ' + row['생활권'] + ' · ' + row['거점id'] + ' · ' + row['이름']);
     if (row['거점id'].indexOf('A') === 0) button.classList.add('alternative-dot');
-    button.onclick = function() {
-        kakao.maps.event.preventMap();
+    button.onclick = function(event) {
+        preventMapClick(event);
         openHub(row['거점id']);
     };
-    var marker = new kakao.maps.CustomOverlay({content: button, position: mapPoint(feature.geometry.coordinates), xAnchor: 0.5, yAnchor: 0.5, zIndex: 30});
+    var marker = new kakao.maps.CustomOverlay({content: button, position: mapPoint(feature.geometry.coordinates), xAnchor: 0.5, yAnchor: 0.5, clickable: true, zIndex: 30});
     marker.setMap(map);
     resultLayers.push(marker);
 }
@@ -260,13 +396,45 @@ function drawAnalysisLayers() {
 function clearSearchPoint() {
     mapAddressRequest += 1;
     if (searchMarker) searchMarker.setMap(null);
-    if (selectedPopup) selectedPopup.close();
+    searchMarker = null;
+    searchMarkerElement = null;
+    searchPopupPoint = null;
+    searchPopupText = null;
+    searchPopupOverlay = null;
+    closeSelectedPopup();
 
     // 💡 검색 초기화 시, 우리가 그렸던 점선도 같이 지도에서 지워주기!
     if (searchDistanceLine) {
         searchDistanceLine.setMap(null);
         searchDistanceLine = null;
     }
+}
+
+function showSearchMarker(position) {
+    searchMarkerElement = document.createElement('span');
+    searchMarkerElement.className = 'search-location-marker';
+    searchMarkerElement.addEventListener('click', function(event) {
+        preventMapClick(event);
+        showSearchPopup();
+    });
+    searchMarker = new kakao.maps.CustomOverlay({
+        position: position,
+        content: searchMarkerElement,
+        xAnchor: 0.5,
+        yAnchor: 0.5,
+        clickable: true,
+        zIndex: 40
+    });
+    kakao.maps.event.addListener(searchMarker, 'click', preventMapClick);
+    searchMarker.setMap(map);
+    updateSearchMarkerSize();
+}
+
+function updateSearchMarkerSize() {
+    if (!map || !searchMarkerElement) return;
+    var size = Math.max(12, Math.min(22, 24 - map.getLevel()));
+    searchMarkerElement.style.width = size + 'px';
+    searchMarkerElement.style.height = size + 'px';
 }
 
 // 팀의 지도 클릭 주소 표시를 같은 카카오 JavaScript 키의 좌표→주소 기능으로 연결한다.
@@ -290,9 +458,11 @@ function showClickedAddress(position) {
         if (!address) return;
         clearSearchPoint();
         var point = [position.getLng(), position.getLat()];
-        searchMarker = new kakao.maps.Circle({center: position, radius: 6, strokeColor: '#fff', strokeWeight: 3, fillColor: '#2469c6', fillOpacity: 1, zIndex: 40});
-        searchMarker.setMap(map);
-        showPointPopup(point, address + ' / 지도에서 선택한 위치');
+        searchPopupPoint = point;
+        searchPopupText = address + ' / 지도에서 선택한 위치';
+        showSearchMarker(position);
+        searchPopupOverlay = null;
+        showSearchPopup();
         showPanel('search');
         var box = document.getElementById('selectedBuilding');
         box.replaceChildren(textNode('h3', '지도에서 선택한 위치'), textNode('p', address));
@@ -344,11 +514,13 @@ function showClickedAddress(position) {
 function showSearchPoint(building) {
     if (!map) return;
     clearSearchPoint();
-    searchMarker = new kakao.maps.Circle({center: mapPoint(building.coordinates), radius: 6, strokeColor: '#fff', strokeWeight: 3, fillColor: '#2469c6', fillOpacity: 1, zIndex: 40});
-    searchMarker.setMap(map);
+    searchPopupPoint = building.coordinates;
+    searchPopupText = building.address + ' / 주거 필지 대표점';
+    showSearchMarker(mapPoint(building.coordinates));
     map.setLevel(3);
     map.panTo(mapPoint(building.coordinates));
-    showPointPopup(building.coordinates, building.address + ' / 주거 필지 대표점');
+    searchPopupOverlay = null;
+    showSearchPopup();
 }
 
 // 카카오 SDK가 준비되면 지도를 만들고 첫 결과를 표시한다.
@@ -361,6 +533,34 @@ function initializeMap() {
     kakao.maps.load(function() {
         map = new kakao.maps.Map(document.getElementById('map'), {center: new kakao.maps.LatLng(37.533, 126.835), level: 5});
         map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+        lastStableMapSize = currentMapSize();
+        lastStableMapCenter = map.getCenter();
+        kakao.maps.event.addListener(map, 'center_changed', rememberMapCenterWhenSizeIsStable);
+        kakao.maps.event.addListener(map, 'zoom_changed', updateSearchMarkerSize);
+        if (window.ResizeObserver) {
+            var mapResizeObserver = new ResizeObserver(function() {
+                var size = currentMapSize();
+                if (size.width === lastStableMapSize.width && size.height === lastStableMapSize.height) return;
+                if (mapSidebarTransitionActive) {
+                    if (mapSidebarResizeFrame !== undefined) return;
+                    mapSidebarResizeFrame = requestAnimationFrame(function() {
+                        mapSidebarResizeFrame = undefined;
+                        if (!mapSidebarTransitionActive) return;
+                        var center = mapSidebarTransitionCenter || lastStableMapCenter || map.getCenter();
+                        map.relayout();
+                        map.setCenter(center);
+                        lastStableMapSize = currentMapSize();
+                        lastStableMapCenter = center;
+                    });
+                    return;
+                }
+                clearTimeout(mapResizeTimer);
+                mapResizeTimer = setTimeout(function() {
+                    relayoutMapKeepingCenter(mapCenterAnimationTarget || lastStableMapCenter);
+                }, 100);
+            });
+            mapResizeObserver.observe(document.getElementById('map'));
+        }
         if (kakao.maps.services) addressGeocoder = new kakao.maps.services.Geocoder();
         kakao.maps.event.addListener(map, 'click', function(event) { showClickedAddress(event.latLng); });
         studyBounds = geometryBounds(pageData.boundary.features[0].geometry);
@@ -370,5 +570,10 @@ function initializeMap() {
 }
 
 window.addEventListener('resize', function() {
-    if (map) map.relayout();
+    if (!map) return;
+    clearTimeout(mapResizeTimer);
+    mapResizeTimer = setTimeout(function() {
+        if (mapSidebarTransitionActive) return;
+        relayoutMapKeepingCenter(mapCenterAnimationTarget || lastStableMapCenter);
+    }, 180);
 });

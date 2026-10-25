@@ -5,7 +5,7 @@ SGIS_BOUNDARY: SGIS 2025 행정동 경계 (https://sgis.mods.go.kr/developer/htm
 SGIS_CENSUS: SGIS 가구·주택 통계 (https://sgis.mods.go.kr/developer/html/newOpenApi/api/dataApi/census.html)
 SGIS_HOUSE_TYPE_02: SGIS 아파트 주택 수 (https://sgis.mods.go.kr/developer/html/openApi/api/dataCode/HouseCode.html)
 ZONE_WASTE_15093944: 양천구 구역별쓰레기배출량 (https://www.data.go.kr/data/15093944/fileData.do)",공유 PNU/건물ID·용도·가구/세대 재집계. 과거 권역 배출량은 참고 추정.,use_summary.csv → 건물 검색·수요 카드,분산 배정·보행거리 결과 미제공
-REQ-DA-002,"TEAM_CANDIDATES: 팀원 1차 후보 11곳 (https://drive.google.com/file/d/1oUWGiz7uWY5-sxeAajXOkH3n63K3V7zb/view?usp=drivesdk)
+REQ-DA-002,"TEAM_CANDIDATES: 팀원 1차 후보 11곳 (팀 제공 자료; 공개 출처는 data/received/team_second_stage/source_manifest.json 참조)
 TEAM_ROADS: 행정안전부 도로명주소 전자지도의 팀 도로 레이어 (https://business.juso.go.kr/)
 TEAM_PROTECTION: 전국어린이·노인장애인보호구역 표준데이터의 팀 추출 결과 (https://www.data.go.kr/data/15012891/standard.do)
 TEAM_SITES: 전국주차장·도시공원·공공시설·공터 검토 결과 (https://www.data.go.kr/data/15012896/standard.do)",후보 ID·접도 도로명으로 조건·도로 속성 연결. 보호시설 수치/설명 불일치 표시.,candidate_review.csv → 후보 카드·도로/보호시설 지도,원본 CSV/SHP·현장 정차·보행·부지 동의 확인 필요
@@ -13,6 +13,6 @@ REQ-F-001,"BUILDING_HUB: 국토교통부 건축HUB 건축물대장 표제부 (ht
 VWORLD_BUILDINGS: VWorld 도로명주소건물 LT_C_SPBD (https://www.vworld.kr/)",분석대상 주소 정규화·부분/유사 일치 후 사용자가 선택.,주소 목록 → 건물ID → 지도·수요·배정 조회,공유 JSON에 건물명 전용 열 없음
 REQ-UI-001,"SGIS_BOUNDARY: SGIS 2025 행정동 경계 (https://sgis.mods.go.kr/developer/html/newOpenApi/api/dataApi/addressBoundary.html)
 TEAM_BOUNDARY: 팀 행정동 경계 ver20260701 (https://github.com/vuski/admdongkor)
-TEAM_CANDIDATES: 팀원 1차 후보 11곳 (https://drive.google.com/file/d/1oUWGiz7uWY5-sxeAajXOkH3n63K3V7zb/view?usp=drivesdk)
+TEAM_CANDIDATES: 팀원 1차 후보 11곳 (팀 제공 자료; 공개 출처는 data/received/team_second_stage/source_manifest.json 참조)
 TEAM_ROADS: 행정안전부 도로명주소 전자지도의 팀 도로 레이어 (https://business.juso.go.kr/)
 TEAM_PROTECTION: 전국어린이·노인장애인보호구역 표준데이터의 팀 추출 결과 (https://www.data.go.kr/data/15012891/standard.do)",EPSG:4326 좌표·공통 건물/후보 ID로 GeoJSON 연결.,일반/영상 지도·건물·후보·조건 표시,권역·방문순서 파일 미제공. 영상 키·실연결 확인 필요

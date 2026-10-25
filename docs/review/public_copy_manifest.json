@@ -1,0 +1,66 @@
+{
+  "checked_at": "2026-10-23",
+  "policy": "Original bytes are retained in Git-ignored local storage; published copies are metadata-cleaned. Original provenance hashes remain historical references.",
+  "files": [
+    {
+      "path": "data/received/archive/first_stage_source.zip",
+      "source_sha256": "7a26a7adeaaebd661a449f8a75220d2dca2da00e223903b0ceeb9451e202797b",
+      "public_sha256": "dc6d2ae3503b17d32c3679b5c0ca049e3ff8dae29711e5a0341b54f3a24d16b5",
+      "removed_metadata": [
+        "data/received/archive/first_stage_source.zip!3. 1차 결과물 코드 greenzone-analysis/data/team/greenzone_1st.xlsx!xl/workbook.xml:local_path_metadata_removed",
+        "data/received/archive/first_stage_source.zip!3. 1차 결과물 코드 greenzone-analysis/data/team/greenzone_1st.xlsx!docProps/core.xml:author_metadata_generalized",
+        "data/received/archive/first_stage_source.zip!3. 1차 결과물 코드 greenzone-analysis/data/team/greenzone_1st.xlsx!docProps/core.xml:author_metadata_generalized",
+        "data/received/archive/first_stage_source.zip!3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.xlsx!xl/workbook.xml:local_path_metadata_removed",
+        "data/received/archive/first_stage_source.zip!3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.xlsx!docProps/core.xml:author_metadata_generalized",
+        "data/received/archive/first_stage_source.zip!3. 1차 결과물 코드 greenzone-analysis/outputs/greenzone1st/greenzone1st.xlsx!docProps/core.xml:author_metadata_generalized"
+      ],
+      "content_scope": "ZIP packaging metadata only; worksheet cell XML not modified"
+    },
+    {
+      "path": "data/received/team_results/first_stage.xlsx",
+      "source_sha256": "967406dccdf946c5d4eaf061364ad95447949147749b42f73be03f73a69a5d5c",
+      "public_sha256": "1bfe3e81c70b5dfb8a28a6be5c4a03675d4423adb2a1abe22abadcad094426ea",
+      "removed_metadata": [
+        "data/received/team_results/first_stage.xlsx!xl/workbook.xml:local_path_metadata_removed",
+        "data/received/team_results/first_stage.xlsx!docProps/core.xml:author_metadata_generalized",
+        "data/received/team_results/first_stage.xlsx!docProps/core.xml:author_metadata_generalized"
+      ],
+      "content_scope": "ZIP packaging metadata only; worksheet cell XML not modified"
+    },
+    {
+      "path": "data/received/team_second_stage/greenzone2nd.xlsx",
+      "source_sha256": "0931949a90019441313f9c1dd66a64e426e1bf38b6728d0ed04b0de4810d4df5",
+      "public_sha256": "5c3c52ab2a0560d8fd95985563df112ecf879e28897c60f9f598ce0cf055516d",
+      "removed_metadata": [
+        "data/received/team_second_stage/greenzone2nd.xlsx!docProps/core.xml:author_metadata_generalized",
+        "data/received/team_second_stage/greenzone2nd.xlsx!docProps/core.xml:author_metadata_generalized"
+      ],
+      "content_scope": "ZIP packaging metadata only; worksheet cell XML not modified"
+    },
+    {
+      "path": "greenzone_data_analysis/greenzone2nd/data/team/greenzone1st.xlsx",
+      "source_sha256": "2c046e036471bd6c5be3164df2af82fc2d54f43b1f057ffba6343ce3a6feb2d3",
+      "public_sha256": "1bfe3e81c70b5dfb8a28a6be5c4a03675d4423adb2a1abe22abadcad094426ea",
+      "removed_metadata": [
+        "greenzone_data_analysis/greenzone2nd/data/team/greenzone1st.xlsx!xl/workbook.xml:local_path_metadata_removed",
+        "greenzone_data_analysis/greenzone2nd/data/team/greenzone1st.xlsx!docProps/core.xml:author_metadata_generalized",
+        "greenzone_data_analysis/greenzone2nd/data/team/greenzone1st.xlsx!docProps/core.xml:author_metadata_generalized"
+      ],
+      "content_scope": "ZIP packaging metadata only; worksheet cell XML not modified"
+    },
+    {
+      "path": "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd.xlsx",
+      "source_sha256": "0931949a90019441313f9c1dd66a64e426e1bf38b6728d0ed04b0de4810d4df5",
+      "public_sha256": "5c3c52ab2a0560d8fd95985563df112ecf879e28897c60f9f598ce0cf055516d",
+      "removed_metadata": [
+        "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd.xlsx!docProps/core.xml:author_metadata_generalized",
+        "greenzone_data_analysis/greenzone2nd/outputs/greenzone2nd/greenzone2nd.xlsx!docProps/core.xml:author_metadata_generalized"
+      ],
+      "content_scope": "ZIP packaging metadata only; worksheet cell XML not modified"
+    }
+  ],
+  "worksheet_preservation": {
+    "parts_compared": 40,
+    "all_unchanged": true
+  }
+}

@@ -5,6 +5,53 @@ var searchQuery = '';
 var searchPage = 0;
 var searchBusy = false;
 var wasteLoaded = false;
+var sidebarCenterRestoreTimer;
+var sidebarCenterToRestore;
+var sidebarTransitionHandler;
+
+function setMapSidebarCollapsed(collapsed) {
+    var isCollapsed = document.body.classList.contains('map-sidebar-collapsed');
+    if (isCollapsed === collapsed) return;
+    sidebarCenterToRestore = map ? (mapCenterAnimationTarget || map.getCenter()) : null;
+    clearTimeout(sidebarCenterRestoreTimer);
+    var panel = document.getElementById('searchPanel');
+    if (sidebarTransitionHandler) {
+        panel.removeEventListener('transitionend', sidebarTransitionHandler);
+        sidebarTransitionHandler = null;
+    }
+    if (sidebarCenterToRestore) beginMapSidebarTransition(sidebarCenterToRestore);
+    document.body.classList.toggle('map-sidebar-collapsed', collapsed);
+
+    var toggle = document.getElementById('sidebarToggle');
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    // 화살표만 두지 않고 버튼이 여는 기능을 글자로 알려준다.
+    toggle.textContent = collapsed ? '주소 검색' : '검색창 접기';
+    toggle.setAttribute('aria-label', collapsed ? '주소 검색' : '검색창 접기');
+    if (!collapsed) {
+        showPanel('search');
+        document.getElementById('keyword').focus({preventScroll: true});
+    }
+
+    if (!sidebarCenterToRestore) return;
+    sidebarTransitionHandler = function(event) {
+        if (event.target !== panel || !['width', 'height', 'flex-basis'].includes(event.propertyName)) return;
+        restoreSidebarMapCenter();
+    };
+    panel.addEventListener('transitionend', sidebarTransitionHandler);
+    sidebarCenterRestoreTimer = setTimeout(restoreSidebarMapCenter, 300);
+}
+
+function restoreSidebarMapCenter() {
+    var panel = document.getElementById('searchPanel');
+    if (sidebarTransitionHandler) {
+        panel.removeEventListener('transitionend', sidebarTransitionHandler);
+        sidebarTransitionHandler = null;
+    }
+    clearTimeout(sidebarCenterRestoreTimer);
+    if (map && sidebarCenterToRestore) finishMapSidebarTransition(sidebarCenterToRestore);
+    sidebarCenterToRestore = null;
+    sidebarCenterRestoreTimer = null;
+}
 
 // 팀의 탭을 전환한다. 검색 결과와 후보 선택 상태는 그대로 남긴다.
 function showPanel(panel) {
@@ -218,6 +265,12 @@ async function loadWaste() {
     } catch (error) { box.textContent = error.message; }
 }
 document.addEventListener('DOMContentLoaded', async function() {
+    var sidebarToggle = document.getElementById('sidebarToggle');
+    sidebarToggle.addEventListener('click', function() {
+        var expanded = this.getAttribute('aria-expanded') === 'true';
+        setMapSidebarCollapsed(expanded);
+    });
+
     document.getElementById('tabSearchBtn').onclick = function() { showPanel('search'); };
     document.getElementById('tabDataBtn').onclick = function() { showPanel('data'); };
     document.getElementById('searchForm').onsubmit = searchBuildings;
@@ -268,6 +321,7 @@ var navSearchBtn = document.getElementById('navSearchBtn');
 if (navSearchBtn && new URLSearchParams(location.search).get('view') !== 'route') {
     navSearchBtn.onclick = function(event) {
         event.preventDefault();
+        setMapSidebarCollapsed(false);
         showPanel('search');
     };
 }
