@@ -370,7 +370,7 @@ ADMIN_PASSWORD=
 
 실제 DB는 SQLite `records`·`history`·`seeds` 3테이블이고, GIS는 JSON/GeoJSON입니다. 자료 간 업무 관계를 이해하기 위한 **논리 ERD 11개 엔터티·14개 관계**를 별도로 제공합니다. 실제 서비스 DB를 새 구조로 바꾸지 않았습니다.
 
-![한국어 논리 ERD](docs/erd/greenzone_logical_erd.svg)
+![한국어 논리 ERD](docs/erd/greenzone_logical_erd.png)
 
 - [ERDCloud 임포트용 FK SQL](docs/erd/greenzone_logical_erd.sql)
 - [실제 SQLite DDL](docs/erd/greenzone_current_sqlite.sql)

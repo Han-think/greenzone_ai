@@ -6,7 +6,7 @@
 
 사용자가 제공한 `greenzone-ai-snapshot.json`은 9개 엔터티의 FK가 모두 비어 있었습니다. 그 컬럼 구성을 바탕으로 PK/FK와 1:N 관계를 선언하고 규칙/문서별 수정 이력을 연결했습니다. 추측한 ERDCloud 전용 JSON 관계 문법을 추가하지 않고 표준 FK SQL을 제공합니다.
 
-![그린존 논리 ERD](greenzone_logical_erd.svg)
+![그린존 논리 ERD](greenzone_logical_erd.png)
 
 ## 실제 구현과 논리 설명의 차이
 
