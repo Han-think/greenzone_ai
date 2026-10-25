@@ -371,6 +371,7 @@ a {
     display: block;
     width: 18px;
     height: 18px;
+    padding: 0;
     border: 3px solid #fff;
     border-radius: 50%;
     background: #2469c6;

@@ -198,7 +198,8 @@ function showSearchPopup() {
 
 function preventMapClick(event) {
     kakao.maps.event.preventMap();
-    if (event) event.stopPropagation();
+    // Kakao 지도 이벤트와 브라우저 클릭 이벤트는 모양이 다를 수 있어 확인 후 호출한다.
+    if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
 }
 
 // 다각형의 모든 점을 담는 Kakao 지도 범위를 만든다.
@@ -411,8 +412,11 @@ function clearSearchPoint() {
 }
 
 function showSearchMarker(position) {
-    searchMarkerElement = document.createElement('span');
+    // 버튼으로 만들어 마우스뿐 아니라 키보드로도 선택 위치 팝업을 다시 연다.
+    searchMarkerElement = document.createElement('button');
+    searchMarkerElement.type = 'button';
     searchMarkerElement.className = 'search-location-marker';
+    searchMarkerElement.setAttribute('aria-label', '선택 위치 팝업 다시 열기');
     searchMarkerElement.addEventListener('click', function(event) {
         preventMapClick(event);
         showSearchPopup();
