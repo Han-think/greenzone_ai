@@ -115,7 +115,7 @@ flowchart LR
 ### 생활권과 거점안
 
 1. **도로거리 계산**: 도로 중심선 그래프로 필지 사이의 접근 거리를 계산합니다.
-2. **생활권 구분**: 도로거리·등록 주거단위를 반영한 그래프에 Louvain을 적용합니다. 팀의 선택 설정은 연결 반경 150m, 해상도 γ=1입니다.
+2. **생활권 구분**: 도로거리·등록 주거단위를 반영한 그래프에 Louvain을 적용합니다. K-means처럼 생활권 수를 먼저 정하지 않고, 팀 보고서에서 연결 반경·해상도 18개 설정을 비교해 중앙값 9개를 확인했습니다. 최종 지도는 연결 반경 150m·해상도 γ=1의 9생활권 결과를 사용합니다. 이 민감도 분석은 팀 산출물이며 현재 웹에서 다시 계산한 결과는 아닙니다.
 3. **후보 연결**: 생활권 안에 1차 후보가 있으면 후보를 비교하고, 없는 생활권에는 새 대안 지점을 탐색합니다.
 4. **조건 검토**: 등록 도로폭 7m 이상·보호시설 반경 200m 밖 등의 분석 조건을 사용합니다.
 5. **결과 비교**: 평균 거리·상위 10% 지점의 거리·최대 거리·기준 거리 안 비율을 비교합니다.
@@ -292,6 +292,7 @@ if (!(Test-Path .env)) { Copy-Item .env.example .env }
 KAKAO_JAVASCRIPT_KEY=
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash-lite
+RAG_EMBEDDING_MODEL=gemini-embedding-001
 OPIK_ENABLED=false
 OPIK_API_KEY=
 OPIK_WORKSPACE=
@@ -308,7 +309,7 @@ ADMIN_PASSWORD=
 
 ### Gemini·Opik 키 설정
 
-- [Google AI Studio 키 발급](https://aistudio.google.com/api-keys)에서 받은 키 전체를 `GEMINI_API_KEY`에 입력합니다. 모델은 실제 확인한 `gemini-3.5-flash-lite`로 설정했습니다. 무료 한도·이용 가능 모델은 계정 상태에 따라 달라집니다.
+- [Google AI Studio 키 발급](https://aistudio.google.com/api-keys)에서 받은 키 전체를 `GEMINI_API_KEY`에 입력합니다. 사진 후보 모델은 `GEMINI_MODEL=gemini-3.5-flash-lite`, RAG 임베딩 모델은 `RAG_EMBEDDING_MODEL=gemini-embedding-001`이며 같은 키를 사용합니다. 무료 한도·이용 가능 모델은 계정 상태에 따라 달라집니다.
 - [Comet API 키 설정](https://www.comet.com/api/my/settings/)에서 받은 키를 `OPIK_API_KEY`에, Opik 주소의 워크스페이스명을 `OPIK_WORKSPACE`에 입력합니다. `OPIK_ENABLED=true`일 때 사진 없는 호출 결과를 기록합니다. 필요 없으면 `false`로 둡니다.
 - 관리자 비밀번호는 `.env`의 `ADMIN_PASSWORD`에 16자 이상으로 설정합니다. 현재 로컬 계정 값은 문서에 공개하지 않습니다.
 - `.env`를 변경하면 서버를 재시작합니다. 키를 브라우저 JavaScript나 Git에 넣지 않습니다.
@@ -368,9 +369,9 @@ ADMIN_PASSWORD=
 
 ## 11. 데이터 연결 ERD
 
-실제 DB는 SQLite `records`·`history`·`seeds` 3테이블이고, GIS는 JSON/GeoJSON입니다. 자료 간 업무 관계를 이해하기 위한 **논리 ERD 11개 엔터티·14개 관계**를 별도로 제공합니다. 실제 서비스 DB를 새 구조로 바꾸지 않았습니다.
+실제 DB는 SQLite `records`·`history`·`seeds` 3테이블이고, GIS는 JSON/GeoJSON입니다. 아래 그림은 제출 발표자료 17쪽과 같은 **논리 ERD 요약도(11개 엔터티·14개 관계)**입니다. 실선은 논리 모델의 키 연결, 점선은 URL에서 파생한 출처 연결이나 `history.kind`별 이력 표현입니다. 그림은 핵심 컬럼을 보여주며 전체 필드 정의는 SQL에 있습니다. 실제 서비스 DB를 새 구조로 바꾸지 않았습니다.
 
-![한국어 논리 ERD](docs/erd/greenzone_logical_erd.png)
+![발표자료 17쪽과 동일한 그린존 논리 ERD 요약도](docs/erd/greenzone_logical_erd.png)
 
 - [ERDCloud 임포트용 FK SQL](docs/erd/greenzone_logical_erd.sql)
 - [실제 SQLite DDL](docs/erd/greenzone_current_sqlite.sql)
@@ -459,13 +460,13 @@ Opik은 후보·보류·오류·시간을 기록한 도구입니다. **환각 �
 
 ![배출 도우미 PC 화면](docs/screenshots/review_20261023_disposal_view.png)
 
-남은 확인은 팀원 독립 검토와 다른 PC 실행 재현입니다. 최종 제출 PDF는 저장소의 2026-10-24 참조 PPTX와 다른 31쪽 파일이므로, 제출 PDF 28쪽의 미병합 문구와 데이터 명세 번호 표기를 별도로 맞춰야 합니다.
+남은 확인은 팀원 독립 검토와 다른 PC 실행 재현입니다. 제출용 PDF(31쪽)는 저장소의 2026-10-24 참조 PPTX(28장)와 별도 파일이며 저장소에는 넣지 않았습니다. 확인한 제출 PDF 28쪽에는 원격 master 반영 완료로 표시돼 있습니다. 12쪽 D01–D30은 팀 공유 명세, 저장소 CSV D01–D18은 별도 목록으로 번호를 1:1 대응하지 않습니다.
 
 ### 실제 답변 내용 평가
 
 [질문별 품질 평가](docs/evaluation/rag_quality.md) · [실제 답변 CSV](docs/evaluation/rag_quality_evaluation_20261023.csv)
 
-2026-10-23 고정 개발 질문 14건을 실제 호출하고 근거를 대조했습니다. 질문 충족 11건·부분 충족 3건이며, 이번 응답에서는 근거 없는 단정을 발견하지 못했습니다. **독립 평가나 전체 환각률을 뜻하지 않습니다.** 취소·환불, 도자기, 과태료 안내의 발췌 누락과 불필요한 재질문을 발견해 후속 항목으로 남겼습니다. Opik 기록 여부와 답변 내용의 적합성을 구분합니다.
+초기 평가에서는 2026-10-23 고정 개발 질문 14건 중 충족 11건·부분 충족 3건이었습니다. 공식 자료를 보완한 뒤 같은 질문을 재평가해 충족 13건·부분 충족 1건(Q08)을 기록했습니다. Q08은 답변 근거는 맞았지만 불필요한 재질문이 있어 부분 충족으로 남겼습니다. 두 결과 모두 **독립 정확도나 전체 환각률을 뜻하지 않습니다.** 질문·근거별 기록은 [평가 문서](docs/evaluation/rag_quality.md)에서 확인할 수 있으며, Opik 기록 여부와 답변 내용 평가는 구분합니다.
 
 ### 사용자·관리자 운영 구분 (2026-10-24 통합본)
 
